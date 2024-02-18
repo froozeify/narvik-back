@@ -1,7 +1,4 @@
 # Narvik - Back
-[Gitlab](https://wh.benoit-vignal.fr/fftir/narvik/narvik-back)
-
-Explication du projet
 
 ## Fonctionnalités
 - Gestion de la présence des membres

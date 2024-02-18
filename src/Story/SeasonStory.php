@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Story;
+
+use App\Factory\SeasonFactory;
+use Zenstruck\Foundry\Story;
+
+final class SeasonStory extends Story {
+  const SEASONS = [
+    "2019/2020",
+    "2020/2021",
+    "2021/2022",
+    "2022/2023",
+    "2023/2024",
+  ];
+
+  public function build(): void {
+    foreach (self::SEASONS as $season) {
+      $this->addToPool('default_seasons', SeasonFactory::createOne([
+        'name' => $season
+      ]));
+    }
+  }
+}

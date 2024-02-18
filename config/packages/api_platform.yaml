@@ -1,0 +1,31 @@
+api_platform:
+    title: Narvik - Backend
+    version: 0.0.1
+    formats:
+        jsonld: ['application/ld+json']
+        json: ['application/json']
+    docs_formats:
+        json: ['application/json']
+        jsonld: ['application/ld+json']
+        jsonopenapi: ['application/vnd.openapi+json']
+        html: ['text/html']
+    defaults:
+        stateless: true
+        cache_headers:
+            vary: ['Content-Type', 'Authorization', 'Origin']
+        extra_properties:
+            standard_put: true
+            rfc_7807_compliant_errors: true
+        pagination_client_items_per_page: true
+        collection:
+            pagination:
+                items_per_page_parameter_name: itemsPerPage
+    event_listeners_backward_compatibility_layer: false
+    keep_legacy_inflector: false
+    path_segment_name_generator: api_platform.metadata.path_segment_name_generator.dash
+    
+    swagger:
+        api_keys:
+            JWT:
+                name: Authorization
+                type: header

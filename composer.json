@@ -1,0 +1,118 @@
+{
+    "name": "benoit-vignal/narvik-back",
+    "version": "1.0.0",
+    "type": "project",
+    "license": "GNU AGPLv3",
+    "description": "App to manage member presence in a french shooting club",
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.2.11",
+        "ext-ctype": "*",
+        "ext-iconv": "*",
+        "api-platform/core": "^3.2",
+        "doctrine/annotations": "^2.0",
+        "doctrine/doctrine-bundle": "^2.11",
+        "doctrine/doctrine-migrations-bundle": "^3.2",
+        "doctrine/orm": "^2.17",
+        "gesdinet/jwt-refresh-token-bundle": "^1.2",
+        "league/csv": "^9.11",
+        "lexik/jwt-authentication-bundle": "^2.20",
+        "nelmio/cors-bundle": "^2.4",
+        "phpdocumentor/reflection-docblock": "^5.3",
+        "phpoffice/phpspreadsheet": "^1.29",
+        "phpstan/phpdoc-parser": "^1.25",
+        "runtime/frankenphp-symfony": "dev-main",
+        "symfony/asset": "7.0.*",
+        "symfony/console": "7.0.*",
+        "symfony/doctrine-messenger": "7.0.*",
+        "symfony/dotenv": "7.0.*",
+        "symfony/expression-language": "7.0.*",
+        "symfony/filesystem": "7.0.*",
+        "symfony/flex": "^2",
+        "symfony/form": "7.0.*",
+        "symfony/framework-bundle": "7.0.*",
+        "symfony/mime": "7.0.*",
+        "symfony/monolog-bundle": "^3.0",
+        "symfony/property-access": "7.0.*",
+        "symfony/property-info": "7.0.*",
+        "symfony/runtime": "7.0.*",
+        "symfony/security-bundle": "7.0.*",
+        "symfony/serializer": "7.0.*",
+        "symfony/twig-bundle": "7.0.*",
+        "symfony/validator": "7.0.*",
+        "symfony/yaml": "7.0.*",
+        "twig/extra-bundle": "^3.8",
+        "twig/twig": "^3.8",
+        "zenstruck/foundry": "^1.36"
+    },
+    "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^3.4",
+        "symfony/debug-bundle": "7.0.*",
+        "symfony/maker-bundle": "^1.51",
+        "symfony/stopwatch": "7.0.*",
+        "symfony/web-profiler-bundle": "7.0.*"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true,
+            "symfony/flex": true,
+            "symfony/runtime": true
+        },
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
+    "replace": {
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-iconv": "*",
+        "symfony/polyfill-php72": "*",
+        "symfony/polyfill-php73": "*",
+        "symfony/polyfill-php74": "*",
+        "symfony/polyfill-php80": "*",
+        "symfony/polyfill-php81": "*"
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ],
+        "reload-db": [
+            "php bin/console doctrine:database:drop --force",
+            "php bin/console doctrine:database:create",
+            "@reload-fixture"
+        ],
+        "reload-schema": [
+            "php bin/console doctrine:schema:drop --force",
+            "php bin/console doctrine:schema:update --force"
+        ],
+        "reload-fixture": [
+            "@reload-schema",
+            "php bin/console doctrine:fixtures:load -q"
+        ]
+    },
+    "conflict": {
+        "symfony/symfony": "*"
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": false,
+            "require": "7.0.*",
+            "docker": true
+        }
+    }
+}

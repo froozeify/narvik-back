@@ -8,13 +8,21 @@ use ApiPlatform\Metadata\Get;
 use App\State\ImageProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 
+
 #[ApiResource(
-  provider: ImageProvider::class,
+  operations: [
+    new Get(),
+
+    new Get(
+      uriTemplate: '/public/images/{id}',
+      name: 'public_image'
+    ),
+  ],
   normalizationContext: [
     'groups' => ['image']
-  ]
+  ],
+  provider: ImageProvider::class,
 )]
-#[Get]
 class Image {
 
   #[ApiProperty(identifier: true)]

@@ -7,8 +7,13 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\OpenApi\Model;
+use App\Controller\GlobalSettingGetPublic;
+use App\Controller\GlobalSettingImportLogo;
 use App\Repository\GlobalSettingRepository;
 use Doctrine\ORM\Mapping as ORM;
+
 
 #[ORM\Entity(repositoryClass: GlobalSettingRepository::class)]
 #[ApiResource(
@@ -16,6 +21,35 @@ use Doctrine\ORM\Mapping as ORM;
     new GetCollection(),
     new Get(),
     new Patch(),
+
+    new Get(
+      uriTemplate: '/public/global-settings/{name}',
+      controller: GlobalSettingGetPublic::class,
+    ),
+
+    new Post(
+      uriTemplate: '/global-settings/-/logo',
+      controller: GlobalSettingImportLogo::class,
+      openapi: new Model\Operation(
+        requestBody: new Model\RequestBody(
+          content: new \ArrayObject([
+            'multipart/form-data' => [
+              'schema' => [
+                'type' => 'object',
+                'properties' => [
+                  'file' => [
+                    'type' => 'string',
+                    'format' => 'binary'
+                  ]
+                ]
+              ]
+            ]
+          ])
+        )
+      ),
+      security: "is_granted('ROLE_ADMIN')",
+      deserialize: false,
+    )
   ]
 )]
 class GlobalSetting {

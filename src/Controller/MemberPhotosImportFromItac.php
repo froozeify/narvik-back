@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Service\MemberPhotoService;
+use App\Service\ImageService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class MemberPhotosImportFromItac extends AbstractController {
 
-  public function __invoke(Request $request, MemberPhotoService $importPhotosService): JsonResponse {
+  public function __invoke(Request $request, ImageService $importPhotosService): JsonResponse {
     /** @var UploadedFile|null $uploadedFile */
     $uploadedFile = $request->files->get('file');
     if (!$uploadedFile) {
@@ -22,7 +22,7 @@ class MemberPhotosImportFromItac extends AbstractController {
       throw new BadRequestHttpException('The "file" must be a ZIP');
     }
 
-    $importPhotosService->importFromFile($uploadedFile);
+    $importPhotosService->importItacPhotos($uploadedFile);
 
     return new JsonResponse();
   }

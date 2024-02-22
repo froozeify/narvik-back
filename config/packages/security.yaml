@@ -56,8 +56,10 @@ security:
         - { path: ^/docs, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI docs
         - { route: ^/auth, roles: PUBLIC_ACCESS }
         - { route: 'auth_bdg', roles: PUBLIC_ACCESS }
+        - { path: ^/public, roles: PUBLIC_ACCESS }
+
         - { path: ^/images, roles: [ROLE_ADMIN, ROLE_BADGER]}
-        
+
         - {path: ^/self, roles: [ ROLE_MEMBER, ROLE_BADGER ]}
 
         - { path: ^/activities, roles: [ROLE_SUPERVISOR, ROLE_BADGER]}

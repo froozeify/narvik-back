@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class MemberPhotoService {
+class ImageService {
 
   public function __construct(
     private Filesystem $fs,
@@ -25,11 +25,23 @@ class MemberPhotoService {
   }
 
 
-  public function importFromFile(UploadedFile $file): void {
-    $imagesFolder = $this->params->get('app.members_photos');
-    if (!$this->fs->exists($imagesFolder)) {
-      mkdir($imagesFolder, recursive: true);
+  private function createFolderIfNotExist(string $path): void {
+    if (!$this->fs->exists($path)) {
+      mkdir($path, recursive: true);
     }
+  }
+
+  public function importLogo(UploadedFile $file): string {
+    $publicFolder = $this->params->get('app.public_image');
+    $this->createFolderIfNotExist($publicFolder);
+
+    $file->move($publicFolder, "logo.png");
+    return bin2hex("logo.png");
+  }
+
+  public function importItacPhotos(UploadedFile $file): void {
+    $imagesFolder = $this->params->get('app.members_photos');
+    $this->createFolderIfNotExist($imagesFolder);
 
     $zipArchive = new \ZipArchive();
     $zipArchive->open($file->getRealPath());
@@ -51,39 +63,9 @@ class MemberPhotoService {
     $memberImage = $this->params->get('app.members_photos') . "/$licence";
     foreach ($possibleExtensions as $extension) {
       if ($this->fs->exists("$memberImage.$extension")) {
-        return "/images/" . base64_encode("members/$licence.$extension");
+        return "/images/" . bin2hex("members/$licence.$extension");
       }
     }
     return null;
-  }
-
-  public function loadImageFromPublicPath(string $publicId): ?Image {
-    $path = base64_decode($publicId);
-    if (!str_starts_with($path, "members/")) {
-      return null;
-    }
-
-    $imageFolder = $this->params->get('app.members_photos');
-    $filename = substr($path, 8);
-
-    if ($this->fs->exists("$imageFolder/$filename")) {
-      $image = new Image();
-      $image->setId($publicId)
-        ->setName($filename);
-
-      $this->setDataUri("$imageFolder/$filename", $image);
-
-      return $image;
-    }
-    return null;
-  }
-
-  private function setDataUri($imagePath, Image $image): void {
-    $finfo = new \finfo(FILEINFO_MIME_TYPE);
-    $type = $finfo->file($imagePath);
-
-    $data = "data:$type;base64," . base64_encode(file_get_contents($imagePath));
-    $image->setMimeType($type)
-      ->setBase64($data);
   }
 }

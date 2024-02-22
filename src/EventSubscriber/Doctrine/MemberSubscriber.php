@@ -8,7 +8,7 @@ use App\Repository\ActivityRepository;
 use App\Repository\MemberPresenceRepository;
 use App\Repository\MemberRepository;
 use App\Service\GlobalSettingService;
-use App\Service\MemberPhotoService;
+use App\Service\ImageService;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\Event\PostLoadEventArgs;
 use Doctrine\ORM\Event\PrePersistEventArgs;
@@ -19,7 +19,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class MemberSubscriber extends AbstractEventSubscriber {
   public function __construct(
     private UserPasswordHasherInterface $passwordHasher,
-    private MemberPhotoService $memberPhotoService,
+    private ImageService $imageService,
     private GlobalSettingService $globalSettingService,
     private ActivityRepository $activityRepository,
     private MemberPresenceRepository $memberPresenceRepository,
@@ -31,7 +31,7 @@ class MemberSubscriber extends AbstractEventSubscriber {
   }
 
   public function postLoad(Member $member, PostLoadEventArgs $args): void {
-    if ($member->getLicence() && $photoPath = $this->memberPhotoService->getMemberPhotoPath($member->getLicence())) {
+    if ($member->getLicence() && $photoPath = $this->imageService->getMemberPhotoPath($member->getLicence())) {
       $member->setProfileImage($photoPath);
     }
 

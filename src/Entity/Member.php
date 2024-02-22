@@ -163,7 +163,7 @@ class Member implements UserInterface, PasswordAuthenticatedUserInterface {
   #[ORM\Id]
   #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
   #[ORM\Column]
-  #[Groups(['member-read', 'member-presence-read'])]
+  #[Groups(['member-read', 'member-presence-read', 'autocomplete'])]
   private ?int $id = null;
 
   #[Groups(['member-read', 'member-presence-read'])]

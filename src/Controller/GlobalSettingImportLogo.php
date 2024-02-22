@@ -27,10 +27,10 @@ class GlobalSettingImportLogo extends AbstractController {
       throw new BadRequestHttpException('The "file" must be a PNG');
     }
 
-    $imageService->importLogo($uploadedFile);
+    $logoId = $imageService->importLogo($uploadedFile);
 
     // For the moment the path is hardcoded
-    $globalSettingService->updateSettingValue(GlobalSetting::LOGO, base64_encode("logo.png"));
+    $globalSettingService->updateSettingValue(GlobalSetting::LOGO, $logoId);
 
     return new JsonResponse();
   }

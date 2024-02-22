@@ -53,10 +53,16 @@ class ImageProvider implements ProviderInterface {
     return null;
   }
 
-  private function loadImageFromProtectedPath(string $publicId): ?Image {
-    $path = base64_decode($publicId);
+  private function decodeEncodedUriId(string $encodedId): ?string {
+    if (!ctype_xdigit($encodedId)) return null;
 
-    if (str_contains('./', $path)) {
+    return hex2bin($encodedId);
+  }
+
+  private function loadImageFromProtectedPath(string $publicId): ?Image {
+    $path = $this->decodeEncodedUriId($publicId);
+
+    if (!$path || str_contains('./', $path)) {
       return null;
     }
 
@@ -66,10 +72,10 @@ class ImageProvider implements ProviderInterface {
   }
 
   private function loadImageFromPublicPath(string $publicId): ?Image {
-    $path = base64_decode($publicId);
+    $path = $this->decodeEncodedUriId($publicId);
 
     // Public resource is at root
-    if (str_contains('/', $path)) {
+    if (!$path || str_contains('/', $path)) {
       return null;
     }
 

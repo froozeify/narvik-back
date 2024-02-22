@@ -31,11 +31,12 @@ class ImageService {
     }
   }
 
-  public function importLogo(UploadedFile $file): void {
+  public function importLogo(UploadedFile $file): string {
     $publicFolder = $this->params->get('app.public_image');
     $this->createFolderIfNotExist($publicFolder);
 
     $file->move($publicFolder, "logo.png");
+    return bin2hex("logo.png");
   }
 
   public function importItacPhotos(UploadedFile $file): void {
@@ -62,7 +63,7 @@ class ImageService {
     $memberImage = $this->params->get('app.members_photos') . "/$licence";
     foreach ($possibleExtensions as $extension) {
       if ($this->fs->exists("$memberImage.$extension")) {
-        return "/images/" . base64_encode("members/$licence.$extension");
+        return "/images/" . bin2hex("members/$licence.$extension");
       }
     }
     return null;

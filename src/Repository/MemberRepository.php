@@ -73,7 +73,7 @@ class MemberRepository extends ServiceEntityRepository implements PasswordUpgrad
     );
 
     $matches = [];
-    preg_match("/^(\d+)-\d+$/m", $string, $matches);
+    preg_match("/^(\d+)-(\d|\/)+$/m", $string, $matches);
 
     if (!empty($matches)) {
       $qb->setParameter('licence', $matches[1]);

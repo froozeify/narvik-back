@@ -75,23 +75,31 @@ use Symfony\Component\Validator\Constraints as Assert;
     ),
 
 
-    new GetCollection(
-      uriTemplate: '/members/-/search/{id}',
+    new Post(
+      uriTemplate: '/members/-/search',
       controller: MemberSearchByLicenceOrName::class,
       openapi: new Model\Operation(
         summary: 'Search members matching the query (by licence or fullName)',
-        parameters: [
-          new Model\Parameter(
-            name: 'id',
-            in: 'path',
-            description: 'The search string',
-            required: true
-          )
-        ]
+        requestBody: new Model\RequestBody(
+          content: new \ArrayObject([
+            'application/json' => [
+              'schema' => [
+                'type' => 'object',
+                'properties' => [
+                  'query' => [
+                    'type' => 'string',
+                  ]
+                ]
+              ]
+            ]
+          ])
+        ),
       ),
       normalizationContext: ['groups' => 'autocomplete'],
       read: false,
-      write: false
+      deserialize: false,
+      write: false,
+      serialize: false,
     ),
     new Post(
       uriTemplate: '/members/-/from-itac',
@@ -155,7 +163,7 @@ class Member implements UserInterface, PasswordAuthenticatedUserInterface {
   #[ORM\Id]
   #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
   #[ORM\Column]
-  #[Groups(['member-read', 'member-presence-read'])]
+  #[Groups(['member-read', 'member-presence-read', 'autocomplete'])]
   private ?int $id = null;
 
   #[Groups(['member-read', 'member-presence-read'])]

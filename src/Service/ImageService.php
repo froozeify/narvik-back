@@ -58,6 +58,8 @@ class ImageService {
     $possibleExtensions = [
       'jpg',
       'JPG',
+      'jpeg',
+      'JPEG'
     ];
 
     $memberImage = $this->params->get('app.members_photos') . "/$licence";

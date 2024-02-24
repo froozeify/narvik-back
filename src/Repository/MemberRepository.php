@@ -57,6 +57,8 @@ class MemberRepository extends ServiceEntityRepository implements PasswordUpgrad
    * @return array
    */
   public function findByLicenceOrName(string $string): array {
+    $string = trim($string);
+
     $qb = $this->createQueryBuilder("m");
     $qb
       ->andWhere(
@@ -73,7 +75,7 @@ class MemberRepository extends ServiceEntityRepository implements PasswordUpgrad
     );
 
     $matches = [];
-    preg_match("/^(\d+)-(\d|\/)+$/m", $string, $matches);
+    preg_match("/^(\d{8,})/m", $string, $matches);
 
     if (!empty($matches)) {
       $qb->setParameter('licence', $matches[1]);

@@ -15,7 +15,7 @@ class MemberPresenceToday extends AbstractController {
     $todayPresentMembers = $memberPresenceRepository->findAllPresentToday();
 
     $controlShootingActivity = $globalSettingService->getSettingValue(GlobalSetting::CONTROL_SHOOTING_ACTIVITY_ID);
-    if ($controlShootingActivity) {
+    if ($controlShootingActivity && is_numeric($controlShootingActivity)) {
       $controlShootingActivity = $activityRepository->find($controlShootingActivity);
       if ($controlShootingActivity) {
         foreach ($todayPresentMembers as $memberPresence) {

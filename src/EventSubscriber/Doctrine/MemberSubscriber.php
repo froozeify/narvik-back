@@ -36,7 +36,7 @@ class MemberSubscriber extends AbstractEventSubscriber {
     }
 
     $controlShootingActivity = $this->globalSettingService->getSettingValue(GlobalSetting::CONTROL_SHOOTING_ACTIVITY_ID);
-    if ($controlShootingActivity) {
+    if ($controlShootingActivity && is_numeric($controlShootingActivity)) {
       $controlShootingActivity = $this->activityRepository->find($controlShootingActivity);
       if ($controlShootingActivity) {
         $presence = $this->memberPresenceRepository->findLastOneByActivity($member, $controlShootingActivity);

@@ -16,6 +16,7 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\MemberPresencesFromItac;
 use App\Controller\MemberPresenceToday;
+use App\Filter\MultipleFilter;
 use App\Repository\MemberPresenceRepository;
 use App\Validator\Constraints\ActivityMustBeEnabled;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -26,7 +27,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: MemberPresenceRepository::class)]
-#[UniqueEntity(fields: ['member', 'date'], message: 'Member already registered for today')]
+#[UniqueEntity(fields: ['member', 'date'], message: 'Member already registered for that day')]
 #[ApiResource(
   operations: [
     new GetCollection(),
@@ -91,6 +92,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
 )]
 #[ApiFilter(DateFilter::class, properties: ['date' => DateFilter::EXCLUDE_NULL])]
 #[ApiFilter(OrderFilter::class, properties: ['date' => 'DESC'])]
+#[ApiFilter(MultipleFilter::class, properties: ['member.firstname', 'member.lastname', 'member.licence'])]
+
 class MemberPresence {
   #[ORM\Id]
   #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
@@ -104,7 +107,7 @@ class MemberPresence {
   private ?Member $member = null;
 
   #[ORM\Column(type: Types::DATE_IMMUTABLE)]
-  #[Groups(['member-presence-read'])]
+  #[Groups(['member-presence'])]
   private ?\DateTimeImmutable $date = null;
 
   #[ORM\ManyToMany(targetEntity: Activity::class, inversedBy: 'memberPresences')]

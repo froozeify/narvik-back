@@ -6,11 +6,13 @@ use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\ExternalPresenceToday;
+use App\Filter\MultipleFilter;
 use App\Repository\ExternalPresenceRepository;
 use App\Validator\Constraints\ActivityMustBeEnabled;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -21,12 +23,15 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ExternalPresenceRepository::class)]
-#[UniqueEntity(fields: ['licence', 'date'], message: 'Member already registered for today')]
+#[UniqueEntity(fields: ['licence', 'date'], message: 'Member already registered for that day')]
 #[ApiResource(
   operations: [
     new GetCollection(),
     new Post(),
     new Patch(),
+    new Delete(
+      security: "is_granted('ROLE_SUPERVISOR')"
+    ),
 
     new GetCollection(
       uriTemplate: '/external-presences/-/today',
@@ -47,6 +52,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 )]
 #[ApiFilter(DateFilter::class, properties: ['date' => DateFilter::EXCLUDE_NULL])]
 #[ApiFilter(OrderFilter::class, properties: ['date' => 'DESC'])]
+#[ApiFilter(MultipleFilter::class, properties: ['firstname', 'lastname', 'licence'])]
 class ExternalPresence {
   #[ORM\Id]
   #[ORM\GeneratedValue(strategy: 'SEQUENCE')]

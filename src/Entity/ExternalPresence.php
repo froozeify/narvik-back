@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\ExternalPresenceToday;
+use App\Filter\MultipleFilter;
 use App\Repository\ExternalPresenceRepository;
 use App\Validator\Constraints\ActivityMustBeEnabled;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -47,6 +48,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 )]
 #[ApiFilter(DateFilter::class, properties: ['date' => DateFilter::EXCLUDE_NULL])]
 #[ApiFilter(OrderFilter::class, properties: ['date' => 'DESC'])]
+#[ApiFilter(MultipleFilter::class, properties: ['firstname', 'lastname', 'licence'])]
 class ExternalPresence {
   #[ORM\Id]
   #[ORM\GeneratedValue(strategy: 'SEQUENCE')]

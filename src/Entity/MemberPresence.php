@@ -16,6 +16,7 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\MemberPresencesFromItac;
 use App\Controller\MemberPresenceToday;
+use App\Filter\MultipleFilter;
 use App\Repository\MemberPresenceRepository;
 use App\Validator\Constraints\ActivityMustBeEnabled;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -91,6 +92,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
 )]
 #[ApiFilter(DateFilter::class, properties: ['date' => DateFilter::EXCLUDE_NULL])]
 #[ApiFilter(OrderFilter::class, properties: ['date' => 'DESC'])]
+#[ApiFilter(MultipleFilter::class, properties: ['member.firstname', 'member.lastname', 'member.licence'])]
+
 class MemberPresence {
   #[ORM\Id]
   #[ORM\GeneratedValue(strategy: 'SEQUENCE')]

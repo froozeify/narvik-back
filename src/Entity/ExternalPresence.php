@@ -23,7 +23,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ExternalPresenceRepository::class)]
-#[UniqueEntity(fields: ['licence', 'date'], message: 'Member already registered for today')]
+#[UniqueEntity(fields: ['licence', 'date'], message: 'Member already registered for that day')]
 #[ApiResource(
   operations: [
     new GetCollection(),

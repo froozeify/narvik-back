@@ -27,7 +27,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: MemberPresenceRepository::class)]
-#[UniqueEntity(fields: ['member', 'date'], message: 'Member already registered for today')]
+#[UniqueEntity(fields: ['member', 'date'], message: 'Member already registered for that day')]
 #[ApiResource(
   operations: [
     new GetCollection(),
@@ -107,7 +107,7 @@ class MemberPresence {
   private ?Member $member = null;
 
   #[ORM\Column(type: Types::DATE_IMMUTABLE)]
-  #[Groups(['member-presence-read'])]
+  #[Groups(['member-presence'])]
   private ?\DateTimeImmutable $date = null;
 
   #[ORM\ManyToMany(targetEntity: Activity::class, inversedBy: 'memberPresences')]

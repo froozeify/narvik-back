@@ -6,6 +6,7 @@ use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
@@ -28,6 +29,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
     new GetCollection(),
     new Post(),
     new Patch(),
+    new Delete(
+      security: "is_granted('ROLE_SUPERVISOR')"
+    ),
 
     new GetCollection(
       uriTemplate: '/external-presences/-/today',

@@ -34,9 +34,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     new Get(),
     new Post(),
     new Patch(),
-    new Delete(
-      security: "is_granted('ROLE_ADMIN')"
-    ),
+    new Delete(),
 
     new GetCollection(
       uriTemplate: '/member-presences/-/today',

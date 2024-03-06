@@ -29,9 +29,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     new GetCollection(),
     new Post(),
     new Patch(),
-    new Delete(
-      security: "is_granted('ROLE_SUPERVISOR')"
-    ),
+    new Delete(),
 
     new GetCollection(
       uriTemplate: '/external-presences/-/today',

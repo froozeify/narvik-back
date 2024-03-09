@@ -47,9 +47,6 @@ class ItacSecondaryClubMembersMessageHandler implements ResetInterface {
     foreach ($message->getRecords() as $record) {
       // We get the user, if he exists
 
-//      dump(ItacSecondaryClubCsvHeaderMapping::LICENCE->value);
-//      dump($record[ItacSecondaryClubCsvHeaderMapping::LICENCE->value]);
-
       /** @var Member|null $member */
       $member = null;
       if (array_key_exists($record[ItacSecondaryClubCsvHeaderMapping::LICENCE->value], $this->members)) {
@@ -102,20 +99,8 @@ class ItacSecondaryClubMembersMessageHandler implements ResetInterface {
 
       $errors = $this->validator->validate($member);
       if (count($errors) > 0) {
-        // TODO: Will be use when Message will contain a batch id so we can have more detailed logs in db
-//        $response['failed'] += 1;
-//        $response['failed_messages'][] = [
-//          'licence' => $member->getLicence(),
-//          'email' => $member->getEmail(),
-//          'lastname' => $member->getLastname(),
-//          'firstname' => $member->getFirstname(),
-//          'message' => (string) $errors
-//        ];
         continue;
       }
-
-      // TODO: Will be use when Message will contain a batch id so we can have more detailed logs in db
-      // $response['success'] += 1;
       // We persist it
       $this->entityManager->persist($member);
       // We set his seasons

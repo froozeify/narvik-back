@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\MemberImportFromItac;
+use App\Controller\MemberImportSecondaryClubFromItac;
 use App\Controller\MemberPhotosImportFromItac;
 use App\Controller\MemberSearchByLicenceOrName;
 use App\Controller\MemberSelf;
@@ -104,6 +105,29 @@ use Symfony\Component\Validator\Constraints as Assert;
     new Post(
       uriTemplate: '/members/-/from-itac',
       controller: MemberImportFromItac::class,
+      openapi: new Model\Operation(
+        requestBody: new Model\RequestBody(
+          content: new \ArrayObject([
+            'multipart/form-data' => [
+              'schema' => [
+                'type' => 'object',
+                'properties' => [
+                  'file' => [
+                    'type' => 'string',
+                    'format' => 'binary'
+                  ]
+                ]
+              ]
+            ]
+          ])
+        )
+      ),
+      security: "is_granted('ROLE_ADMIN')",
+      deserialize: false,
+    ),
+    new Post(
+      uriTemplate: '/members/-/secondary-from-itac',
+      controller: MemberImportSecondaryClubFromItac::class,
       openapi: new Model\Operation(
         requestBody: new Model\RequestBody(
           content: new \ArrayObject([

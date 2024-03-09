@@ -15,6 +15,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\MemberPresencesFromItac;
+use App\Controller\MemberPresencesImportFromExternal;
 use App\Controller\MemberPresenceToday;
 use App\Filter\MultipleFilter;
 use App\Repository\MemberPresenceRepository;
@@ -66,6 +67,12 @@ use Symfony\Component\Serializer\Attribute\Groups;
           ])
         )
       ),
+      security: "is_granted('ROLE_ADMIN')",
+      deserialize: false,
+    ),
+    new Post(
+      uriTemplate: '/member-presences/-/import-from-external-presences',
+      controller: MemberPresencesImportFromExternal::class,
       security: "is_granted('ROLE_ADMIN')",
       deserialize: false,
     )

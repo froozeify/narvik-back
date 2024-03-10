@@ -13,6 +13,7 @@ use App\Repository\AgeCategoryRepository;
 use App\Repository\MemberRepository;
 use App\Repository\MemberSeasonRepository;
 use App\Repository\SeasonRepository;
+use App\Service\MemberPresenceService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -31,7 +32,8 @@ class ItacSecondaryClubMembersMessageHandler implements ResetInterface {
     private SeasonRepository $seasonRepository,
     private AgeCategoryRepository $ageCategoryRepository,
     private MemberSeasonRepository $memberSeasonRepository,
-    private ValidatorInterface $validator,) {
+    private ValidatorInterface $validator,
+    private MemberPresenceService $memberPresenceService,) {
   }
 
   public function reset(): void {
@@ -108,6 +110,9 @@ class ItacSecondaryClubMembersMessageHandler implements ResetInterface {
     }
 
     $this->entityManager->flush();
+
+    // We run the migration
+    $this->memberPresenceService->importFromExternalPresence();
   }
 
   private function toBoolean($value): bool {

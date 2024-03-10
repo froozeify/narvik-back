@@ -15,6 +15,7 @@ framework:
             # Route your messages to the transports
             # 'App\Message\YourMessage': async
             App\Message\ItacMembersMessage: csv_import
+            App\Message\ItacSecondaryClubMembersMessage: csv_import
             App\Message\CerberePresencesDateMessage: csv_import
 
 # when@test:

@@ -37,6 +37,10 @@ class MemberSeason {
   #[Groups(['member-season-read'])]
   private ?AgeCategory $ageCategory = null;
 
+  #[ORM\Column(type: 'boolean', options: ["default" => 0])]
+  #[Groups(['member-season-read'])]
+  private bool $isSecondaryClub = false;
+
   public function __construct() { }
 
   public function getId(): ?int {
@@ -67,6 +71,15 @@ class MemberSeason {
 
   public function setMember(?Member $member): static {
     $this->member = $member;
+    return $this;
+  }
+
+  public function getIsSecondaryClub(): bool {
+    return $this->isSecondaryClub;
+  }
+
+  public function setIsSecondaryClub(bool $isSecondaryClub): MemberSeason {
+    $this->isSecondaryClub = $isSecondaryClub;
     return $this;
   }
 }

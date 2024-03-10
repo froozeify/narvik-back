@@ -200,6 +200,11 @@ class InstallCommand extends Command {
       $this->io->writeln("Date du dernier import depuis itac");
       $this->globalSettingService->updateSettingValue(GlobalSetting::LAST_ITAC_IMPORT, null);
     }
+
+    if (!$this->globalSettingService->getSettingValue(GlobalSetting::LAST_SECONDARY_CLUB_ITAC_IMPORT)) {
+      $this->io->writeln("Date du dernier import club secondaire depuis itac");
+      $this->globalSettingService->updateSettingValue(GlobalSetting::LAST_SECONDARY_CLUB_ITAC_IMPORT, null);
+    }
   }
 
   private function randomToken(int $length): string {

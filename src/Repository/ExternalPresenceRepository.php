@@ -51,6 +51,14 @@ class ExternalPresenceRepository extends ServiceEntityRepository {
       ->getQuery()->getResult();
   }
 
+  public function findAllWithLicence(): ?array {
+    $qb = $this->createQueryBuilder('e');
+    return $qb
+      ->where($qb->expr()->isNotNull("e.licence"))
+      ->orderBy("e.licence", "ASC")
+      ->getQuery()->getResult();
+  }
+
   public function countTotalExternalPresencesYearlyUntilDate(\DateTime $maxDate): int {
     $startYear = (new \DateTime())
       ->setDate((int) $maxDate->format("Y"), 1, 1)

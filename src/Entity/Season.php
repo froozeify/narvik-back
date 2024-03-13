@@ -10,24 +10,24 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: SeasonRepository::class)]
-#[ApiResource]
 #[ApiResource(
   normalizationContext: [
     'groups' => ['season', 'season-read']
   ],
   denormalizationContext: [
     'groups' => []
-  ]
+  ],
+  order: ['name' => 'DESC'],
 )]
 class Season {
   #[ORM\Id]
   #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
   #[ORM\Column]
-  #[Groups(['season-read'])]
+  #[Groups(['season-read', 'member-season-read', 'member-presence-read'])]
   private ?int $id = null;
 
   #[ORM\Column(length: 255)]
-  #[Groups(['season-read', 'admin-write'])]
+  #[Groups(['season-read', 'admin-write', 'member-season-read', 'member-presence-read'])]
   private ?string $name = null;
 
   #[ORM\OneToMany(mappedBy: 'season', targetEntity: MemberSeason::class)]

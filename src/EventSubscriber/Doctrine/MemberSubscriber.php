@@ -3,26 +3,17 @@
 namespace App\EventSubscriber\Doctrine;
 
 use App\Entity\Member;
-use App\Enum\GlobalSetting;
-use App\Repository\ActivityRepository;
-use App\Repository\MemberPresenceRepository;
-use App\Repository\MemberRepository;
-use App\Service\GlobalSettingService;
-use App\Service\ImageService;
+use App\Service\MemberService;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\Event\PostLoadEventArgs;
 use Doctrine\ORM\Event\PrePersistEventArgs;
-use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[AsEntityListener(entity: Member::class)]
 class MemberSubscriber extends AbstractEventSubscriber {
   public function __construct(
     private UserPasswordHasherInterface $passwordHasher,
-    private ImageService $imageService,
-    private GlobalSettingService $globalSettingService,
-    private ActivityRepository $activityRepository,
-    private MemberPresenceRepository $memberPresenceRepository,
+    private MemberService $memberService,
   ) {
   }
 
@@ -31,20 +22,9 @@ class MemberSubscriber extends AbstractEventSubscriber {
   }
 
   public function postLoad(Member $member, PostLoadEventArgs $args): void {
-    if ($member->getLicence() && $photoPath = $this->imageService->getMemberPhotoPath($member->getLicence())) {
-      $member->setProfileImage($photoPath);
-    }
-
-    $controlShootingActivity = $this->globalSettingService->getSettingValue(GlobalSetting::CONTROL_SHOOTING_ACTIVITY_ID);
-    if ($controlShootingActivity && is_numeric($controlShootingActivity)) {
-      $controlShootingActivity = $this->activityRepository->find($controlShootingActivity);
-      if ($controlShootingActivity) {
-        $presence = $this->memberPresenceRepository->findLastOneByActivity($member, $controlShootingActivity);
-        if ($presence) {
-          $member->setLastControlShooting($presence->getDate());
-        }
-      }
-    }
+    $this->memberService->setProfileImage($member);
+    $this->memberService->setCurrentSeason($member);
+    $this->memberService->setLastControlShooting($member);
   }
 
   private function updatePassword(Member $member): void {

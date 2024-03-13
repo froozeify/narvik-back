@@ -196,6 +196,9 @@ class Member implements UserInterface, PasswordAuthenticatedUserInterface {
   #[Groups(['member-read', 'member-presence-read'])]
   private ?\DateTimeImmutable $lastControlShooting = null;
 
+  #[Groups(['member-read', 'member-presence-read'])]
+  private ?MemberSeason $currentSeason = null;
+
   #[Groups(['autocomplete', 'member-read', 'member-presence-read'])]
   private ?string $fullName = null;
 
@@ -643,5 +646,14 @@ class Member implements UserInterface, PasswordAuthenticatedUserInterface {
 
   public function setLastControlShooting(?\DateTimeImmutable $lastControlShooting): void {
     $this->lastControlShooting = $lastControlShooting;
+  }
+
+  public function getCurrentSeason(): ?MemberSeason {
+    return $this->currentSeason;
+  }
+
+  public function setCurrentSeason(?MemberSeason $currentSeason): Member {
+    $this->currentSeason = $currentSeason;
+    return $this;
   }
 }

@@ -22,7 +22,7 @@ class MemberSeason {
   #[ORM\Id]
   #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
   #[ORM\Column]
-  #[Groups(['member-season-read'])]
+  #[Groups(['member-season-read', 'member-presence-read'])]
   private ?int $id = null;
 
   #[ORM\ManyToOne(targetEntity: Member::class, inversedBy: 'memberSeasons')]
@@ -34,11 +34,11 @@ class MemberSeason {
   private ?Season $season = null;
 
   #[ORM\ManyToOne(targetEntity: AgeCategory::class, inversedBy: 'memberSeasons')]
-  #[Groups(['member-season-read'])]
+  #[Groups(['member-season-read', 'member-presence-read'])]
   private ?AgeCategory $ageCategory = null;
 
   #[ORM\Column(type: 'boolean', options: ["default" => 0])]
-  #[Groups(['member-season-read'])]
+  #[Groups(['member-season-read', 'member-presence-read'])]
   private bool $isSecondaryClub = false;
 
   public function __construct() { }

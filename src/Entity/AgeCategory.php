@@ -34,7 +34,7 @@ class AgeCategory {
   private ?string $name = null;
 
   #[ORM\OneToMany(mappedBy: 'ageCategory', targetEntity: MemberSeason::class)]
-  #[Groups(['admin-read'])]
+  #[Groups(['age-category-read'])]
   private Collection $memberSeasons;
 
   public function __construct() {

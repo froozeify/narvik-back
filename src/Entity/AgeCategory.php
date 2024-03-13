@@ -22,15 +22,15 @@ class AgeCategory {
   #[ORM\Id]
   #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
   #[ORM\Column]
-  #[Groups(['age-category-read', 'member-presence-read'])]
+  #[Groups(['age-category-read', 'member-read', 'member-presence-read'])]
   private ?int $id = null;
 
   #[ORM\Column(length: 255)]
-  #[Groups(['age-category-read', 'member-presence-read'])]
+  #[Groups(['age-category-read', 'member-read', 'member-presence-read'])]
   private ?string $code = null;
 
   #[ORM\Column(length: 255)]
-  #[Groups(['age-category-read', 'member-presence-read'])]
+  #[Groups(['age-category-read', 'member-read', 'member-presence-read'])]
   private ?string $name = null;
 
   #[ORM\OneToMany(mappedBy: 'ageCategory', targetEntity: MemberSeason::class)]

@@ -64,10 +64,10 @@ class MemberRepository extends ServiceEntityRepository implements PasswordUpgrad
       ->andWhere(
         $qb->expr()->orX(
           $qb->expr()->like('m.licence', ':licence'),
-          $qb->expr()->like($qb->expr()->lower('m.firstname'), $qb->expr()->lower(':name')),
-          $qb->expr()->like($qb->expr()->lower('m.lastname'), $qb->expr()->lower(':name')),
-          $qb->expr()->like($qb->expr()->lower($qb->expr()->concat('m.lastname ', 'm.firstname')), $qb->expr()->lower(':name')),
-          $qb->expr()->like($qb->expr()->lower($qb->expr()->concat('m.firstname ', 'm.lastname')), $qb->expr()->lower(':name')),
+          $qb->expr()->like("unaccent(". $qb->expr()->lower('m.firstname') . ")", "unaccent(" . $qb->expr()->lower(':name') . ")"),
+          $qb->expr()->like("unaccent(". $qb->expr()->lower('m.lastname') . ")", "unaccent(" . $qb->expr()->lower(':name') . ")"),
+          $qb->expr()->like("unaccent(". $qb->expr()->lower($qb->expr()->concat('m.lastname ', 'm.firstname')) . ")", "unaccent(".$qb->expr()->lower(':name').")"),
+          $qb->expr()->like("unaccent(". $qb->expr()->lower($qb->expr()->concat('m.firstname ', 'm.lastname')).")", "unaccent(".$qb->expr()->lower(':name').")"),
         ),
       );
     $qb->andWhere(

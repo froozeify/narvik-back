@@ -107,7 +107,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
   ],
   denormalizationContext: [
     'groups' => ['member-presence', 'member-presence-write']
-  ]
+  ],
+  paginationClientEnabled: true,
 )]
 #[ApiResource(
   uriTemplate: '/members/{memberId}/presences.{_format}',

@@ -15,6 +15,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\OpenApi\Model;
+use App\Controller\MemberPresencesFromCsv;
 use App\Controller\MemberPresencesFromItac;
 use App\Controller\MemberPresencesImportFromExternal;
 use App\Controller\MemberPresenceToday;
@@ -72,6 +73,29 @@ use Symfony\Component\Serializer\Attribute\Groups;
       deserialize: false,
     ),
     new Post(
+      uriTemplate: '/member-presences/-/from-csv',
+      controller: MemberPresencesFromCsv::class,
+      openapi: new Model\Operation(
+        requestBody: new Model\RequestBody(
+          content: new \ArrayObject([
+            'multipart/form-data' => [
+              'schema' => [
+                'type' => 'object',
+                'properties' => [
+                  'file' => [
+                    'type' => 'string',
+                    'format' => 'binary'
+                  ]
+                ]
+              ]
+            ]
+          ])
+        )
+      ),
+      security: "is_granted('ROLE_ADMIN')",
+      deserialize: false,
+    ),
+    new Post(
       uriTemplate: '/member-presences/-/import-from-external-presences',
       controller: MemberPresencesImportFromExternal::class,
       security: "is_granted('ROLE_ADMIN')",
@@ -83,7 +107,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
   ],
   denormalizationContext: [
     'groups' => ['member-presence', 'member-presence-write']
-  ]
+  ],
+  paginationClientEnabled: true,
 )]
 #[ApiResource(
   uriTemplate: '/members/{memberId}/presences.{_format}',

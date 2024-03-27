@@ -1,0 +1,17 @@
+App\Entity\MemberPresence:
+    id: ~
+    date: ~
+    createdAt: ~ 
+    
+    member:
+        prefix: member
+        fields:
+            id: ~
+            licence: ~
+            fullName: ~
+
+    activities:
+        prefix: activities
+        fields:
+            id: ~
+            name: ~

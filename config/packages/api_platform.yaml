@@ -4,6 +4,7 @@ api_platform:
     formats:
         jsonld: ['application/ld+json']
         json: ['application/json']
+        csv: ['text/csv']
     docs_formats:
         json: ['application/json']
         jsonld: ['application/ld+json']

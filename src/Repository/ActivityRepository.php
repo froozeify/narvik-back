@@ -23,6 +23,16 @@ class ActivityRepository extends ServiceEntityRepository {
     parent::__construct($registry, Activity::class);
   }
 
+  public function findOneByName(string $name): ?Activity {
+    $qb = $this->createQueryBuilder('a');
+
+    return $qb
+      ->andWhere($qb->expr()->like($qb->expr()->lower('a.name'), $qb->expr()->lower(':name')))
+      ->setParameter('name', $name)
+      ->getQuery()
+      ->getOneOrNullResult();
+  }
+
   public function findByIds(array $activities): array {
     $qb = $this->createQueryBuilder('a');
     return $qb

@@ -23,12 +23,16 @@ class MemberPresenceRepository extends ServiceEntityRepository {
     parent::__construct($registry, MemberPresence::class);
   }
 
-  private function applyTodayConstraint(QueryBuilder $qb) {
+  private function applyTodayConstraint(QueryBuilder $qb): QueryBuilder {
+    return $this->applyDayConstraint($qb, new \DateTime());
+  }
+
+  private function applyDayConstraint(QueryBuilder $qb, \DateTime $date): QueryBuilder {
     return $qb->andWhere(
-        $qb->expr()->between('m.date', ':from', ':to'),
-      )
-      ->setParameter('from', (new \DateTime())->setTime(0, 0, 0))
-      ->setParameter('to', (new \DateTime())->setTime(23, 59, 59))
+      $qb->expr()->between('m.date', ':from', ':to'),
+    )
+       ->setParameter('from', $date->setTime(0, 0, 0))
+       ->setParameter('to', $date->setTime(23, 59, 59))
     ;
   }
 
@@ -43,8 +47,12 @@ class MemberPresenceRepository extends ServiceEntityRepository {
   }
 
   public function findOneToday(Member $member): ?MemberPresence {
+    return $this->findOneByDay($member, new \DateTime());
+  }
+
+  public function findOneByDay(Member $member, \DateTime $date): ?MemberPresence {
     $qb = $this->createQueryBuilder('m');
-    return $this->applyTodayConstraint($qb)
+    return $this->applyDayConstraint($qb, $date)
       ->andWhere("m.member = :member")
       ->setParameter("member", $member)
       ->getQuery()->getOneOrNullResult();

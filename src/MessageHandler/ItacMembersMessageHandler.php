@@ -102,13 +102,17 @@ class ItacMembersMessageHandler implements ResetInterface {
         ->setPostal1($record[ItacCsvHeaderMapping::POSTAL_1->value])
         ->setPostal2($record[ItacCsvHeaderMapping::POSTAL_2->value])
         ->setPostal3($record[ItacCsvHeaderMapping::POSTAL_3->value])
-        ->setZipCode($record[ItacCsvHeaderMapping::ZIP_CODE->value])
         ->setCity($record[ItacCsvHeaderMapping::CITY->value])
         ->setCountry($record[ItacCsvHeaderMapping::COUNTRY->value])
 
         ->setBlacklisted($record[ItacCsvHeaderMapping::BLACKLISTED->value] !== 'Autorisé')
         ->setLicenceState($record[ItacCsvHeaderMapping::LICENCE_STATE->value])
         ->setLicenceType($record[ItacCsvHeaderMapping::LICENCE_TYPE->value]);
+
+      if (is_numeric($record[ItacCsvHeaderMapping::ZIP_CODE->value])) {
+        $member
+          ->setZipCode(intval($record[ItacCsvHeaderMapping::ZIP_CODE->value]));
+      }
 
       $errors = $this->validator->validate($member);
       if (count($errors) > 0) {

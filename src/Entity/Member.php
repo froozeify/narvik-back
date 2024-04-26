@@ -223,7 +223,6 @@ class Member implements UserInterface, PasswordAuthenticatedUserInterface {
   private ?string $plainPassword = null;
 
   #[ORM\OneToMany(mappedBy: 'member', targetEntity: MemberPresence::class, orphanRemoval: true)]
-  #[Groups(['member-read'])]
   private Collection $memberPresences;
 
   #[ORM\Column]
@@ -231,7 +230,6 @@ class Member implements UserInterface, PasswordAuthenticatedUserInterface {
   private bool $accountActivated = false;
 
   #[ORM\OneToMany(mappedBy: 'member', targetEntity: MemberSeason::class, orphanRemoval: true)]
-  #[Groups(['member-read'])]
   private Collection $memberSeasons;
 
 

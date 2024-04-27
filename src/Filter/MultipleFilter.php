@@ -5,6 +5,7 @@ namespace App\Filter;
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
+use App\DQL\CustomExpr;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\PropertyInfo\Type;
 
@@ -71,7 +72,7 @@ final class MultipleFilter extends AbstractFilter {
         $linkedTo = $joinAlias;
       }
     }
-    return $queryBuilder->expr()->like($queryBuilder->expr()->lower($clauseField), $queryBuilder->expr()->lower(":value$iParam"));
+    return $queryBuilder->expr()->like(CustomExpr::unaccentInsensitive($clauseField), CustomExpr::unaccentInsensitive(":value$iParam"));
   }
 
   public function getDescription(string $resourceClass): array {

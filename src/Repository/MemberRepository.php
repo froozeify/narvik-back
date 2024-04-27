@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\DQL\CustomExpr;
 use App\Entity\Member;
 use App\Entity\MemberPresence;
 use App\Entity\Season;
@@ -64,10 +65,10 @@ class MemberRepository extends ServiceEntityRepository implements PasswordUpgrad
       ->andWhere(
         $qb->expr()->orX(
           $qb->expr()->like('m.licence', ':licence'),
-          $qb->expr()->like("unaccent(". $qb->expr()->lower('m.firstname') . ")", "unaccent(" . $qb->expr()->lower(':name') . ")"),
-          $qb->expr()->like("unaccent(". $qb->expr()->lower('m.lastname') . ")", "unaccent(" . $qb->expr()->lower(':name') . ")"),
-          $qb->expr()->like("unaccent(". $qb->expr()->lower($qb->expr()->concat('m.lastname ', 'm.firstname')) . ")", "unaccent(".$qb->expr()->lower(':name').")"),
-          $qb->expr()->like("unaccent(". $qb->expr()->lower($qb->expr()->concat('m.firstname ', 'm.lastname')).")", "unaccent(".$qb->expr()->lower(':name').")"),
+          $qb->expr()->like(CustomExpr::unaccentInsensitive('m.firstname'), CustomExpr::unaccentInsensitive(':name')),
+          $qb->expr()->like(CustomExpr::unaccentInsensitive('m.lastname'), CustomExpr::unaccentInsensitive(':name')),
+          $qb->expr()->like(CustomExpr::unaccentInsensitive($qb->expr()->concat('m.lastname ', 'm.firstname')), CustomExpr::unaccentInsensitive(':name')),
+          $qb->expr()->like(CustomExpr::unaccentInsensitive($qb->expr()->concat('m.firstname ', 'm.lastname')), CustomExpr::unaccentInsensitive(':name')),
         ),
       );
     $qb->andWhere(

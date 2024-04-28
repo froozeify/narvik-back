@@ -39,3 +39,5 @@ config/jwt
 private/
 supervisord.log
 supervisord.pid
+
+dump/

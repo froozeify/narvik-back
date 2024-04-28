@@ -3,6 +3,7 @@ DOCKER_COMP = docker compose
 
 # Docker containers
 PHP_CONT = $(DOCKER_COMP) exec php
+DB_CONT = $(DOCKER_COMP) exec database
 
 # Executables
 PHP      = $(PHP_CONT) php
@@ -61,3 +62,11 @@ sf: ## List all Symfony commands or pass the parameter "c=" to run a given comma
 
 cc: c=c:c ## Clear the cache
 cc: sf
+
+## —— Database 📦 ——————————————————————————————————————————————————————————————
+db-dump: ## Dump the current database
+	@$(DB_CONT) sh -c 'pg_dumpall -c -U $$POSTGRES_USER | gzip' > ./dump/dump_`date +%Y-%m-%d"_"%H_%M_%S`.sql.gz
+
+db-restore: ## Restore a database dump. The file must be called './dump/dump.sql.gz'
+	docker compose exec database sh -c 'psql -d $$POSTGRES_DB -U $$POSTGRES_USER -c "DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public;"'
+	gunzip < ./dump/dump.sql.gz | docker compose exec -T database sh -c 'psql -d $$POSTGRES_DB -U $$POSTGRES_USER'

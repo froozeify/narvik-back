@@ -33,8 +33,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
   ],
   denormalizationContext: [
     'groups' => ['admin-write']
-  ],
-  paginationEnabled: false
+  ]
 )]
 class InventoryItem {
   #[ORM\Id]

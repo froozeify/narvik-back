@@ -40,6 +40,8 @@ down: ## Stop the docker hub
 
 stop: down
 
+restart: stop up
+
 logs: ## Show live logs
 	@$(DOCKER_COMP) logs --tail=0 --follow
 

@@ -4,6 +4,7 @@ namespace App\DataFixtures;
 
 use App\Factory\ExternalPresenceFactory;
 use App\Factory\InventoryCategoryFactory;
+use App\Factory\InventoryItemFactory;
 use App\Factory\MemberFactory;
 use App\Factory\MemberPresenceFactory;
 use App\Factory\MemberSeasonFactory;
@@ -42,5 +43,6 @@ class AppFixtures extends Fixture {
      ******************************************************/
 
     InventoryCategoryFactory::new()->many(4, 10)->create();
+    InventoryItemFactory::new()->many(20, 40)->create();
   }
 }

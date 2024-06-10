@@ -10,6 +10,8 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Controller\ActivityMergeTo;
 use App\Repository\InventoryCategoryRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -53,6 +55,14 @@ class InventoryCategory {
   #[Groups(['admin-write', 'inventory-category-read'])]
   private ?int $weight = null;
 
+  #[ORM\OneToMany(mappedBy: 'category', targetEntity: InventoryItem::class)]
+  #[Groups(['inventory-category-read'])]
+  private Collection $items;
+
+  public function __construct() {
+      $this->items = new ArrayCollection();
+  }
+
   public function getId(): ?int {
     return $this->id;
   }
@@ -73,5 +83,30 @@ class InventoryCategory {
   public function setWeight(int $weight): static {
     $this->weight = $weight;
     return $this;
+  }
+
+  /**
+   * @return Collection<int, InventoryItem>
+   */
+  public function getItems(): Collection {
+      return $this->items;
+  }
+
+  public function addItem(InventoryItem $item): static {
+      if (!$this->items->contains($item)) {
+          $this->items->add($item);
+          $item->setCategory($this);
+      }
+      return $this;
+  }
+
+  public function removeItem(InventoryItem $item): static {
+      if ($this->items->removeElement($item)) {
+          // set the owning side to null (unless already changed)
+          if ($item->getCategory() === $this) {
+              $item->setCategory(null);
+          }
+      }
+      return $this;
   }
 }

@@ -66,6 +66,8 @@ security:
 
         - { path: ^/external-presences, roles: [ROLE_SUPERVISOR, ROLE_BADGER]}
         - { path: ^/global-settings, roles: [ROLE_ADMIN]}
+            
+        - { path: ^/inventory-categories, roles: [ROLE_SUPERVISOR]}
 
         - { path: ^/members/-/from-itac, roles: [ROLE_ADMIN]}
         - { path: ^/members, roles: [ROLE_SUPERVISOR, ROLE_BADGER]}

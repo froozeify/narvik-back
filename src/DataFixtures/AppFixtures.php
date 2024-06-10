@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Factory\ExternalPresenceFactory;
+use App\Factory\InventoryCategoryFactory;
 use App\Factory\MemberFactory;
 use App\Factory\MemberPresenceFactory;
 use App\Factory\MemberSeasonFactory;
@@ -28,12 +29,18 @@ class AppFixtures extends Fixture {
     // We create the users
     MemberFactory::new()->admin("admin@admin.com")->create();
     MemberFactory::new()->badger()->create();
-    MemberFactory::createMany(faker()->numberBetween(120, 420), [
+    MemberFactory::createMany(faker()->numberBetween(60, 120), [
       'memberPresences' => MemberPresenceFactory::new()->many(1, 4),
       'memberSeasons' => MemberSeasonFactory::new()->many(0, 4),
     ]);
 
     // We record some external presence
     ExternalPresenceFactory::new()->many(40, 80)->create();
+
+    /*******************************************************
+     *                    INVENTORY                        *
+     ******************************************************/
+
+    InventoryCategoryFactory::new()->many(4, 10)->create();
   }
 }

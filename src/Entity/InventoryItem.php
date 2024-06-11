@@ -77,10 +77,6 @@ class InventoryItem {
   #[Groups(['inventory-item-read'])]
   private ?InventoryCategory $category = null;
 
-  #[ORM\Column]
-  #[Groups(['inventory-item'])]
-  private ?int $weight = null;
-
   public function getId(): ?int {
     return $this->id;
   }
@@ -100,15 +96,6 @@ class InventoryItem {
 
   public function setDescription(?string $description): static {
     $this->description = $description;
-    return $this;
-  }
-
-  public function getWeight(): ?int {
-    return $this->weight;
-  }
-
-  public function setWeight(int $weight): static {
-    $this->weight = $weight;
     return $this;
   }
 

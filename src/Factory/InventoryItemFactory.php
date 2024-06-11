@@ -45,7 +45,6 @@ final class InventoryItemFactory extends ModelFactory {
       'category'      => InventoryCategoryFactory::randomOrCreate(),
       'purchasePrice' => self::faker()->randomFloat(2, 1, 20),
       'sellingPrice'  => self::faker()->randomFloat(2, 20, 80),
-      'weight'        => mt_rand(1, 20),
     ];
   }
 

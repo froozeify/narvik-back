@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Entity\InventoryItem;
-use App\Repository\Trait\WeightRepositoryTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,7 +15,6 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method InventoryItem[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class InventoryItemRepository extends ServiceEntityRepository {
-  use WeightRepositoryTrait;
 
   public function __construct(ManagerRegistry $registry) {
     parent::__construct($registry, InventoryItem::class);

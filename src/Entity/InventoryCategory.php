@@ -44,11 +44,11 @@ class InventoryCategory {
   #[ORM\Id]
   #[ORM\GeneratedValue]
   #[ORM\Column]
-  #[Groups(['admin-write', 'inventory-category-read'])]
+  #[Groups(['admin-write', 'inventory-category-read', 'inventory-item-read'])]
   private ?int $id = null;
 
   #[ORM\Column(length: 255)]
-  #[Groups(['inventory-category'])]
+  #[Groups(['inventory-category', 'inventory-item-read'])]
   private ?string $name = null;
 
   #[ORM\Column]

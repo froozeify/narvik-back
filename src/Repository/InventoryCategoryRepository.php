@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\InventoryCategory;
-use App\Repository\Trait\WeightRepositoryTrait;
+use App\Repository\Trait\SortableEntityRepositoryTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,7 +16,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method InventoryCategory[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class InventoryCategoryRepository extends ServiceEntityRepository {
-  use WeightRepositoryTrait;
+  use SortableEntityRepositoryTrait;
 
   public function __construct(ManagerRegistry $registry) {
     parent::__construct($registry, InventoryCategory::class);

@@ -8,13 +8,17 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use App\Controller\ActivityMergeTo;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\OpenApi\Model;
+use App\Controller\InventoryCategoryMove;
+use App\Entity\Interface\SortableEntityInterface;
 use App\Repository\InventoryCategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
+
 
 #[ORM\Entity(repositoryClass: InventoryCategoryRepository::class)]
 #[UniqueEntity(fields: ['weight'], ignoreNull: true)]
@@ -31,20 +35,44 @@ use Symfony\Component\Serializer\Attribute\Groups;
     new Delete(
       security: "is_granted('ROLE_ADMIN')"
     ),
+
+    new Put(
+      uriTemplate: '/inventory-categories/{id}/move',
+      controller: InventoryCategoryMove::class,
+      openapi: new Model\Operation(
+        description: 'Move `up` or `down` an inventory category',
+        requestBody: new Model\RequestBody(
+          content: new \ArrayObject([
+            'application/json' => [
+              'schema' => [
+                'type' => 'object',
+                'properties' => [
+                  'direction' => ['type' => 'string'],
+                ]
+              ]
+            ]
+          ])
+        )
+      ),
+
+      security: "is_granted('ROLE_ADMIN')",
+      read: false,
+      write: false,
+    )
   ],
   normalizationContext: [
     'groups' => ['inventory-category', 'inventory-category-read']
   ],
   denormalizationContext: [
-    'groups' => ['admin-write']
+    'groups' => ['inventory-category', 'inventory-category-write']
   ],
   // paginationEnabled: false
 )]
-class InventoryCategory {
+class InventoryCategory implements SortableEntityInterface {
   #[ORM\Id]
   #[ORM\GeneratedValue]
   #[ORM\Column]
-  #[Groups(['admin-write', 'inventory-category-read', 'inventory-item-read'])]
+  #[Groups(['inventory-category-read', 'inventory-item-read'])]
   private ?int $id = null;
 
   #[ORM\Column(length: 255)]
@@ -52,7 +80,7 @@ class InventoryCategory {
   private ?string $name = null;
 
   #[ORM\Column]
-  #[Groups(['admin-write', 'inventory-category-read'])]
+  #[Groups(['inventory-category-read'])]
   private ?int $weight = null;
 
   #[ORM\OneToMany(mappedBy: 'category', targetEntity: InventoryItem::class)]

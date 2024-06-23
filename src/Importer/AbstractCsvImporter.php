@@ -72,7 +72,7 @@ abstract class AbstractCsvImporter {
 
     $realRows = [];
     foreach ($rows as $row) {
-      $realRows[] = str_getcsv($row, $delimiter);
+      $realRows[] = str_getcsv((string) $row, $delimiter);
     }
     return $this->parse($realRows);
   }
@@ -126,7 +126,7 @@ abstract class AbstractCsvImporter {
   protected function getValue(array $row, string $colName): ?string {
     if ($this->hasKey($colName) && // Col declared in the general header
         array_key_exists($this->getHeaderIndex($colName), $row)) { // Col is present in our line
-      return trim($row[$this->getHeaderIndex($colName)]);
+      return trim((string) $row[$this->getHeaderIndex($colName)]);
     }
     return null;
   }
@@ -140,7 +140,7 @@ abstract class AbstractCsvImporter {
       $colValue = $this->getValue($row, $col);
 
       // preg_match('/^'.$colName.'\.(\d*)\.(.*)$/', $col, $matches);
-      $fieldNames = explode(".", $col, 3);
+      $fieldNames = explode(".", (string) $col, 3);
       $values[$fieldNames[1]][$fieldNames[2]] = $colValue;
 
     }
@@ -181,13 +181,12 @@ abstract class AbstractCsvImporter {
   }
 
   /**
-   * @param mixed $value
    * @param string $type the check that is made, can be int, bool
    *
    * @return mixed the value sanitized
    * @throws \Exception When the value is malformed
    */
-  protected function sanitizeColValueForNumber($value, string $type = "int") {
+  protected function sanitizeColValueForNumber(mixed $value, string $type = "int") {
     if ($type === "int") {
       if ($value === "") $value = null;
       if (!is_null($value) && !is_numeric($value)) {
@@ -195,7 +194,7 @@ abstract class AbstractCsvImporter {
       }
     } elseif ($type === "bool") {
       if (!is_bool($value) && !is_null($value)) {
-        $value = strtolower($value);
+        $value = strtolower((string) $value);
         return !in_array($value, ["", "0", "false"]);
       } else {
         return false;
@@ -262,14 +261,14 @@ abstract class AbstractCsvImporter {
     if ($lineNumber && ($lineNumber % $this->everyN === 0)) $this->callbackEveryNParsedRows();
   }
 
-  private function sanitizeCols(array &$row) {
+  private function sanitizeCols(array &$row): void {
     // http://en.wikipedia.org/wiki/Byte_order_mark#UTF-8
     $bom = pack('CCC', 0xEF, 0xBB, 0xBF);
     foreach ($row as $k => $col) {
-      if (substr($col, 0, 3) === $bom) {
-        $col = substr($col, 3);
+      if (substr((string) $col, 0, 3) === $bom) {
+        $col = substr((string) $col, 3);
       }
-      $row[$k] = trim($col);
+      $row[$k] = trim((string) $col);
     }
   }
 

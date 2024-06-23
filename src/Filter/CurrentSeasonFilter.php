@@ -15,11 +15,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 final class CurrentSeasonFilter extends AbstractFilter {
   public const PROPERTY_NAME = "currentSeason";
 
-  private SeasonRepository $seasonRepository;
-
-  public function __construct(ManagerRegistry $managerRegistry, SeasonRepository $seasonRepository, LoggerInterface $logger = null, ?array $properties = null, ?NameConverterInterface $nameConverter = null) {
+  public function __construct(ManagerRegistry $managerRegistry, private readonly SeasonRepository $seasonRepository, LoggerInterface $logger = null, ?array $properties = null, ?NameConverterInterface $nameConverter = null) {
     parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
-    $this->seasonRepository = $seasonRepository;
   }
 
 
@@ -59,7 +56,7 @@ final class CurrentSeasonFilter extends AbstractFilter {
   private function getAcceptedFilterProps(): array {
     $acceptedFilterProps = [];
     foreach (array_keys($this->properties) as $filterProps) {
-      $acceptedFilterProps = array_merge($acceptedFilterProps, array_map("trim", explode(",", $filterProps)));
+      $acceptedFilterProps = array_merge($acceptedFilterProps, array_map("trim", explode(",", (string) $filterProps)));
     }
     return array_unique($acceptedFilterProps);
   }
@@ -86,7 +83,7 @@ final class CurrentSeasonFilter extends AbstractFilter {
   }
 
   private function toBoolean($value): bool {
-    return is_bool($value) ? $value : !in_array(strtolower($value), ['', '0', 'false']);
+    return is_bool($value) ? $value : !in_array(strtolower((string) $value), ['', '0', 'false']);
   }
 
   public function getDescription(string $resourceClass): array {

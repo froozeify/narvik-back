@@ -7,15 +7,8 @@ abstract class AbstractImportedItemResult {
   public const WARNING = "warning";
   public const ERROR = "error";
 
-  protected string $status = self::ERROR;
-  protected string $identifier = "";
-  protected array $data = [];
-
-  public function __construct(string $status, string $identifier, array $data = []) {
-    $this->status = $status;
-    $this->data = $data;
-    $this->identifier = $identifier;
-    if (!empty($identifier)) $this->data["identifier"] = $identifier;
+  public function __construct(protected string $status, protected string $identifier, protected array $data = []) {
+    if (!empty($this->identifier)) $this->data["identifier"] = $this->identifier;
   }
 
   /**

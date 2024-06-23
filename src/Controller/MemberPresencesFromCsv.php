@@ -3,8 +3,6 @@
 namespace App\Controller;
 
 use App\Importer\ImportMemberPresence;
-use App\Service\ImportCerbereService;
-use App\Service\ImageService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;

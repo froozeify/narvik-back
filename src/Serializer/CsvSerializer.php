@@ -135,7 +135,7 @@ class CsvSerializer implements NormalizerAwareInterface, NormalizerInterface {
     }
   }
 
-  private function renameKey(&$array, $oldKey, $newKey) {
+  private function renameKey(&$array, $oldKey, $newKey): void {
     $keys = array_keys($array);
     $index = array_search($oldKey, $keys, true);
     $keys[$index] = $newKey;

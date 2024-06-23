@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Repository\MemberRepository;
 use App\Service\ImportItacCsvService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;

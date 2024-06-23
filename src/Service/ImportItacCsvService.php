@@ -22,8 +22,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class ImportItacCsvService {
 
   public function __construct(
-    private MessageBusInterface $bus,
-    private GlobalSettingService $globalSettingService,
+    private readonly MessageBusInterface $bus,
+    private readonly GlobalSettingService $globalSettingService,
   ) {
   }
 

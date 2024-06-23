@@ -16,3 +16,7 @@ supervisord.pid
 ###< lexik/jwt-authentication-bundle ###
 
 dump/
+
+###> phpstan/phpstan ###
+phpstan.neon
+###< phpstan/phpstan ###

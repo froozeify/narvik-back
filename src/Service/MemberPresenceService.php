@@ -11,10 +11,10 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class MemberPresenceService {
   public function __construct(
-    private EntityManagerInterface $em,
-    private ExternalPresenceRepository $externalPresenceRepository,
-    private MemberRepository $memberRepository,
-    private MemberPresenceRepository $memberPresenceRepository,
+    private readonly EntityManagerInterface $em,
+    private readonly ExternalPresenceRepository $externalPresenceRepository,
+    private readonly MemberRepository $memberRepository,
+    private readonly MemberPresenceRepository $memberPresenceRepository,
   ) {
   }
   public function importFromExternalPresence(): int {

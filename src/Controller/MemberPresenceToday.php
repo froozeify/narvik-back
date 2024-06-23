@@ -3,12 +3,10 @@
 namespace App\Controller;
 
 use App\Enum\GlobalSetting;
-use App\Repository\ActivityRepository;
 use App\Repository\MemberPresenceRepository;
 use App\Service\GlobalSettingService;
 use App\Service\MemberService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 
 class MemberPresenceToday extends AbstractController {
 

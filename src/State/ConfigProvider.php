@@ -17,10 +17,10 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 class ConfigProvider implements ProviderInterface {
 
   public function __construct(
-    private Security $security,
-    private AuthorizationCheckerInterface $authorizationChecker,
-    private GlobalSettingService $globalSettingService,
-    private ContainerBagInterface $params,
+    private readonly Security $security,
+    private readonly AuthorizationCheckerInterface $authorizationChecker,
+    private readonly GlobalSettingService $globalSettingService,
+    private readonly ContainerBagInterface $params,
   ) {
   }
 

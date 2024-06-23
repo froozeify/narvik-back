@@ -31,7 +31,7 @@ class MemberSelfUpdatePassword extends AbstractController {
     }
 
     $currentPwd = $payload['current'];
-    $newPwd = trim($payload['new']);
+    $newPwd = trim((string) $payload['new']);
 
     if (!$passwordHasher->isPasswordValid($user, $currentPwd)) {
       throw new HttpException(Response::HTTP_BAD_REQUEST, "Invalid password");

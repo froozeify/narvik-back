@@ -11,11 +11,11 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class MemberService {
   public function __construct(
-    private ImageService $imageService,
-    private GlobalSettingService $globalSettingService,
-    private ActivityRepository $activityRepository,
-    private MemberPresenceRepository $memberPresenceRepository,
-    private SeasonRepository $seasonRepository,
+    private readonly ImageService $imageService,
+    private readonly GlobalSettingService $globalSettingService,
+    private readonly ActivityRepository $activityRepository,
+    private readonly MemberPresenceRepository $memberPresenceRepository,
+    private readonly SeasonRepository $seasonRepository,
   ) {
   }
 

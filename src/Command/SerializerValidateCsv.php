@@ -27,8 +27,8 @@ class SerializerValidateCsv extends Command {
   private $customCsvConfigs = [];
 
   public function __construct(
-    private KernelInterface $kernel,
-    private CsvSerializer $csvSerializer,
+    private readonly KernelInterface $kernel,
+    private readonly CsvSerializer $csvSerializer,
   ) {
     parent::__construct();
   }

@@ -12,8 +12,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 #[AsEntityListener(entity: Member::class)]
 class MemberSubscriber extends AbstractEventSubscriber {
   public function __construct(
-    private UserPasswordHasherInterface $passwordHasher,
-    private MemberService $memberService,
+    private readonly UserPasswordHasherInterface $passwordHasher,
+    private readonly MemberService $memberService,
   ) {
   }
 

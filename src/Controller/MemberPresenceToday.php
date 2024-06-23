@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class MemberPresenceToday extends AbstractController {
 
-  public function __invoke(Request $request, MemberPresenceRepository $memberPresenceRepository, MemberService $memberService, GlobalSettingService $globalSettingService): ?array {
+  public function __invoke(MemberPresenceRepository $memberPresenceRepository, MemberService $memberService, GlobalSettingService $globalSettingService): ?array {
     $todayPresentMembers = $memberPresenceRepository->findAllPresentToday();
 
     $controlShootingActivity = $globalSettingService->getSettingValue(GlobalSetting::CONTROL_SHOOTING_ACTIVITY_ID);

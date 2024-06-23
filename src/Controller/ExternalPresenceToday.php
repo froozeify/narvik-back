@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ExternalPresenceToday extends AbstractController {
 
-  public function __invoke(Request $request, ExternalPresenceRepository $externalPresenceRepository): ?array {
+  public function __invoke(ExternalPresenceRepository $externalPresenceRepository): ?array {
     return $externalPresenceRepository->findAllPresentToday();
   }
 

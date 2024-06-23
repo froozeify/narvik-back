@@ -14,7 +14,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class GlobalSettingGetPublic extends AbstractController {
-  const AVAILABLE_PUBLICLY = [
+  public const AVAILABLE_PUBLICLY = [
     GlobalSettingEnum::LOGO->name
   ];
 

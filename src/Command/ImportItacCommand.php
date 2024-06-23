@@ -18,8 +18,8 @@ use Symfony\Component\Filesystem\Filesystem;
 )]
 class ImportItacCommand extends Command {
   public function __construct(
-    private Filesystem $fs,
-    private ImportItacCsvService $itacCsvService,
+    private readonly Filesystem $fs,
+    private readonly ImportItacCsvService $itacCsvService,
   ) {
     parent::__construct();
   }

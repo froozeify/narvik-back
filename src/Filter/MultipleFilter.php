@@ -46,7 +46,7 @@ final class MultipleFilter extends AbstractFilter {
   private function getAcceptedFilterProps(): array {
     $acceptedFilterProps = [];
     foreach (array_keys($this->properties) as $filterProps) {
-      $acceptedFilterProps = array_merge($acceptedFilterProps, array_map("trim", explode(",", $filterProps)));
+      $acceptedFilterProps = array_merge($acceptedFilterProps, array_map("trim", explode(",", (string) $filterProps)));
     }
     return array_unique($acceptedFilterProps);
   }

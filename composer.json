@@ -48,6 +48,8 @@
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.4",
+        "phpstan/phpstan-doctrine": "^1.4",
+        "rector/rector": "^1.1",
         "symfony/debug-bundle": "7.0.*",
         "symfony/maker-bundle": "^1.51",
         "symfony/stopwatch": "7.0.*",

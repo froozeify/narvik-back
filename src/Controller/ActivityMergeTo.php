@@ -15,7 +15,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class ActivityMergeTo extends AbstractController {
 
-  public function __invoke(Request $request, Activity $activity, Activity $targetActivity, ActivityRepository $activityRepository): Activity {
+  public function __invoke(Activity $activity, Activity $targetActivity, ActivityRepository $activityRepository): Activity {
     if ($activity->getId() === $targetActivity->getId()) {
       throw new HttpException(Response::HTTP_BAD_REQUEST, "Can't migrate to self activity");
     }

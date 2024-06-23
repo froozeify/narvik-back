@@ -14,9 +14,9 @@ class ImportCerbereService {
   private array $csvActivities = [];
 
   public function __construct(
-    private EntityManagerInterface $em,
-    private ActivityRepository $activityRepository,
-    private MessageBusInterface $bus,
+    private readonly EntityManagerInterface $em,
+    private readonly ActivityRepository $activityRepository,
+    private readonly MessageBusInterface $bus,
   ) {
   }
 
@@ -47,7 +47,7 @@ class ImportCerbereService {
 
   private function saveCsvActivities(): void {
     foreach ($this->csvActivities as $csvActivity) {
-      $csvActivity = trim($csvActivity);
+      $csvActivity = trim((string) $csvActivity);
       $dbActivity = $this->activityRepository->findOneBy(["name" => $csvActivity]);
       if ($dbActivity) {
         continue;
@@ -113,7 +113,7 @@ class ImportCerbereService {
           continue; // We don't save anymore data in the subset
         }
 
-        $activities = array_filter(explode(";", $row[$activitiesColId]));
+        $activities = array_filter(explode(";", (string) $row[$activitiesColId]));
         foreach ($activities as &$activity) {
           $activity = trim($activity);
           if (!in_array($activity, $this->csvActivities)) {

@@ -27,13 +27,13 @@ class ItacSecondaryClubMembersMessageHandler implements ResetInterface {
   private array $ageCategories = [];
 
   public function __construct(
-    private EntityManagerInterface $entityManager,
-    private MemberRepository $memberRepository,
-    private SeasonRepository $seasonRepository,
-    private AgeCategoryRepository $ageCategoryRepository,
-    private MemberSeasonRepository $memberSeasonRepository,
-    private ValidatorInterface $validator,
-    private MemberPresenceService $memberPresenceService,) {
+    private readonly EntityManagerInterface $entityManager,
+    private readonly MemberRepository $memberRepository,
+    private readonly SeasonRepository $seasonRepository,
+    private readonly AgeCategoryRepository $ageCategoryRepository,
+    private readonly MemberSeasonRepository $memberSeasonRepository,
+    private readonly ValidatorInterface $validator,
+    private readonly MemberPresenceService $memberPresenceService,) {
   }
 
   public function reset(): void {
@@ -44,7 +44,7 @@ class ItacSecondaryClubMembersMessageHandler implements ResetInterface {
   }
 
 
-  public function __invoke(ItacSecondaryClubMembersMessage $message) {
+  public function __invoke(ItacSecondaryClubMembersMessage $message): void {
 
     foreach ($message->getRecords() as $record) {
       // We get the user, if he exists
@@ -116,7 +116,7 @@ class ItacSecondaryClubMembersMessageHandler implements ResetInterface {
   }
 
   private function toBoolean($value): bool {
-    return is_bool($value) ? $value : !in_array(strtolower($value), ['', '0', 'false']);
+    return is_bool($value) ? $value : !in_array(strtolower((string) $value), ['', '0', 'false']);
   }
 
   private function defineMemberSeason(Member $member, array $record): void {

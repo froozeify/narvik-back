@@ -7,7 +7,7 @@ use App\Enum\MemberRole;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-final class DefaultContextBuilder implements SerializerContextBuilderInterface {
+final readonly class DefaultContextBuilder implements SerializerContextBuilderInterface {
   public function __construct(
     private SerializerContextBuilderInterface $decorated,
     private AuthorizationCheckerInterface $authorizationChecker,

@@ -8,7 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class GlobalSettingService {
   public function __construct(
-    private EntityManagerInterface $em
+    private readonly EntityManagerInterface $em
   ) {
 
   }

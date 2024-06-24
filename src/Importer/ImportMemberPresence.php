@@ -14,11 +14,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ImportMemberPresence extends AbstractCsvImporter {
-  const COL_LICENCE = 'member.licence';
-  const COL_DATE = 'date';
-  const COL_ACTIVITIES = 'activities';
+  public const COL_LICENCE = 'member.licence';
+  public const COL_DATE = 'date';
+  public const COL_ACTIVITIES = 'activities';
 
-  const ERROR_CODES = [
+  public const ERROR_CODES = [
     // 1xx: Error
     100 => ["errorCode" => "member-not-found", "reason" => "Member not found"],
     101 => ["errorCode" => "date-wrong-format", "reason" => "Date wrongly formatted"],
@@ -31,9 +31,9 @@ class ImportMemberPresence extends AbstractCsvImporter {
   public function __construct(
     EntityManagerInterface $em,
     ValidatorInterface $validator,
-    private MemberRepository $memberRepository,
-    private ActivityRepository $activityRepository,
-    private MemberPresenceRepository $memberPresenceRepository,
+    private readonly MemberRepository $memberRepository,
+    private readonly ActivityRepository $activityRepository,
+    private readonly MemberPresenceRepository $memberPresenceRepository,
   ) {
     parent::__construct($em, $validator);
   }

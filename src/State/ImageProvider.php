@@ -18,8 +18,8 @@ use Symfony\Component\Filesystem\Filesystem;
 class ImageProvider implements ProviderInterface {
 
   public function __construct(
-    private Filesystem $fs,
-    private ContainerBagInterface $params,
+    private readonly Filesystem $fs,
+    private readonly ContainerBagInterface $params,
   ) {
   }
 

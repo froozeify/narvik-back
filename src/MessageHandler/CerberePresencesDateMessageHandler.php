@@ -25,11 +25,11 @@ class CerberePresencesDateMessageHandler implements ResetInterface {
   private array $externalMembers = [];
 
   public function __construct(
-    private EntityManagerInterface $entityManager,
-    private MemberRepository $memberRepository,
-    private ExternalPresenceRepository $externalPresenceRepository,
-    private ActivityRepository $activityRepository,
-    private ValidatorInterface $validator,) {
+    private readonly EntityManagerInterface $entityManager,
+    private readonly MemberRepository $memberRepository,
+    private readonly ExternalPresenceRepository $externalPresenceRepository,
+    private readonly ActivityRepository $activityRepository,
+    private readonly ValidatorInterface $validator,) {
   }
 
   public function reset(): void {
@@ -38,7 +38,7 @@ class CerberePresencesDateMessageHandler implements ResetInterface {
     $this->externalMembers = [];
   }
 
-  public function __invoke(CerberePresencesDateMessage $message) {
+  public function __invoke(CerberePresencesDateMessage $message): void {
     $this->generateActivitiesList();
     $this->generateMembersList();
     $this->generateExternalPresenceList();

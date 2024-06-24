@@ -5,6 +5,8 @@ api_platform:
         jsonld: ['application/ld+json']
         json: ['application/json']
         csv: ['text/csv']
+        multipart:
+            mime_types: ['multipart/form-data']
     docs_formats:
         json: ['application/json']
         jsonld: ['application/ld+json']
@@ -21,7 +23,7 @@ api_platform:
         collection:
             pagination:
                 items_per_page_parameter_name: itemsPerPage
-    event_listeners_backward_compatibility_layer: false
+    use_symfony_listeners: true
     keep_legacy_inflector: false
     path_segment_name_generator: api_platform.metadata.path_segment_name_generator.dash
     

@@ -24,12 +24,12 @@ class InstallCommand extends Command {
   private SymfonyStyle $io;
 
   public function __construct(
-    private EntityManagerInterface $em,
-    private MemberRepository $memberRepository,
-    private GlobalSettingService $globalSettingService,
-    private UrlGeneratorInterface $router,
-    private KernelInterface $kernel,
-    private Filesystem $fs,
+    private readonly EntityManagerInterface $em,
+    private readonly MemberRepository $memberRepository,
+    private readonly GlobalSettingService $globalSettingService,
+    private readonly UrlGeneratorInterface $router,
+    private readonly KernelInterface $kernel,
+    private readonly Filesystem $fs,
   ) {
     parent::__construct();
   }

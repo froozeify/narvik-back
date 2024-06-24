@@ -6,7 +6,7 @@ class ItacMembersMessage {
 
   //TODO: Add a message batch id, so we can log in db after the success/warnings with some stats
   public function __construct(
-    private array $records,
+    private readonly array $records,
   ) {
   }
 

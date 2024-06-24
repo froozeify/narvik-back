@@ -13,7 +13,7 @@ use App\Repository\MemberSeasonRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class MetricProvider implements ProviderInterface {
-  const METRICS = [
+  public const METRICS = [
     "members",
     "presences",
     "external-presences",
@@ -22,11 +22,11 @@ class MetricProvider implements ProviderInterface {
   ];
 
   public function __construct(
-    private MemberRepository $memberRepository,
-    private MemberSeasonRepository $memberSeasonRepository,
-    private MemberPresenceRepository $memberPresenceRepository,
-    private ExternalPresenceRepository $externalPresenceRepository,
-    private EntityManagerInterface $entityManager,
+    private readonly MemberRepository $memberRepository,
+    private readonly MemberSeasonRepository $memberSeasonRepository,
+    private readonly MemberPresenceRepository $memberPresenceRepository,
+    private readonly ExternalPresenceRepository $externalPresenceRepository,
+    private readonly EntityManagerInterface $entityManager,
   ) {
   }
 

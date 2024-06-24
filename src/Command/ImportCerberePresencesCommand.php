@@ -21,8 +21,8 @@ class ImportCerberePresencesCommand extends Command {
 //  private array $csvActivities = [];
 
   public function __construct(
-    private Filesystem $fs,
-    private ImportCerbereService $importCerbereService,
+    private readonly Filesystem $fs,
+    private readonly ImportCerbereService $importCerbereService,
 //    private EntityManagerInterface $em,
 //    private ActivityRepository $activityRepository,
 //    private MessageBusInterface $bus,

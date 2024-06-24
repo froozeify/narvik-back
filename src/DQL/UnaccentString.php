@@ -21,7 +21,7 @@ class UnaccentString extends FunctionNode {
     return 'UNACCENT(' . $this->subselect->dispatch($sqlWalker) . ')';
   }
 
-  public function parse(Parser $parser) {
+  public function parse(Parser $parser): void {
     $parser->match(Lexer::T_IDENTIFIER);
     $parser->match(Lexer::T_OPEN_PARENTHESIS);
     $this->subselect = $parser->StringPrimary();

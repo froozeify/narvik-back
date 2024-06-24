@@ -19,8 +19,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class ImageService {
 
   public function __construct(
-    private Filesystem $fs,
-    private ContainerBagInterface $params,
+    private readonly Filesystem $fs,
+    private readonly ContainerBagInterface $params,
   ) {
   }
 

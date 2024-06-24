@@ -16,11 +16,11 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 class MemberProcessor implements ProcessorInterface {
   public function __construct(
     #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
-    private ProcessorInterface $persistProcessor,
+    private readonly ProcessorInterface $persistProcessor,
     #[Autowire(service: 'api_platform.doctrine.orm.state.remove_processor')]
-    private ProcessorInterface $removeProcessor,
-    private AuthorizationCheckerInterface $authorizationChecker,
-    private UserPasswordHasherInterface $passwordHasher
+    private readonly ProcessorInterface $removeProcessor,
+    private readonly AuthorizationCheckerInterface $authorizationChecker,
+    private readonly UserPasswordHasherInterface $passwordHasher
   ) {
   }
 

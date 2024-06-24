@@ -4,8 +4,8 @@ namespace App\Message;
 
 class CerberePresencesDateMessage {
   public function __construct(
-    private \DateTimeImmutable $date,
-    private array $datas
+    private readonly \DateTimeImmutable $date,
+    private readonly array $datas
   ) {
 
   }

@@ -17,7 +17,7 @@ trait SortableEntityRepositoryTrait {
       if ($result) {
         $lastWeight = $result->getWeight();
       }
-    } catch (\Exception $e) {
+    } catch (\Exception) {
     }
 
     if (!$lastWeight) {

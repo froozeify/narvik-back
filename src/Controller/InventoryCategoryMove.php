@@ -19,7 +19,7 @@ class InventoryCategoryMove extends AbstractController {
     }
 
     $payload = $this->checkAndGetJsonValues($request, ['direction']);
-    $direction = strtolower($payload['direction']);
+    $direction = strtolower((string) $payload['direction']);
 
     if (!in_array($direction, ['up', 'down'])) {
         throw new HttpException(Response::HTTP_BAD_REQUEST, "Direction must be 'up' or 'down'");

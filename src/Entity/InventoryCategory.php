@@ -22,6 +22,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: InventoryCategoryRepository::class)]
 #[UniqueEntity(fields: ['weight'], ignoreNull: true)]
+#[UniqueEntity(fields: ['name'], ignoreNull: true)]
 #[ApiResource(
   operations: [
     new GetCollection(),
@@ -79,7 +80,7 @@ class InventoryCategory implements SortableEntityInterface {
   #[Groups(['inventory-category', 'inventory-item-read'])]
   private ?string $name = null;
 
-  #[ORM\Column]
+  #[ORM\Column(nullable: true)]
   #[Groups(['inventory-category-read'])]
   private ?int $weight = null;
 

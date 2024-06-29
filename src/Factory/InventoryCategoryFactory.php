@@ -61,7 +61,6 @@ final class InventoryCategoryFactory extends PersistentProxyObjectFactory {
   protected function defaults(): array {
     return [
       'name'   => self::faker()->text(10),
-      'weight' => mt_rand(1, 20),
     ];
   }
 

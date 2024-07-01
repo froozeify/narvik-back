@@ -41,7 +41,7 @@ use Symfony\Component\Validator\Constraints as Assert;
   ]
 )]
 #[ApiFilter(OrderFilter::class, properties: ['name' => 'ASC', 'category.name' => 'ASC'])]
-#[ApiFilter(MultipleFilter::class, properties: ['name'])]
+#[ApiFilter(MultipleFilter::class, properties: ['name', 'barcode'])]
 #[ApiFilter(SearchFilter::class, properties: ['category.id' => 'exact'])]
 class InventoryItem {
   #[ORM\Id]

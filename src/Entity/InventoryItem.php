@@ -2,12 +2,16 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Filter\MultipleFilter;
 use App\Repository\InventoryItemRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -35,6 +39,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
     'groups' => ['admin-write']
   ]
 )]
+#[ApiFilter(OrderFilter::class, properties: ['name' => 'ASC', 'category.name' => 'ASC'])]
+#[ApiFilter(MultipleFilter::class, properties: ['name'])]
+#[ApiFilter(SearchFilter::class, properties: ['category.id' => 'exact'])]
 class InventoryItem {
   #[ORM\Id]
   #[ORM\GeneratedValue]

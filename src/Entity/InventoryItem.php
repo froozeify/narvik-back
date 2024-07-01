@@ -16,6 +16,7 @@ use App\Repository\InventoryItemRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: InventoryItemRepository::class)]
 #[ApiResource(
@@ -71,6 +72,12 @@ class InventoryItem {
   #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2, nullable: true)]
   #[Groups(['inventory-item'])]
   private ?string $sellingPrice = null;
+
+  #[ORM\Column(nullable: false)]
+  #[Groups(['inventory-item'])]
+  #[Assert\GreaterThanOrEqual(value: 1)]
+  #[Assert\NotBlank]
+  private int $sellingQuantity = 1;
 
   #[ORM\Column(nullable: true)]
   #[Groups(['inventory-item'])]
@@ -130,6 +137,15 @@ class InventoryItem {
 
   public function setSellingPrice(?string $sellingPrice): static {
     $this->sellingPrice = $sellingPrice;
+    return $this;
+  }
+
+  public function getSellingQuantity(): int {
+    return $this->sellingQuantity;
+  }
+
+  public function setSellingQuantity(int $sellingQuantity): static {
+    $this->sellingQuantity = $sellingQuantity;
     return $this;
   }
 

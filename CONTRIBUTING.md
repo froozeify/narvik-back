@@ -1,3 +1,11 @@
+# Loading the fixture
+Various commands are available:
+
+- `composer reload-fixture`
+  - Empty the database then load all the fixtures
+- `composer reload-db`
+  - Completely drop the database and recreate it from scratch, then load all fixtures
+
 # Creating new entity
 When creating a new entity, you should do the next steps :
 

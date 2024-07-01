@@ -4,6 +4,7 @@ namespace App\Factory;
 
 use App\Entity\InventoryItem;
 use App\Repository\InventoryItemRepository;
+use App\Story\InventoryCategoryStory;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
@@ -62,7 +63,7 @@ final class InventoryItemFactory extends PersistentProxyObjectFactory {
     return [
       'name'          => self::faker()->text(10),
       'canBeSold'     => self::faker()->boolean(),
-      'category'      => InventoryCategoryFactory::randomOrCreate(),
+      'category'      => InventoryCategoryStory::getRandom('default_categories'),
       'purchasePrice' => self::faker()->randomFloat(2, 1, 20),
       'sellingPrice'  => self::faker()->randomFloat(2, 20, 80),
     ];

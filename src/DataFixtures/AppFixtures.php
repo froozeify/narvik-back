@@ -11,6 +11,7 @@ use App\Factory\MemberSeasonFactory;
 use App\Factory\SeasonFactory;
 use App\Story\ActivityStory;
 use App\Story\GlobalSettingStory;
+use App\Story\InventoryCategoryStory;
 use App\Story\SeasonStory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -42,7 +43,8 @@ class AppFixtures extends Fixture {
      *                    INVENTORY                        *
      ******************************************************/
 
-    InventoryCategoryFactory::new()->many(4, 10)->create();
+    // We create the default season
+    InventoryCategoryStory::load();
     InventoryItemFactory::new()->many(20, 40)->create();
   }
 }

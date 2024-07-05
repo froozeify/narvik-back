@@ -8,10 +8,14 @@ created by the docker container.
 
 ## HTTPs and Redirects
 
-If Symfony is generating an internal redirect for an `https://` url, but the resulting url is `http://`, you have to
-uncomment the `TRUSTED_PROXIES` setting in your `.env` file.
-For more details see
-the [Symfony internal redirect documentation](https://symfony.com/doc/current/routing.html#redirecting-to-urls-and-routes-directly-from-a-route).
+If Symfony is generating an internal redirect for an `https://` url, but the resulting url is `http://`, you have to uncomment the `TRUSTED_PROXIES` setting in your `.env` file and add this line in `config/packages/framework.yaml`:
+```
+# config/packages/framework.yaml
+framework:
+    trusted_proxies: '%env(TRUSTED_PROXIES)%'
+```
+
+For more details see the [Symfony internal redirect documentation](https://symfony.com/doc/current/routing.html#redirecting-to-urls-and-routes-directly-from-a-route).
 
 ## TLS/HTTPS Issues
 

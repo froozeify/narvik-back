@@ -1,8 +1,7 @@
 #syntax=docker/dockerfile:1.4
 
 # Versions
-# FROM dunglas/frankenphp:1-alpine AS frankenphp_upstream php 8.3.9 got a bug with filter https://github.com/api-platform/core/issues/6416
-FROM dunglas/frankenphp:1-php8.3.7-alpine AS frankenphp_upstream
+FROM dunglas/frankenphp:1-alpine AS frankenphp_upstream
 
 # The different stages of this Dockerfile are meant to be built into separate images
 # https://docs.docker.com/develop/develop-images/multistage-build/#stop-at-a-specific-build-stage

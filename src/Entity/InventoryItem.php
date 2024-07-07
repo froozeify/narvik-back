@@ -15,10 +15,12 @@ use App\Filter\MultipleFilter;
 use App\Repository\InventoryItemRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: InventoryItemRepository::class)]
+#[UniqueEntity(fields: ['name'], message: 'An item with the same name is already defined' )]
 #[ApiResource(
   operations: [
     new GetCollection(),

@@ -37,7 +37,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     'groups' => ['inventory-item', 'inventory-item-read']
   ],
   denormalizationContext: [
-    'groups' => ['admin-write']
+    'groups' => ['inventory-item', 'inventory-item-write']
   ]
 )]
 #[ApiFilter(OrderFilter::class, properties: ['name' => 'ASC', 'category.name' => 'ASC'])]
@@ -88,7 +88,7 @@ class InventoryItem {
   private ?string $barcode = null;
 
   #[ORM\ManyToOne(inversedBy: 'items')]
-  #[Groups(['inventory-item-read'])]
+  #[Groups(['inventory-item'])]
   private ?InventoryCategory $category = null;
 
   public function getId(): ?int {

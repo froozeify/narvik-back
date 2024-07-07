@@ -67,7 +67,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
   denormalizationContext: [
     'groups' => ['inventory-category', 'inventory-category-write']
   ],
-  // paginationEnabled: false
 )]
 class InventoryCategory implements SortableEntityInterface {
   #[ORM\Id]

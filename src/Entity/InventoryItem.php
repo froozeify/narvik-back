@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Filter\MultipleFilter;
 use App\Repository\InventoryItemRepository;
+use App\Service\UtilsService;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -120,7 +121,7 @@ class InventoryItem {
   }
 
   public function setPurchasePrice(?string $purchasePrice): static {
-    $this->purchasePrice = $purchasePrice;
+    $this->purchasePrice = UtilsService::convertStringToDbDecimal($purchasePrice);
     return $this;
   }
 
@@ -138,7 +139,7 @@ class InventoryItem {
   }
 
   public function setSellingPrice(?string $sellingPrice): static {
-    $this->sellingPrice = $sellingPrice;
+    $this->sellingPrice = UtilsService::convertStringToDbDecimal($sellingPrice);
     return $this;
   }
 

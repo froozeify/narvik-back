@@ -54,10 +54,6 @@ trait SortableEntityRepositoryTrait {
     $itemWeight = $itemToMove->getWeight();
 
     $targetItem = $this->getUpperItem($itemWeight);
-    dump(
-      'target',
-      $targetItem
-    );
     // No item found, we do nothing
     if (!$targetItem) {
       return;

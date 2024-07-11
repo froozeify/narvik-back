@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Controller\Abstract\AbstractController;
 use App\Entity\Member;
 use App\Repository\MemberRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;

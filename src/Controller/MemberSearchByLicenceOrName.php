@@ -2,10 +2,10 @@
 
 namespace App\Controller;
 
+use App\Controller\Abstract\AbstractController;
 use App\Repository\MemberRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class MemberSearchByLicenceOrName extends AbstractController {

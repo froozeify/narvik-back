@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\InventoryCategory;
+use App\Repository\Interface\SortableRepositoryInterface;
 use App\Repository\Trait\SortableEntityRepositoryTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -15,7 +16,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method InventoryCategory[]    findAll()
  * @method InventoryCategory[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class InventoryCategoryRepository extends ServiceEntityRepository {
+class InventoryCategoryRepository extends ServiceEntityRepository implements SortableRepositoryInterface {
   use SortableEntityRepositoryTrait;
 
   public function __construct(ManagerRegistry $registry) {

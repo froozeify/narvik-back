@@ -13,6 +13,7 @@ use App\Factory\SeasonFactory;
 use App\Story\ActivityStory;
 use App\Story\GlobalSettingStory;
 use App\Story\InventoryCategoryStory;
+use App\Story\SalePaymentModeStory;
 use App\Story\SeasonStory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -51,5 +52,7 @@ class AppFixtures extends Fixture {
     foreach ($items as $item) {
       InventoryItemHistoryFactory::new()->many(2, 6)->create(['item' => $item]);
     }
+
+    SalePaymentModeStory::load();
   }
 }

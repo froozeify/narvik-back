@@ -77,6 +77,8 @@ security:
         - { path: ^/member-presences/-/from-cerbere, roles: [ROLE_ADMIN]}
         - { path: ^/member-presences, roles: [ROLE_SUPERVISOR, ROLE_BADGER]}
         - { path: ^/metrics, roles: [ROLE_SUPERVISOR]}
+
+        - { path: ^/sale-payment-modes, roles: [ROLE_SUPERVISOR]}
             
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }

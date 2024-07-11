@@ -1,11 +1,8 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Abstract;
 
-use App\Entity\Member;
-use App\Repository\MemberRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as SymfonyAbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;

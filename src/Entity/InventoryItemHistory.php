@@ -1,0 +1,97 @@
+<?php
+
+namespace App\Entity;
+
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
+use App\Repository\InventoryItemHistoryRepository;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
+
+#[ORM\Entity(repositoryClass: InventoryItemHistoryRepository::class)]
+#[ApiResource(
+  uriTemplate: '/inventory-items/{itemId}/histories.{_format}',
+  operations: [
+    new GetCollection(),
+  ],
+  uriVariables: [
+    'itemId' => new Link(toProperty: 'item', fromClass: InventoryItem::class),
+  ],
+  normalizationContext: [
+    'groups' => ['inventory-item-history', 'inventory-item-history-read']
+  ],
+  order: ['date' => 'DESC'],
+)]
+#[ApiFilter(OrderFilter::class, properties: ['date' => 'DESC'])]
+class InventoryItemHistory {
+  #[ORM\Id]
+  #[ORM\GeneratedValue]
+  #[ORM\Column]
+  #[Groups(['inventory-item-history-read'])]
+  private ?int $id = null;
+
+  #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2, nullable: true)]
+  #[Groups(['inventory-item-history-read'])]
+  private ?string $sellingPrice = null;
+
+  #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2, nullable: true)]
+  #[Groups(['inventory-item-history-read'])]
+  private ?string $purchasePrice = null;
+
+  #[ORM\Column]
+  #[Groups(['inventory-item-history-read'])]
+  private ?\DateTimeImmutable $date = null;
+
+  #[ORM\ManyToOne]
+  #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+  private ?InventoryItem $item = null;
+
+  public function __construct() {
+    $this->date = new \DateTimeImmutable();
+  }
+
+  public function getId(): ?int {
+    return $this->id;
+  }
+
+  public function getSellingPrice(): ?string {
+    return $this->sellingPrice;
+  }
+
+  public function setSellingPrice(?string $sellingPrice): static {
+    $this->sellingPrice = $sellingPrice;
+    return $this;
+  }
+
+  public function getPurchasePrice(): ?string {
+    return $this->purchasePrice;
+  }
+
+  public function setPurchasePrice(?string $purchasePrice): static {
+    $this->purchasePrice = $purchasePrice;
+    return $this;
+  }
+
+  public function getDate(): ?\DateTimeImmutable {
+    return $this->date;
+  }
+
+  public function setDate(\DateTimeImmutable $date): static {
+    $this->date = $date;
+    return $this;
+  }
+
+  public function getItem(): ?InventoryItem {
+    return $this->item;
+  }
+
+  public function setItem(?InventoryItem $item): static {
+    $this->item = $item;
+    return $this;
+  }
+}

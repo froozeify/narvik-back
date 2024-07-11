@@ -5,6 +5,7 @@ namespace App\DataFixtures;
 use App\Factory\ExternalPresenceFactory;
 use App\Factory\InventoryCategoryFactory;
 use App\Factory\InventoryItemFactory;
+use App\Factory\InventoryItemHistoryFactory;
 use App\Factory\MemberFactory;
 use App\Factory\MemberPresenceFactory;
 use App\Factory\MemberSeasonFactory;
@@ -45,6 +46,10 @@ class AppFixtures extends Fixture {
 
     // We create the default season
     InventoryCategoryStory::load();
-    InventoryItemFactory::new()->many(20, 40)->create();
+
+    $items = InventoryItemFactory::new()->many(20, 40)->create();
+    foreach ($items as $item) {
+      InventoryItemHistoryFactory::new()->many(2, 6)->create(['item' => $item]);
+    }
   }
 }

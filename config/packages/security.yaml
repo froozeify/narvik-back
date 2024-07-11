@@ -69,6 +69,7 @@ security:
             
         - { path: ^/inventory-categories, roles: [ROLE_SUPERVISOR]}
         - { path: ^/inventory-items, roles: [ROLE_SUPERVISOR]}
+        - { path: ^/inventory-item-histories, roles: [ROLE_SUPERVISOR]}
 
         - { path: ^/members/-/from-itac, roles: [ROLE_ADMIN]}
         - { path: ^/members, roles: [ROLE_SUPERVISOR, ROLE_BADGER]}

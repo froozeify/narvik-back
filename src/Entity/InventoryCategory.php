@@ -18,6 +18,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 
 #[ORM\Entity(repositoryClass: InventoryCategoryRepository::class)]
@@ -77,6 +78,7 @@ class InventoryCategory implements SortableEntityInterface {
 
   #[ORM\Column(length: 255)]
   #[Groups(['inventory-category', 'inventory-item-read'])]
+  #[Assert\NotBlank]
   private ?string $name = null;
 
   #[ORM\Column(nullable: true)]

@@ -41,9 +41,10 @@ use Symfony\Component\Validator\Constraints as Assert;
   ],
   denormalizationContext: [
     'groups' => ['inventory-item', 'inventory-item-write']
-  ]
+  ],
+  order: ['category.weight' => 'ASC', 'name' => 'ASC']
 )]
-#[ApiFilter(OrderFilter::class, properties: ['name' => 'ASC', 'category.name' => 'ASC'])]
+#[ApiFilter(OrderFilter::class, properties: ['name' => 'ASC', 'category.name' => 'ASC', 'category.weight' => 'ASC'])]
 #[ApiFilter(MultipleFilter::class, properties: ['name', 'barcode'])]
 #[ApiFilter(SearchFilter::class, properties: ['category.id' => 'exact'])]
 class InventoryItem {

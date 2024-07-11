@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -68,7 +70,9 @@ use Symfony\Component\Validator\Constraints as Assert;
   denormalizationContext: [
     'groups' => ['inventory-category', 'inventory-category-write']
   ],
+  order: ['weight' => 'asc'],
 )]
+#[ApiFilter(OrderFilter::class, properties: ['weight' => 'ASC', 'name' => 'ASC'])]
 class InventoryCategory implements SortableEntityInterface {
   #[ORM\Id]
   #[ORM\GeneratedValue]

@@ -25,15 +25,11 @@ class InventoryCategoryMove extends AbstractController {
         throw new HttpException(Response::HTTP_BAD_REQUEST, "Direction must be 'up' or 'down'");
     }
 
-    dump($inventoryCategory);
-
     if ($direction === 'up') {
       $inventoryCategoryRepository->moveUp($inventoryCategory);
     } else {
       $inventoryCategoryRepository->moveDown($inventoryCategory);
     }
-
-    dump($inventoryCategory);
 
     return new JsonResponse();
   }

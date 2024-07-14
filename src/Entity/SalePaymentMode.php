@@ -10,6 +10,9 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\OpenApi\Model;
+use App\Controller\SalePaymentModeMove;
 use App\Entity\Interface\SortableEntityInterface;
 use App\Repository\SalePaymentModeRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -33,6 +36,30 @@ use Symfony\Component\Validator\Constraints as Assert;
     new Delete(
       security: "is_granted('ROLE_ADMIN')"
     ),
+
+    new Put(
+      uriTemplate: '/sale-payment-modes/{id}/move',
+      controller: SalePaymentModeMove::class,
+      openapi: new Model\Operation(
+        description: 'Move `up` or `down` a payment mode',
+        requestBody: new Model\RequestBody(
+          content: new \ArrayObject([
+            'application/json' => [
+              'schema' => [
+                'type' => 'object',
+                'properties' => [
+                  'direction' => ['type' => 'string'],
+                ]
+              ]
+            ]
+          ])
+        )
+      ),
+
+      security: "is_granted('ROLE_ADMIN')",
+      read: false,
+      write: false,
+    )
   ],
   normalizationContext: [
     'groups' => ['sale-payment-mode', 'sale-payment-mode-read']

@@ -35,7 +35,7 @@ class AppFixtures extends Fixture {
     MemberFactory::new()->badger()->create();
     MemberFactory::createMany(faker()->numberBetween(60, 120), [
       'memberPresences' => MemberPresenceFactory::new()->many(1, 4),
-      'memberSeasons' => MemberSeasonFactory::new()->many(0, 4),
+      'memberSeasons'   => MemberSeasonFactory::new()->many(0, 4),
     ]);
 
     // We record some external presence
@@ -46,11 +46,28 @@ class AppFixtures extends Fixture {
      ******************************************************/
 
     // We create the default season
-    InventoryCategoryStory::load();
+    $defaultCategoriesPool = InventoryCategoryStory::load();
 
-    $items = InventoryItemFactory::new()->many(20, 40)->create();
-    foreach ($items as $item) {
-      InventoryItemHistoryFactory::new()->many(2, 6)->create(['item' => $item]);
+    $itemsMapping = [
+      "Cibles" => ['Cible C50', 'Visuel C50', 'Pistolet 10M', 'Carabine 10M'],
+      "Munitions" => ['semi-auto 22lr', '9mm - Sellier & Bellot', '9mm - Geco', 'Plombs'],
+      "Administratif" => ['licence', 'droit d\'entrée', 'second club'],
+      "Droit de tir" => ['10M', '25/50M'],
+    ];
+    $categories = $defaultCategoriesPool->getPool('default');
+    foreach ($categories as $category) {
+      $catName = $category->_real()->getName();
+      if (array_key_exists($catName, $itemsMapping)) {
+        foreach ($itemsMapping[$catName] as $name) {
+          $item = InventoryItemFactory::createOne(['name' => $name, 'category' => $category]);
+          InventoryItemHistoryFactory::new()->many(2, 6)->create(['item' => $item]);
+        }
+      } else {
+        $items = InventoryItemFactory::new()->many(1, 5)->create(['category' => $category]);
+        foreach ($items as $item) {
+          InventoryItemHistoryFactory::new()->many(2, 6)->create(['item' => $item]);
+        }
+      }
     }
 
     SalePaymentModeStory::load();

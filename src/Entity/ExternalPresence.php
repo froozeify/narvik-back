@@ -49,7 +49,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
   ]
 )]
 #[ApiFilter(DateFilter::class, properties: ['date' => DateFilter::EXCLUDE_NULL])]
-#[ApiFilter(OrderFilter::class, properties: ['date' => 'DESC'])]
+#[ApiFilter(OrderFilter::class, properties: ['date' => 'DESC', 'createdAt' => 'DESC'])]
 #[ApiFilter(MultipleFilter::class, properties: ['firstname', 'lastname', 'licence'])]
 class ExternalPresence {
   #[ORM\Id]

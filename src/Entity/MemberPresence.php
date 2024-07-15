@@ -122,7 +122,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
   paginationClientEnabled: true,
 )]
 #[ApiFilter(DateFilter::class, properties: ['date' => DateFilter::EXCLUDE_NULL])]
-#[ApiFilter(OrderFilter::class, properties: ['date' => 'DESC'])]
+#[ApiFilter(OrderFilter::class, properties: ['date' => 'DESC', 'createdAt' => 'DESC'])]
 #[ApiFilter(MultipleFilter::class, properties: ['member.firstname', 'member.lastname', 'member.licence'])]
 #[ApiFilter(SearchFilter::class, properties: ['activities.id' => 'exact'])]
 class MemberPresence {

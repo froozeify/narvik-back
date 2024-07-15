@@ -8,6 +8,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 
 #[ORM\Entity(repositoryClass: MemberSeasonRepository::class)]
 #[ApiResource(
@@ -17,6 +19,19 @@ use Symfony\Component\Serializer\Attribute\Groups;
   denormalizationContext: [
     'groups' => ['member-season', 'member-season-write']
   ]
+)]
+#[ApiResource(
+  uriTemplate: '/members/{id}/seasons.{_format}',
+  operations: [
+    new GetCollection(),
+  ],
+  uriVariables: [
+    'id' => new Link(toProperty: 'member', fromClass: Member::class),
+  ],
+  normalizationContext: [
+    'groups' => ['member-season', 'member-season-read']
+  ],
+  order: ['season.name' => 'DESC'],
 )]
 class MemberSeason {
   #[ORM\Id]

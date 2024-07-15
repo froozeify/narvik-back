@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: InventoryItemRepository::class)]
-#[UniqueEntity(fields: ['name'], message: 'An item with the same name is already defined' )]
+#[UniqueEntity(fields: ['name', 'category'], message: 'An item with the same name is already defined' )]
 #[ApiResource(
   operations: [
     new GetCollection(),

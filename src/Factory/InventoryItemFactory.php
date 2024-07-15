@@ -63,7 +63,7 @@ final class InventoryItemFactory extends PersistentProxyObjectFactory {
     return [
       'name'            => self::faker()->text(10),
       'description'     => self::faker()->boolean(40) ? self::faker()->words(self::faker()->numberBetween(4, 8), true) : null,
-      'canBeSold'       => self::faker()->boolean(),
+      'canBeSold'       => self::faker()->boolean(75),
       'category'        => InventoryCategoryStory::getRandom('default'),
       'purchasePrice'   => self::faker()->randomFloat(2, 1, 20),
       'sellingPrice'    => self::faker()->randomFloat(2, 20, 80),

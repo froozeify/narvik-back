@@ -61,7 +61,7 @@ final class InventoryItemHistoryFactory extends PersistentProxyObjectFactory {
    */
   protected function defaults(): array|callable {
     return [
-      'date' => \DateTimeImmutable::createFromMutable(self::faker()->dateTimeBetween('-2 years')),
+      'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTimeBetween('-2 years')),
       'item' => InventoryItemFactory::random(),
       'purchasePrice' => self::faker()->randomFloat(2, 1, 20),
       'sellingPrice' => self::faker()->randomFloat(2, 20, 80),

@@ -5,9 +5,10 @@ namespace App\Entity;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
+use App\Entity\Interface\TimestampEntityInterface;
+use App\Entity\Trait\TimestampTrait;
 use App\Repository\InventoryItemHistoryRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -23,12 +24,14 @@ use Symfony\Component\Serializer\Attribute\Groups;
     'itemId' => new Link(toProperty: 'item', fromClass: InventoryItem::class),
   ],
   normalizationContext: [
-    'groups' => ['inventory-item-history', 'inventory-item-history-read']
+    'groups' => ['inventory-item-history', 'inventory-item-history-read', 'timestamp']
   ],
-  order: ['date' => 'DESC'],
+  order: ['createdAt' => 'DESC'],
 )]
-#[ApiFilter(OrderFilter::class, properties: ['date' => 'DESC'])]
-class InventoryItemHistory {
+#[ApiFilter(OrderFilter::class, properties: ['createdAt' => 'DESC'])]
+class InventoryItemHistory implements TimestampEntityInterface {
+  use TimestampTrait;
+
   #[ORM\Id]
   #[ORM\GeneratedValue]
   #[ORM\Column]
@@ -43,17 +46,9 @@ class InventoryItemHistory {
   #[Groups(['inventory-item-history-read'])]
   private ?string $purchasePrice = null;
 
-  #[ORM\Column]
-  #[Groups(['inventory-item-history-read'])]
-  private ?\DateTimeImmutable $date = null;
-
   #[ORM\ManyToOne]
   #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
   private ?InventoryItem $item = null;
-
-  public function __construct() {
-    $this->date = new \DateTimeImmutable();
-  }
 
   public function getId(): ?int {
     return $this->id;
@@ -74,15 +69,6 @@ class InventoryItemHistory {
 
   public function setPurchasePrice(?string $purchasePrice): static {
     $this->purchasePrice = $purchasePrice;
-    return $this;
-  }
-
-  public function getDate(): ?\DateTimeImmutable {
-    return $this->date;
-  }
-
-  public function setDate(\DateTimeImmutable $date): static {
-    $this->date = $date;
     return $this;
   }
 

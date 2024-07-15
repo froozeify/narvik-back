@@ -11,6 +11,8 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Entity\Interface\TimestampEntityInterface;
+use App\Entity\Trait\TimestampTrait;
 use App\Filter\MultipleFilter;
 use App\Repository\InventoryItemRepository;
 use App\Service\UtilsService;
@@ -37,7 +39,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     ),
   ],
   normalizationContext: [
-    'groups' => ['inventory-item', 'inventory-item-read']
+    'groups' => ['inventory-item', 'inventory-item-read', 'timestamp']
   ],
   denormalizationContext: [
     'groups' => ['inventory-item', 'inventory-item-write']
@@ -47,7 +49,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(OrderFilter::class, properties: ['name' => 'ASC', 'category.name' => 'ASC', 'category.weight' => 'ASC'])]
 #[ApiFilter(MultipleFilter::class, properties: ['name', 'barcode'])]
 #[ApiFilter(SearchFilter::class, properties: ['category.id' => 'exact'])]
-class InventoryItem {
+class InventoryItem implements TimestampEntityInterface {
+  use TimestampTrait;
+
   #[ORM\Id]
   #[ORM\GeneratedValue]
   #[ORM\Column]

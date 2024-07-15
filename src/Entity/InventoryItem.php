@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
@@ -51,6 +52,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(MultipleFilter::class, properties: ['name', 'barcode'])]
 #[ApiFilter(SearchFilter::class, properties: ['category.id' => 'exact'])]
 #[ApiFilter(BooleanFilter::class, properties: ['canBeSold'])]
+#[ApiFilter(ExistsFilter::class, properties: ['sellingPrice'])]
 class InventoryItem implements TimestampEntityInterface {
   use TimestampTrait;
 

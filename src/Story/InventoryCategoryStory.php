@@ -17,7 +17,7 @@ final class InventoryCategoryStory extends Story {
 
   public function build(): void {
     foreach (self::CATEGORIES as $category) {
-      $this->addToPool('default_categories', InventoryCategoryFactory::createOne([
+      $this->addToPool('default', InventoryCategoryFactory::createOne([
         'name' => $category
       ]));
     }

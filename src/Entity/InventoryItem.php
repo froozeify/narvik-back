@@ -64,6 +64,7 @@ class InventoryItem implements TimestampEntityInterface {
 
   #[ORM\Column(length: 255)]
   #[Groups(['inventory-item'])]
+  #[Assert\NotBlank]
   private ?string $name = null;
 
   #[ORM\Column(length: 255, nullable: true)]
@@ -78,11 +79,9 @@ class InventoryItem implements TimestampEntityInterface {
   #[Groups(['inventory-item'])]
   private ?bool $canBeSold = null;
 
-  /**
-   * null = price to be set on sale (useful fpr the Other/Donation item)
-   */
-  #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2, nullable: true)]
+  #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2)]
   #[Groups(['inventory-item'])]
+  #[Assert\NotNull]
   private ?string $sellingPrice = null;
 
   #[ORM\Column(nullable: false)]
@@ -147,7 +146,7 @@ class InventoryItem implements TimestampEntityInterface {
     return $this->sellingPrice;
   }
 
-  public function setSellingPrice(?string $sellingPrice): static {
+  public function setSellingPrice(string $sellingPrice): static {
     $this->sellingPrice = UtilsService::convertStringToDbDecimal($sellingPrice);
     return $this;
   }

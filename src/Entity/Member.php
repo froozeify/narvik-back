@@ -316,9 +316,16 @@ class Member implements UserInterface, PasswordAuthenticatedUserInterface {
   #[ORM\Column(length: 1)]
   private string $licenceType = "C";
 
+  /**
+   * @var Collection<int, Sale>
+   */
+  #[ORM\OneToMany(mappedBy: 'seller', targetEntity: Sale::class)]
+  private Collection $sales;
+
   public function __construct() {
     $this->memberPresences = new ArrayCollection();
     $this->memberSeasons = new ArrayCollection();
+    $this->sales = new ArrayCollection();
   }
 
   public function getId(): ?int {
@@ -652,6 +659,31 @@ class Member implements UserInterface, PasswordAuthenticatedUserInterface {
 
   public function setCurrentSeason(?MemberSeason $currentSeason): Member {
     $this->currentSeason = $currentSeason;
+    return $this;
+  }
+
+  /**
+   * @return Collection<int, Sale>
+   */
+  public function getSales(): Collection {
+    return $this->sales;
+  }
+
+  public function addSale(Sale $sale): static {
+    if (!$this->sales->contains($sale)) {
+      $this->sales->add($sale);
+      $sale->setSeller($this);
+    }
+    return $this;
+  }
+
+  public function removeSale(Sale $sale): static {
+    if ($this->sales->removeElement($sale)) {
+      // set the owning side to null (unless already changed)
+      if ($sale->getSeller() === $this) {
+        $sale->setSeller(null);
+      }
+    }
     return $this;
   }
 }

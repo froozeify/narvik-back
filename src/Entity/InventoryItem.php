@@ -59,7 +59,7 @@ class InventoryItem implements TimestampEntityInterface {
   #[ORM\Id]
   #[ORM\GeneratedValue]
   #[ORM\Column]
-  #[Groups(['admin-write', 'inventory-item-read'])]
+  #[Groups(['inventory-item-read'])]
   private ?int $id = null;
 
   #[ORM\Column(length: 255)]

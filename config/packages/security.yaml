@@ -78,7 +78,9 @@ security:
         - { path: ^/member-presences, roles: [ROLE_SUPERVISOR, ROLE_BADGER]}
         - { path: ^/metrics, roles: [ROLE_SUPERVISOR]}
 
+        - { path: ^/sales, roles: [ROLE_SUPERVISOR]}
         - { path: ^/sale-payment-modes, roles: [ROLE_SUPERVISOR]}
+        # - { path: ^/sale-purchased-items, roles: [ROLE_SUPERVISOR]} # Not available in the API
             
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }

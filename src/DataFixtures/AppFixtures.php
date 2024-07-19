@@ -9,6 +9,7 @@ use App\Factory\InventoryItemHistoryFactory;
 use App\Factory\MemberFactory;
 use App\Factory\MemberPresenceFactory;
 use App\Factory\MemberSeasonFactory;
+use App\Factory\SaleFactory;
 use App\Factory\SeasonFactory;
 use App\Story\ActivityStory;
 use App\Story\GlobalSettingStory;
@@ -31,7 +32,7 @@ class AppFixtures extends Fixture {
     GlobalSettingStory::load();
 
     // We create the users
-    MemberFactory::new()->admin("admin@admin.com")->create();
+    $adminMember = MemberFactory::new()->admin("admin@admin.com")->create();
     MemberFactory::new()->badger()->create();
     MemberFactory::createMany(faker()->numberBetween(60, 120), [
       'memberPresences' => MemberPresenceFactory::new()->many(1, 4),
@@ -71,5 +72,8 @@ class AppFixtures extends Fixture {
     }
 
     SalePaymentModeStory::load();
+    SaleFactory::createMany(faker()->numberBetween(20, 50), [
+      'seller' => $adminMember,
+    ]);
   }
 }

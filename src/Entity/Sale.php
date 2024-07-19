@@ -73,9 +73,10 @@ class Sale implements TimestampEntityInterface {
   /**
    * @var Collection<int, SalePurchasedItem>
    */
-  #[ORM\OneToMany(mappedBy: 'sale', targetEntity: SalePurchasedItem::class, orphanRemoval: true)]
+  #[ORM\OneToMany(mappedBy: 'sale', targetEntity: SalePurchasedItem::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
   #[Groups(['sale'])]
-  #[Assert\NotNull]
+  #[Assert\Valid]
+  #[Assert\Count(min: 1)]
   private Collection $salePurchasedItems;
 
   public function __construct() {

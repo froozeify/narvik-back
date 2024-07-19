@@ -2,18 +2,28 @@
 
 namespace App\EventSubscriber\Doctrine;
 
+use App\Entity\Member;
 use App\Entity\Sale;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 #[AsEntityListener(entity: Sale::class)]
 class SaleSubscriber extends AbstractEventSubscriber {
-  public function __construct() {
+  public function __construct(
+    private readonly TokenStorageInterface $tokenStorage,
+  ) {
   }
 
   public function prePersist(Sale $sale, PrePersistEventArgs $args): void {
+    // We auto set to current logged user
+    $member = $this->tokenStorage->getToken()?->getUser();
+    if (!$sale->getSeller() && $member instanceof Member) {
+      $sale->setSeller($member);
+    }
+
     $this->autoSetFields($sale, $args);
   }
 
@@ -34,11 +44,7 @@ class SaleSubscriber extends AbstractEventSubscriber {
       }
 
       // Item price is not set we get it for the InventoryItem object
-      if (!$salePurchasedItem->getItem()) {
-        continue;
-      }
-
-      $sellingPrice = $salePurchasedItem->getItem()->getSellingPrice();
+      $sellingPrice = $salePurchasedItem->getItem()?->getSellingPrice();
       if (!$sellingPrice) { // Selling price still not set at this point, we remove the item
         $sale->removeSalePurchasedItem($salePurchasedItem);
         continue;

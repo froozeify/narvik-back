@@ -31,7 +31,7 @@ class SalePurchasedItem implements TimestampEntityInterface {
   #[Assert\NotNull]
   private ?Sale $sale = null;
 
-  #[ORM\Column(length: 255)]
+  #[ORM\Column(length: 255, nullable: true)]
   #[Groups(['sale'])]
   #[Assert\NotBlank(allowNull: true)]
   private ?string $itemName = null;
@@ -43,6 +43,7 @@ class SalePurchasedItem implements TimestampEntityInterface {
 
   #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2)]
   #[Groups(['sale'])]
+  #[Assert\NotBlank(allowNull: true)]
   private ?string $itemPrice = null;
 
   #[ORM\Column]

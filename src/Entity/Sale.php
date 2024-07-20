@@ -30,7 +30,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     new Get(),
     new Post(),
     new Delete(
-      security: "is_granted('ROLE_ADMIN')"
+      security: "is_granted('ROLE_ADMIN') || is_granted('SALE_DELETE', object)",
     ),
   ],
   normalizationContext: [

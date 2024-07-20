@@ -199,7 +199,7 @@ class Member implements UserInterface, PasswordAuthenticatedUserInterface {
   #[Groups(['member-read', 'member-presence-read'])]
   private ?MemberSeason $currentSeason = null;
 
-  #[Groups(['autocomplete', 'member-read', 'member-presence-read'])]
+  #[Groups(['autocomplete', 'member-read', 'member-presence-read', 'sale-read'])]
   private ?string $fullName = null;
 
   #[ORM\Column]

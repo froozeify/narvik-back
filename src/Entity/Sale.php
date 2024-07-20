@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
@@ -42,6 +43,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[ApiFilter(OrderFilter::class, properties: ['createdAt' => 'DESC'])]
 #[ApiFilter(SearchFilter::class, properties: ['seller.id' => 'exact'])]
+#[ApiFilter(DateFilter::class, properties: ['createdAt' => DateFilter::EXCLUDE_NULL])]
 class Sale implements TimestampEntityInterface {
   use TimestampTrait;
 

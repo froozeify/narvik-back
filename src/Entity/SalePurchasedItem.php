@@ -22,7 +22,7 @@ class SalePurchasedItem implements TimestampEntityInterface {
   private ?int $id = null;
 
   #[ORM\ManyToOne]
-  #[Groups(['sale-write'])]
+  #[Groups(['sale'])]
   #[Assert\NotBlank(allowNull: true)]
   private ?InventoryItem $item = null;
 

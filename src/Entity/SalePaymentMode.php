@@ -76,17 +76,17 @@ class SalePaymentMode implements SortableEntityInterface {
   #[ORM\Id]
   #[ORM\GeneratedValue]
   #[ORM\Column]
-  #[Groups(['sale-payment-mode-read'])]
+  #[Groups(['sale-payment-mode-read', 'sale-read'])]
   private ?int $id = null;
 
   #[ORM\Column(length: 255)]
-  #[Groups(['sale-payment-mode'])]
+  #[Groups(['sale-payment-mode', 'sale-read'])]
   #[Assert\NotBlank]
   private ?string $name = null;
 
   #[ORM\Column(length: 255)]
   #[Assert\NotBlank]
-  #[Groups(['sale-payment-mode'])]
+  #[Groups(['sale-payment-mode', 'sale-read'])]
   private ?string $icon = null;
 
   #[ORM\Column]

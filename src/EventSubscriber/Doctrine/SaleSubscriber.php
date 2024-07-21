@@ -5,6 +5,8 @@ namespace App\EventSubscriber\Doctrine;
 use App\Entity\Member;
 use App\Entity\Sale;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
+use Doctrine\ORM\Event\PostPersistEventArgs;
+use Doctrine\ORM\Event\PostRemoveEventArgs;
 use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
@@ -27,8 +29,44 @@ class SaleSubscriber extends AbstractEventSubscriber {
     $this->autoSetFields($sale, $args);
   }
 
+  public function postPersist(Sale $sale, PostPersistEventArgs $args): void {
+    $objectManager = $args->getObjectManager();
+
+    // We update the inventory item remaining stock
+    foreach ($sale->getSalePurchasedItems() as $purchasedItem) {
+      $inventoryItem = $purchasedItem->getItem();
+      if (!$inventoryItem || is_null($inventoryItem->getQuantity())) {
+        continue;
+      }
+      $inventoryItem->setQuantity($inventoryItem->getQuantity() - ($purchasedItem->getQuantity() * $inventoryItem->getSellingQuantity()));
+
+      // No more in stock we don't go negative
+      if ($inventoryItem->getQuantity() < 0) {
+        $inventoryItem->setQuantity(0);
+      }
+
+      $objectManager->persist($inventoryItem);
+    }
+    $objectManager->flush();
+  }
+
   public function preUpdate(Sale $sale, PreUpdateEventArgs $args): void {
     $this->autoSetFields($sale, $args);
+  }
+
+  public function postRemove(Sale $sale, PostRemoveEventArgs $args): void {
+    // A sale is canceled, we restock the items
+    $objectManager = $args->getObjectManager();
+    foreach ($sale->getSalePurchasedItems() as $purchasedItem) {
+      $inventoryItem = $purchasedItem->getItem();
+      if (!$inventoryItem || is_null($inventoryItem->getQuantity())) {
+        continue;
+      }
+
+      $inventoryItem->setQuantity($inventoryItem->getQuantity() + ($purchasedItem->getQuantity() * $inventoryItem->getSellingQuantity()));
+      $objectManager->persist($inventoryItem);
+    }
+    $objectManager->flush();
   }
 
   public function autoSetFields(Sale $sale, LifecycleEventArgs $args): void {

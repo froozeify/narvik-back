@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -59,8 +61,10 @@ use ApiPlatform\OpenApi\Model;
   denormalizationContext: [
     'groups' => ['admin-write']
   ],
+  order: ['name' => 'asc'],
   paginationEnabled: false
 )]
+#[ApiFilter(OrderFilter::class, properties: ['name' => 'ASC'])]
 class Activity {
   #[ORM\Id]
   #[ORM\GeneratedValue(strategy: 'SEQUENCE')]

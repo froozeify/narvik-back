@@ -64,7 +64,7 @@ use ApiPlatform\OpenApi\Model;
   order: ['name' => 'asc'],
   paginationEnabled: false
 )]
-#[ApiFilter(OrderFilter::class, properties: ['name' => 'ASC'])]
+#[ApiFilter(OrderFilter::class, properties: ['name' => 'ASC', 'isEnabled' => 'ASC'])]
 class Activity {
   #[ORM\Id]
   #[ORM\GeneratedValue(strategy: 'SEQUENCE')]

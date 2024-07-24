@@ -17,6 +17,16 @@ abstract class AbstractEventSubscriber {
     return array_key_exists($property, $this->getChangedProperties($objectManager, $entity));
   }
 
+  protected function hasChangedProperties(ObjectManager $objectManager, $entity, array $properties): bool {
+    $changedProps = $this->getChangedProperties($objectManager, $entity);
+    foreach (array_keys($changedProps) as $changedProp) {
+      if (in_array($changedProp, $properties)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * Force to have $properties and only them changed at the same time (all must be present and changed)
    * Maybe a rework with a more gentle method could be wanted

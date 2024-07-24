@@ -22,4 +22,11 @@ class UtilsService {
 
     return implode("/", $seasons);
   }
+
+  public static function convertStringToDbDecimal(?string $string): ?string {
+    if (!is_numeric($string) && empty($string)) {
+      return null;
+    }
+    return filter_var(str_replace(',', '.', $string), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+  }
 }

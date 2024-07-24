@@ -15,9 +15,9 @@ class MemberPresenceToday extends AbstractController {
 
     $controlShootingActivity = $globalSettingService->getSettingValue(GlobalSetting::CONTROL_SHOOTING_ACTIVITY_ID);
 
-    if ($controlShootingActivity && is_numeric($controlShootingActivity)) {
-      foreach ($todayPresentMembers as $memberPresence) {
-        $memberService->setCurrentSeason($memberPresence->getMember());
+    foreach ($todayPresentMembers as $memberPresence) {
+      $memberService->setCurrentSeason($memberPresence->getMember());
+      if ($controlShootingActivity && is_numeric($controlShootingActivity)) {
         $memberService->setLastControlShooting($memberPresence->getMember());
       }
     }

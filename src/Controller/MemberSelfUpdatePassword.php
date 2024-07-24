@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
+use App\Controller\Abstract\AbstractController;
 use App\Entity\Member;
 use App\Repository\MemberRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,16 +19,7 @@ class MemberSelfUpdatePassword extends AbstractController {
       throw new HttpException(Response::HTTP_BAD_REQUEST);
     }
 
-    $payload = json_decode($request->getContent(), true);
-    $requiredParams = [
-      'current',
-      'new'
-    ];
-
-    foreach ($requiredParams as $requiredParam) {
-      if (!array_key_exists($requiredParam, $payload)) {
-        throw new HttpException(Response::HTTP_BAD_REQUEST, "Missing required field: '$requiredParam'");}
-    }
+    $payload = $this->checkAndGetJsonValues($request, ['current', 'new']);
 
     $currentPwd = $payload['current'];
     $newPwd = trim((string) $payload['new']);

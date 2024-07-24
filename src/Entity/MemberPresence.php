@@ -19,6 +19,8 @@ use App\Controller\MemberPresencesFromCsv;
 use App\Controller\MemberPresencesFromItac;
 use App\Controller\MemberPresencesImportFromExternal;
 use App\Controller\MemberPresenceToday;
+use App\Entity\Interface\TimestampEntityInterface;
+use App\Entity\Trait\TimestampTrait;
 use App\Filter\MultipleFilter;
 use App\Repository\MemberPresenceRepository;
 use App\Validator\Constraints\ActivityMustBeEnabled;
@@ -103,7 +105,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     )
   ],
   normalizationContext: [
-    'groups' => ['member-presence', 'member-presence-read']
+    'groups' => ['member-presence', 'member-presence-read', 'timestamp']
   ],
   denormalizationContext: [
     'groups' => ['member-presence', 'member-presence-write']
@@ -117,15 +119,17 @@ use Symfony\Component\Serializer\Attribute\Groups;
   ], uriVariables: [
     'memberId' => new Link(fromClass: Member::class, toProperty: 'member'),
   ], normalizationContext: [
-    'groups' => ['member-presence', 'member-presence-read']
+    'groups' => ['member-presence', 'member-presence-read', 'timestamp']
   ],
   paginationClientEnabled: true,
 )]
 #[ApiFilter(DateFilter::class, properties: ['date' => DateFilter::EXCLUDE_NULL])]
-#[ApiFilter(OrderFilter::class, properties: ['date' => 'DESC'])]
+#[ApiFilter(OrderFilter::class, properties: ['date' => 'DESC', 'createdAt' => 'DESC'])]
 #[ApiFilter(MultipleFilter::class, properties: ['member.firstname', 'member.lastname', 'member.licence'])]
 #[ApiFilter(SearchFilter::class, properties: ['activities.id' => 'exact'])]
-class MemberPresence {
+class MemberPresence implements TimestampEntityInterface {
+  use TimestampTrait;
+
   #[ORM\Id]
   #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
   #[ORM\Column]
@@ -146,13 +150,8 @@ class MemberPresence {
   #[ActivityMustBeEnabled]
   private Collection $activities;
 
-  #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-  #[Groups(['member-presence-read'])]
-  private ?\DateTimeImmutable $createdAt = null;
-
   public function __construct() {
     $this->activities = new ArrayCollection();
-    $this->createdAt = new \DateTimeImmutable();
     $this->date = new \DateTimeImmutable();
   }
 
@@ -190,23 +189,12 @@ class MemberPresence {
     if (!$this->activities->contains($activity)) {
       $this->activities->add($activity);
     }
-
     return $this;
   }
 
   public function removeActivity(Activity $activity): static {
     $this->activities->removeElement($activity);
-
     return $this;
   }
 
-  public function getCreatedAt(): ?\DateTimeImmutable {
-    return $this->createdAt;
-  }
-
-  public function setCreatedAt(\DateTimeImmutable $createdAt): static {
-    $this->createdAt = $createdAt;
-
-    return $this;
-  }
 }

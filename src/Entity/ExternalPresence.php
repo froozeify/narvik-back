@@ -12,6 +12,8 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\ExternalPresenceToday;
+use App\Entity\Interface\TimestampEntityInterface;
+use App\Entity\Trait\TimestampTrait;
 use App\Filter\MultipleFilter;
 use App\Repository\ExternalPresenceRepository;
 use App\Validator\Constraints\ActivityMustBeEnabled;
@@ -42,16 +44,18 @@ use Symfony\Component\Serializer\Attribute\Groups;
     )
   ],
   normalizationContext: [
-    'groups' => ['external-presence', 'external-presence-read']
+    'groups' => ['external-presence', 'external-presence-read', 'timestamp']
   ],
   denormalizationContext: [
     'groups' => ['external-presence', 'external-presence-write']
   ]
 )]
 #[ApiFilter(DateFilter::class, properties: ['date' => DateFilter::EXCLUDE_NULL])]
-#[ApiFilter(OrderFilter::class, properties: ['date' => 'DESC'])]
+#[ApiFilter(OrderFilter::class, properties: ['date' => 'DESC', 'createdAt' => 'DESC'])]
 #[ApiFilter(MultipleFilter::class, properties: ['firstname', 'lastname', 'licence'])]
-class ExternalPresence {
+class ExternalPresence implements TimestampEntityInterface {
+  use TimestampTrait;
+
   #[ORM\Id]
   #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
   #[ORM\Column]
@@ -82,13 +86,8 @@ class ExternalPresence {
   #[ActivityMustBeEnabled]
   private Collection $activities;
 
-  #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-  #[Groups(['external-presence-read'])]
-  private ?\DateTimeImmutable $createdAt = null;
-
   public function __construct() {
     $this->activities = new ArrayCollection();
-    $this->createdAt = new \DateTimeImmutable();
     $this->date = new \DateTimeImmutable();
   }
 
@@ -147,23 +146,11 @@ class ExternalPresence {
     if (!$this->activities->contains($activity)) {
       $this->activities->add($activity);
     }
-
     return $this;
   }
 
   public function removeActivity(Activity $activity): static {
     $this->activities->removeElement($activity);
-
-    return $this;
-  }
-
-  public function getCreatedAt(): ?\DateTimeImmutable {
-    return $this->createdAt;
-  }
-
-  public function setCreatedAt(\DateTimeImmutable $createdAt): static {
-    $this->createdAt = $createdAt;
-
     return $this;
   }
 }

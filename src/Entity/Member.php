@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
@@ -179,6 +180,7 @@ use Symfony\Component\Validator\Constraints as Assert;
   processor: MemberProcessor::class,
 )]
 #[ApiFilter(ExistsFilter::class, properties: ['licence'])]
+#[ApiFilter(SearchFilter::class, properties: ['role' => 'exact'])]
 #[ApiFilter(OrderFilter::class, properties: ['lastname' => 'ASC', 'firstname' => 'ASC'])]
 #[ApiFilter(MultipleFilter::class, properties: ['firstname', 'lastname', 'licence'])]
 #[ApiFilter(CurrentSeasonFilter::class, properties: ['memberSeasons.season'])]
@@ -199,7 +201,7 @@ class Member implements UserInterface, PasswordAuthenticatedUserInterface {
   #[Groups(['member-read', 'member-presence-read'])]
   private ?MemberSeason $currentSeason = null;
 
-  #[Groups(['autocomplete', 'member-read', 'member-presence-read'])]
+  #[Groups(['autocomplete', 'member-read', 'member-presence-read', 'sale-read'])]
   private ?string $fullName = null;
 
   #[ORM\Column]
@@ -316,9 +318,16 @@ class Member implements UserInterface, PasswordAuthenticatedUserInterface {
   #[ORM\Column(length: 1)]
   private string $licenceType = "C";
 
+  /**
+   * @var Collection<int, Sale>
+   */
+  #[ORM\OneToMany(mappedBy: 'seller', targetEntity: Sale::class)]
+  private Collection $sales;
+
   public function __construct() {
     $this->memberPresences = new ArrayCollection();
     $this->memberSeasons = new ArrayCollection();
+    $this->sales = new ArrayCollection();
   }
 
   public function getId(): ?int {
@@ -652,6 +661,31 @@ class Member implements UserInterface, PasswordAuthenticatedUserInterface {
 
   public function setCurrentSeason(?MemberSeason $currentSeason): Member {
     $this->currentSeason = $currentSeason;
+    return $this;
+  }
+
+  /**
+   * @return Collection<int, Sale>
+   */
+  public function getSales(): Collection {
+    return $this->sales;
+  }
+
+  public function addSale(Sale $sale): static {
+    if (!$this->sales->contains($sale)) {
+      $this->sales->add($sale);
+      $sale->setSeller($this);
+    }
+    return $this;
+  }
+
+  public function removeSale(Sale $sale): static {
+    if ($this->sales->removeElement($sale)) {
+      // set the owning side to null (unless already changed)
+      if ($sale->getSeller() === $this) {
+        $sale->setSeller(null);
+      }
+    }
     return $this;
   }
 }

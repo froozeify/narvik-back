@@ -66,6 +66,10 @@ security:
 
         - { path: ^/external-presences, roles: [ROLE_SUPERVISOR, ROLE_BADGER]}
         - { path: ^/global-settings, roles: [ROLE_ADMIN]}
+            
+        - { path: ^/inventory-categories, roles: [ROLE_SUPERVISOR]}
+        - { path: ^/inventory-items, roles: [ROLE_SUPERVISOR]}
+        - { path: ^/inventory-item-histories, roles: [ROLE_SUPERVISOR]}
 
         - { path: ^/members/-/from-itac, roles: [ROLE_ADMIN]}
         - { path: ^/members, roles: [ROLE_SUPERVISOR, ROLE_BADGER]}
@@ -73,6 +77,10 @@ security:
         - { path: ^/member-presences/-/from-cerbere, roles: [ROLE_ADMIN]}
         - { path: ^/member-presences, roles: [ROLE_SUPERVISOR, ROLE_BADGER]}
         - { path: ^/metrics, roles: [ROLE_SUPERVISOR]}
+
+        - { path: ^/sales, roles: [ROLE_SUPERVISOR]}
+        - { path: ^/sale-payment-modes, roles: [ROLE_SUPERVISOR]}
+        # - { path: ^/sale-purchased-items, roles: [ROLE_SUPERVISOR]} # Not available in the API
             
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }

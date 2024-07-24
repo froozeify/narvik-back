@@ -54,7 +54,7 @@ class Sale implements TimestampEntityInterface {
   private ?int $id = null;
 
   #[ORM\ManyToOne(inversedBy: 'sales')]
-  #[Groups(['sale-read'])]
+  #[Groups(['sale'])]
   private ?Member $seller = null;
 
   #[ORM\ManyToOne]

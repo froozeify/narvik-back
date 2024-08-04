@@ -41,14 +41,18 @@ class MemberPresenceRepository extends ServiceEntityRepository {
     ;
   }
 
-  private function applyActivityExclusionConstraint(QueryBuilder $qb): QueryBuilder {
+  private function applyActivityExclusionConstraint(QueryBuilder $qb): void {
     $ignoredActivities = $this->globalSettingService->getSettingValue(GlobalSetting::IGNORED_ACTIVITIES_OPENING_STATS);
     if ($ignoredActivities) {
+      $ids = array_values(json_decode($ignoredActivities, true));
+      if (empty($ids)) {
+        return;
+      }
+
       $qb->leftJoin('m.activities', 'mpa')
          ->andWhere($qb->expr()->notIn("mpa.id", ":ids"))
-         ->setParameter("ids", array_values(json_decode($ignoredActivities, true)));
+         ->setParameter("ids", $ids);
     }
-    return $qb;
   }
 
   /**

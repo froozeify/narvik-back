@@ -78,7 +78,7 @@ class MetricProvider implements ProviderInterface {
     return $metric;
   }
 
-  protected function getPresences(string $identifier) {
+  protected function getPresences(string $identifier): Metric {
     $total = $this->memberPresenceRepository->countTotalMembersPresences();
 
     $currentYear = $this->memberPresenceRepository->countTotalMembersPresencesYearlyUntilToday();
@@ -112,7 +112,7 @@ class MetricProvider implements ProviderInterface {
     return $metric;
   }
 
-  protected function getExternalPresences(string $identifier) {
+  protected function getExternalPresences(string $identifier): Metric {
     $total = $this->externalPresenceRepository->countTotalExternalPresences();
 
     $currentYear = $this->externalPresenceRepository->countTotalExternalPresencesYearlyUntilToday();
@@ -146,7 +146,7 @@ class MetricProvider implements ProviderInterface {
     return $metric;
   }
 
-  protected function getImportBatches(string $identifier) {
+  protected function getImportBatches(string $identifier): Metric {
     $sql = "SELECT count(m.id) FROM messenger_messages m WHERE m.queue_name = 'csv_import'";
 
     $res = $this->entityManager->getConnection()->prepare($sql)->executeQuery()->fetchOne();
@@ -157,7 +157,7 @@ class MetricProvider implements ProviderInterface {
     return $metric;
   }
 
-  protected function getActivities(string $identifier) {
+  protected function getActivities(string $identifier): Metric {
     $currentYearTotal = $lastYearTotal = 0;
     $currentYearMetrics = $lastYearMetrics = [];
     foreach ($this->memberPresenceRepository->countPresencesPerActivitiesYearlyUntilToday() as $datas) {

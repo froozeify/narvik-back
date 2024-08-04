@@ -5,6 +5,8 @@ namespace App\Repository;
 use App\Entity\Activity;
 use App\Entity\Member;
 use App\Entity\MemberPresence;
+use App\Enum\GlobalSetting;
+use App\Service\GlobalSettingService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
@@ -19,8 +21,11 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method MemberPresence[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class MemberPresenceRepository extends ServiceEntityRepository {
-  public function __construct(ManagerRegistry $registry) {
+  private GlobalSettingService $globalSettingService;
+
+  public function __construct(ManagerRegistry $registry, GlobalSettingService $globalSettingService) {
     parent::__construct($registry, MemberPresence::class);
+    $this->globalSettingService = $globalSettingService;
   }
 
   private function applyTodayConstraint(QueryBuilder $qb): QueryBuilder {
@@ -34,6 +39,16 @@ class MemberPresenceRepository extends ServiceEntityRepository {
        ->setParameter('from', $date->setTime(0, 0, 0))
        ->setParameter('to', $date->setTime(23, 59, 59))
     ;
+  }
+
+  private function applyActivityExclusionConstraint(QueryBuilder $qb): QueryBuilder {
+    $ignoredActivities = $this->globalSettingService->getSettingValue(GlobalSetting::IGNORED_ACTIVITIES_OPENING_STATS);
+    if ($ignoredActivities) {
+      $qb->leftJoin('m.activities', 'mpa')
+         ->andWhere($qb->expr()->notIn("mpa.id", ":ids"))
+         ->setParameter("ids", array_values(json_decode($ignoredActivities, true)));
+    }
+    return $qb;
   }
 
   /**
@@ -79,6 +94,10 @@ class MemberPresenceRepository extends ServiceEntityRepository {
       ->getQuery()->getResult();
   }
 
+  /**********************************************************
+   *                        METRICS
+   *********************************************************/
+
   public function countTotalMembersPresencesYearlyUntilDate(\DateTime $maxDate): int {
     $startYear = (new \DateTime())
       ->setDate((int) $maxDate->format("Y"), 1, 1)
@@ -99,6 +118,8 @@ class MemberPresenceRepository extends ServiceEntityRepository {
       ->setTime(0, 0, 0);
 
     $qb = $this->createQueryBuilder("m");
+    $this->applyActivityExclusionConstraint($qb);
+
     return $qb
       ->select($qb->expr()->countDistinct("m.date"))
       ->andWhere($qb->expr()->between("m.date", ":from", ":to"))

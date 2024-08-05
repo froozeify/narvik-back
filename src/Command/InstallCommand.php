@@ -170,22 +170,10 @@ class InstallCommand extends Command {
   }
 
   private function generateGlobalSettingsDefault(): void {
-    $this->io->section("Génération des settings globaux par défaut");
-
-    if (!$this->globalSettingService->getSettingValue(GlobalSetting::CONTROL_SHOOTING_ACTIVITY_ID)) {
-      $this->io->writeln("Activité correspondante au tir contrôlé");
-      $this->globalSettingService->updateSettingValue(GlobalSetting::CONTROL_SHOOTING_ACTIVITY_ID, null);
-    }
-
-    if (!$this->globalSettingService->getSettingValue(GlobalSetting::LAST_ITAC_IMPORT)) {
-      $this->io->writeln("Date du dernier import depuis itac");
-      $this->globalSettingService->updateSettingValue(GlobalSetting::LAST_ITAC_IMPORT, null);
-    }
-
-    if (!$this->globalSettingService->getSettingValue(GlobalSetting::LAST_SECONDARY_CLUB_ITAC_IMPORT)) {
-      $this->io->writeln("Date du dernier import club secondaire depuis itac");
-      $this->globalSettingService->updateSettingValue(GlobalSetting::LAST_SECONDARY_CLUB_ITAC_IMPORT, null);
-    }
+    $command = new ArrayInput([
+      'command' => 'install:default-settings',
+    ]);
+    $this->getApplication()->doRun($command, $this->io);
   }
 
   private function randomToken(int $length): string {

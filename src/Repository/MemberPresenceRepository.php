@@ -5,9 +5,11 @@ namespace App\Repository;
 use App\Entity\Activity;
 use App\Entity\Member;
 use App\Entity\MemberPresence;
+use App\Repository\Interface\PresenceRepositoryInterface;
+use App\Repository\Trait\PresenceRepositoryTrait;
+use App\Service\GlobalSettingService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -18,32 +20,14 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method MemberPresence[]    findAll()
  * @method MemberPresence[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class MemberPresenceRepository extends ServiceEntityRepository {
-  public function __construct(ManagerRegistry $registry) {
+class MemberPresenceRepository extends ServiceEntityRepository implements PresenceRepositoryInterface {
+  use PresenceRepositoryTrait;
+
+  private GlobalSettingService $globalSettingService;
+
+  public function __construct(ManagerRegistry $registry, GlobalSettingService $globalSettingService) {
     parent::__construct($registry, MemberPresence::class);
-  }
-
-  private function applyTodayConstraint(QueryBuilder $qb): QueryBuilder {
-    return $this->applyDayConstraint($qb, new \DateTime());
-  }
-
-  private function applyDayConstraint(QueryBuilder $qb, \DateTime $date): QueryBuilder {
-    return $qb->andWhere(
-      $qb->expr()->between('m.date', ':from', ':to'),
-    )
-       ->setParameter('from', $date->setTime(0, 0, 0))
-       ->setParameter('to', $date->setTime(23, 59, 59))
-    ;
-  }
-
-  /**
-   * @return MemberPresence[] Returns an array of MemberPresence objects
-   */
-  public function findAllPresentToday() {
-    $qb = $this->createQueryBuilder('m');
-    return $this->applyTodayConstraint($qb)
-      ->orderBy('m.createdAt', 'DESC')
-      ->getQuery()->getResult();
+    $this->globalSettingService = $globalSettingService;
   }
 
   public function findOneToday(Member $member): ?MemberPresence {
@@ -68,101 +52,6 @@ class MemberPresenceRepository extends ServiceEntityRepository {
       ->setParameter("member", $member)
       ->setMaxResults(1)
       ->getQuery()->getOneOrNullResult();
-  }
-
-  public function findAllByActivity(Activity $activity): ?array {
-    $qb = $this->createQueryBuilder('m');
-    return $qb
-      ->innerJoin("m.activities", "a", Join::WITH, $qb->expr()->eq("a.id", ":activity"))
-      ->orderBy("m.date", "DESC")
-      ->setParameter("activity", $activity)
-      ->getQuery()->getResult();
-  }
-
-  public function countTotalMembersPresencesYearlyUntilDate(\DateTime $maxDate): int {
-    $startYear = (new \DateTime())
-      ->setDate((int) $maxDate->format("Y"), 1, 1)
-      ->setTime(0, 0, 0);
-
-    $qb = $this->createQueryBuilder("m");
-    return $qb
-      ->select($qb->expr()->count("m.id"))
-      ->andWhere($qb->expr()->between("m.date", ":from", ":to"))
-      ->setParameter("from", $startYear)
-      ->setParameter("to", $maxDate)
-      ->getQuery()->getSingleScalarResult();
-  }
-
-  public function countNumberOfMemberPresenceDaysYearlyUntilDate(\DateTime $maxDate): int {
-    $startYear = (new \DateTime())
-      ->setDate((int) $maxDate->format("Y"), 1, 1)
-      ->setTime(0, 0, 0);
-
-    $qb = $this->createQueryBuilder("m");
-    return $qb
-      ->select($qb->expr()->countDistinct("m.date"))
-      ->andWhere($qb->expr()->between("m.date", ":from", ":to"))
-      ->setParameter("from", $startYear)
-      ->setParameter("to", $maxDate)
-      ->getQuery()->getSingleScalarResult();
-  }
-
-  public function countTotalMembersPresencesYearlyUntilToday(): int {
-    return $this->countTotalMembersPresencesYearlyUntilDate(new \DateTime());
-  }
-
-  public function countTotalMembersPresencesYearlyForPreviousYear(): int {
-    $lastYear = new \DateTime();
-    $lastYear->setDate((int) $lastYear->format("Y") - 1, $lastYear->format("m"), $lastYear->format("d"));
-
-    return $this->countTotalMembersPresencesYearlyUntilDate($lastYear);
-  }
-
-  public function countTotalMembersPresences(): int {
-    $qb = $this->createQueryBuilder("m");
-    return $qb
-      ->select($qb->expr()->count("m.id"))
-      ->getQuery()->getSingleScalarResult();
-  }
-
-  public function countNumberOfMemberPresenceDaysYearlyUntilToday(): int {
-    return $this->countNumberOfMemberPresenceDaysYearlyUntilDate(new \DateTime());
-  }
-
-  public function countNumberOfMemberPresenceDaysYearlyForPreviousYear(): int {
-    $lastYear = new \DateTime();
-    $lastYear->setDate((int) $lastYear->format("Y") - 1, $lastYear->format("m"), $lastYear->format("d"));
-
-    return $this->countNumberOfMemberPresenceDaysYearlyUntilDate($lastYear);
-  }
-
-  public function countPresencesPerActivitiesYearlyUntilDate(\DateTime $maxDate) {
-    $startYear = (new \DateTime())
-      ->setDate((int) $maxDate->format("Y"), 1, 1)
-      ->setTime(0, 0, 0);
-
-    $qb = $this->createQueryBuilder("m");
-    return $qb
-      ->select("a.name")
-      ->addSelect($qb->expr()->count("a.name") . ' AS total')
-      ->innerJoin("m.activities", "a")
-      ->groupBy("a.name")
-      ->orderBy("a.name")
-
-      ->andWhere($qb->expr()->between("m.date", ":from", ":to"))
-      ->setParameter("from", $startYear)
-      ->setParameter("to", $maxDate)
-      ->getQuery()->getResult();
-  }
-
-  public function countPresencesPerActivitiesYearlyUntilToday() {
-    return $this->countPresencesPerActivitiesYearlyUntilDate(new \DateTime());
-  }
-
-  public function countPresencesPerActivitiesYearlyForPreviousYear() {
-    $lastYear = new \DateTime();
-    $lastYear->setDate((int) $lastYear->format("Y") - 1, $lastYear->format("m"), $lastYear->format("d"));
-    return $this->countPresencesPerActivitiesYearlyUntilDate($lastYear);
   }
 
 }

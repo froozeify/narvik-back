@@ -7,6 +7,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\Metric;
 use App\Repository\ExternalPresenceRepository;
+use App\Repository\Interface\PresenceRepositoryInterface;
 use App\Repository\MemberPresenceRepository;
 use App\Repository\MemberRepository;
 use App\Repository\MemberSeasonRepository;
@@ -78,15 +79,23 @@ class MetricProvider implements ProviderInterface {
     return $metric;
   }
 
-  protected function getPresences(string $identifier) {
-    $total = $this->memberPresenceRepository->countTotalMembersPresences();
+  protected function getPresences(string $identifier): Metric {
+    return $this->generatePresenceMetrics($identifier, $this->memberPresenceRepository);
+  }
 
-    $currentYear = $this->memberPresenceRepository->countTotalMembersPresencesYearlyUntilToday();
-    $currentYearOpenedDays = $this->memberPresenceRepository->countNumberOfMemberPresenceDaysYearlyUntilToday();
+  protected function getExternalPresences(string $identifier): Metric {
+    return $this->generatePresenceMetrics($identifier, $this->externalPresenceRepository);
+  }
+
+  private function generatePresenceMetrics(string $identifier, PresenceRepositoryInterface $repository): Metric {
+    $total = $repository->countTotalPresences();
+
+    $currentYear = $repository->countTotalPresencesYearlyUntilToday();
+    $currentYearOpenedDays = $repository->countNumberOfPresenceDaysYearlyUntilToday();
 
 
-    $lastYear = $this->memberPresenceRepository->countTotalMembersPresencesYearlyForPreviousYear();
-    $lastYearOpenedDays = $this->memberPresenceRepository->countNumberOfMemberPresenceDaysYearlyForPreviousYear();
+    $lastYear = $repository->countTotalPresencesYearlyForPreviousYear();
+    $lastYearOpenedDays = $repository->countNumberOfPresenceDaysYearlyForPreviousYear();
 
     $metric = new Metric();
     $metric->setName($identifier);
@@ -112,41 +121,7 @@ class MetricProvider implements ProviderInterface {
     return $metric;
   }
 
-  protected function getExternalPresences(string $identifier) {
-    $total = $this->externalPresenceRepository->countTotalExternalPresences();
-
-    $currentYear = $this->externalPresenceRepository->countTotalExternalPresencesYearlyUntilToday();
-    $currentYearOpenedDays = $this->externalPresenceRepository->countNumberOfExternalPresenceDaysYearlyUntilToday();
-
-
-    $lastYear = $this->externalPresenceRepository->countTotalExternalPresencesYearlyForPreviousYear();
-    $lastYearOpenedDays = $this->externalPresenceRepository->countNumberOfExternalPresenceDaysYearlyForPreviousYear();
-
-    $metric = new Metric();
-    $metric->setName($identifier);
-    $metric->setValue($total);
-    $metric->setChildMetrics([
-      (new Metric())
-        ->setName("previous-year")
-        ->setValue($lastYear)
-        ->setChildMetrics([
-          (new Metric())
-            ->setName("opened-days")
-            ->setValue($lastYearOpenedDays),
-        ]),
-      (new Metric())
-        ->setName("current-year")
-        ->setValue($currentYear)
-        ->setChildMetrics([
-          (new Metric())
-            ->setName("opened-days")
-            ->setValue($currentYearOpenedDays),
-        ]),
-    ]);
-    return $metric;
-  }
-
-  protected function getImportBatches(string $identifier) {
+  protected function getImportBatches(string $identifier): Metric {
     $sql = "SELECT count(m.id) FROM messenger_messages m WHERE m.queue_name = 'csv_import'";
 
     $res = $this->entityManager->getConnection()->prepare($sql)->executeQuery()->fetchOne();
@@ -157,7 +132,7 @@ class MetricProvider implements ProviderInterface {
     return $metric;
   }
 
-  protected function getActivities(string $identifier) {
+  protected function getActivities(string $identifier): Metric {
     $currentYearTotal = $lastYearTotal = 0;
     $currentYearMetrics = $lastYearMetrics = [];
     foreach ($this->memberPresenceRepository->countPresencesPerActivitiesYearlyUntilToday() as $datas) {

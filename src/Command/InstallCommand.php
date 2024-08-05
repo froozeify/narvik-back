@@ -19,7 +19,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-#[AsCommand(name: 'install', description: 'Create the bare default environment',)]
+#[AsCommand(name: 'install', description: 'Create the bare default environment')]
 class InstallCommand extends Command {
   private SymfonyStyle $io;
 
@@ -104,35 +104,14 @@ class InstallCommand extends Command {
   private function createAdminAccount(): void {
     $this->io->section("Création d'un compte administrateur");
 
-    $adminEmail = $this->io->askQuestion(new Question("Adresse mail administrateur", "admin@admin.com"));
-
-    $dbAmin = $this->memberRepository->findOneByEmail($adminEmail);
-
-    if ($dbAmin) {
-      $this->io->info("Email déjà existant, création du compte administrateur ignoré");
-      return;
-    }
-
-    $pwdQuestion = new Question("Mot de passe");
-    $pwdQuestion->setHidden(true);
-    $pwdQuestion->setValidator(function (?string $value): string {
-      if (empty($value)) {
-        throw new \Exception("Mot de passe invalide");
-      }
-      return $value;
-    });
-
-    $pwd = $this->io->askQuestion($pwdQuestion);
-    $adminMember = new Member();
-    $adminMember->setFirstname("admin")
-      ->setLastname("admin")
-      ->setEmail($adminEmail)
-      ->setPlainPassword($pwd)
-      ->setRole(MemberRole::admin)
-      ->setAccountActivated(true);
-
-    $this->em->persist($adminMember);
-    $this->em->flush();
+    $command = new ArrayInput([
+      'command' => 'member:create',
+      '--licence' => 'null',
+      '--role' => MemberRole::admin->value,
+      '--firstname' => 'Admin',
+      '--lastname' => 'ADMIN',
+    ]);
+    $this->getApplication()->doRun($command, $this->io);
   }
 
   private function createBadgerAccount(): void {
@@ -144,14 +123,16 @@ class InstallCommand extends Command {
       return;
     }
 
-    $badgerMember = new Member();
-    $badgerMember->setFirstname("badger")
-      ->setLastname("badger")
-      ->setEmail("badger")
-      ->setPlainPassword("badger")
-      ->setRole(MemberRole::badger);
-    $this->em->persist($badgerMember);
-    $this->em->flush();
+    $command = new ArrayInput([
+      'command' => 'member:create',
+      '--licence' => 'null',
+      '--role' => MemberRole::badger->value,
+      '--email' => 'badger',
+      '--password' => 'badger',
+      '--firstname' => 'Badger',
+      '--lastname' => 'badger',
+    ]);
+    $this->getApplication()->doRun($command, $this->io);
   }
 
   private function generateBadgerLoginToken(): void {

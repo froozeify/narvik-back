@@ -79,14 +79,14 @@ class MetricProvider implements ProviderInterface {
   }
 
   protected function getPresences(string $identifier): Metric {
-    $total = $this->memberPresenceRepository->countTotalMembersPresences();
+    $total = $this->memberPresenceRepository->countTotalPresences();
 
-    $currentYear = $this->memberPresenceRepository->countTotalMembersPresencesYearlyUntilToday();
-    $currentYearOpenedDays = $this->memberPresenceRepository->countNumberOfMemberPresenceDaysYearlyUntilToday();
+    $currentYear = $this->memberPresenceRepository->countTotalPresencesYearlyUntilToday();
+    $currentYearOpenedDays = $this->memberPresenceRepository->countNumberOfPresenceDaysYearlyUntilToday();
 
 
-    $lastYear = $this->memberPresenceRepository->countTotalMembersPresencesYearlyForPreviousYear();
-    $lastYearOpenedDays = $this->memberPresenceRepository->countNumberOfMemberPresenceDaysYearlyForPreviousYear();
+    $lastYear = $this->memberPresenceRepository->countTotalPresencesYearlyForPreviousYear();
+    $lastYearOpenedDays = $this->memberPresenceRepository->countNumberOfPresenceDaysYearlyForPreviousYear();
 
     $metric = new Metric();
     $metric->setName($identifier);
@@ -113,14 +113,14 @@ class MetricProvider implements ProviderInterface {
   }
 
   protected function getExternalPresences(string $identifier): Metric {
-    $total = $this->externalPresenceRepository->countTotalExternalPresences();
+    $total = $this->externalPresenceRepository->countTotalPresences();
 
-    $currentYear = $this->externalPresenceRepository->countTotalExternalPresencesYearlyUntilToday();
-    $currentYearOpenedDays = $this->externalPresenceRepository->countNumberOfExternalPresenceDaysYearlyUntilToday();
+    $currentYear = $this->externalPresenceRepository->countTotalPresencesYearlyUntilToday();
+    $currentYearOpenedDays = $this->externalPresenceRepository->countNumberOfPresenceDaysYearlyUntilToday();
 
 
-    $lastYear = $this->externalPresenceRepository->countTotalExternalPresencesYearlyForPreviousYear();
-    $lastYearOpenedDays = $this->externalPresenceRepository->countNumberOfExternalPresenceDaysYearlyForPreviousYear();
+    $lastYear = $this->externalPresenceRepository->countTotalPresencesYearlyForPreviousYear();
+    $lastYearOpenedDays = $this->externalPresenceRepository->countNumberOfPresenceDaysYearlyForPreviousYear();
 
     $metric = new Metric();
     $metric->setName($identifier);

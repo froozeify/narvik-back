@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\ExternalPresence;
+use App\Repository\Interface\PresenceRepositoryInterface;
 use App\Repository\Trait\PresenceRepositoryTrait;
 use App\Service\GlobalSettingService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -16,7 +17,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method ExternalPresence[]    findAll()
  * @method ExternalPresence[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ExternalPresenceRepository extends ServiceEntityRepository {
+class ExternalPresenceRepository extends ServiceEntityRepository implements PresenceRepositoryInterface {
   use PresenceRepositoryTrait;
 
   private GlobalSettingService $globalSettingService;

@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Activity;
 use App\Entity\Member;
 use App\Entity\MemberPresence;
+use App\Repository\Interface\PresenceRepositoryInterface;
 use App\Repository\Trait\PresenceRepositoryTrait;
 use App\Service\GlobalSettingService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -19,7 +20,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method MemberPresence[]    findAll()
  * @method MemberPresence[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class MemberPresenceRepository extends ServiceEntityRepository {
+class MemberPresenceRepository extends ServiceEntityRepository implements PresenceRepositoryInterface {
   use PresenceRepositoryTrait;
 
   private GlobalSettingService $globalSettingService;

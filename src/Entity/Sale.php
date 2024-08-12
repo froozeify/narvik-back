@@ -41,7 +41,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     'groups' => ['sale', 'sale-read', 'timestamp']
   ],
   denormalizationContext: [
-    'groups' => ['sale', 'sale-write']
+    'groups' => ['sale', 'sale-write', 'timestamp-write-create']
   ],
   order: ['createdAt' => 'DESC']
 )]

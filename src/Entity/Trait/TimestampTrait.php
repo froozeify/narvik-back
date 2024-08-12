@@ -8,11 +8,11 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 trait TimestampTrait {
   #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
-  #[Groups(['timestamp'])]
+  #[Groups(['timestamp', 'timestamp-write-create'])]
   private ?\DateTimeImmutable $createdAt = null;
 
   #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
-  #[Groups(['timestamp'])]
+  #[Groups(['timestamp', 'timestamp-write-update'])]
   private ?\DateTimeImmutable $updatedAt = null;
 
   public function getCreatedAt(): ?\DateTimeImmutable {

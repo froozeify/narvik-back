@@ -48,7 +48,7 @@ use Symfony\Component\Validator\Constraints as Assert;
   ],
   order: ['category.weight' => 'ASC', 'name' => 'ASC']
 )]
-#[ApiFilter(OrderFilter::class, properties: ['name' => 'ASC', 'category.name' => 'ASC', 'category.weight' => 'ASC'])]
+#[ApiFilter(OrderFilter::class, properties: ['name' => 'ASC', 'category.name' => 'ASC', 'category.weight' => 'ASC', 'quantity' => ['default_direction' => 'ASC', 'nulls_comparison' => OrderFilter::NULLS_ALWAYS_LAST ]])]
 #[ApiFilter(MultipleFilter::class, properties: ['name', 'barcode'])]
 #[ApiFilter(SearchFilter::class, properties: ['category.id' => 'exact'])]
 #[ApiFilter(BooleanFilter::class, properties: ['canBeSold'])]
@@ -93,6 +93,10 @@ class InventoryItem implements TimestampEntityInterface {
   #[ORM\Column(nullable: true)]
   #[Groups(['inventory-item'])]
   private ?int $quantity = null;
+
+  #[ORM\Column(nullable: true)]
+  #[Groups(['inventory-item'])]
+  private ?int $quantityAlert = null;
 
   #[ORM\Column(length: 255, nullable: true)]
   #[Groups(['inventory-item'])]
@@ -157,6 +161,15 @@ class InventoryItem implements TimestampEntityInterface {
 
   public function setSellingQuantity(int $sellingQuantity): static {
     $this->sellingQuantity = $sellingQuantity;
+    return $this;
+  }
+
+  public function getQuantityAlert(): ?int {
+    return $this->quantityAlert;
+  }
+
+  public function setQuantityAlert(?int $quantityAlert): static {
+    $this->quantityAlert = $quantityAlert;
     return $this;
   }
 

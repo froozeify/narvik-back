@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Entity\Interface\TimestampEntityInterface;
 use App\Entity\Trait\TimestampTrait;
@@ -29,6 +30,9 @@ use Symfony\Component\Validator\Constraints as Assert;
     new GetCollection(),
     new Get(),
     new Post(),
+    new Patch(
+      security: "is_granted('ROLE_ADMIN') || is_granted('SALE_UPDATE', object)",
+    ),
     new Delete(
       security: "is_granted('ROLE_ADMIN') || is_granted('SALE_DELETE', object)",
     ),
@@ -37,7 +41,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     'groups' => ['sale', 'sale-read', 'timestamp']
   ],
   denormalizationContext: [
-    'groups' => ['sale', 'sale-write']
+    'groups' => ['sale', 'sale-write', 'timestamp-write-create']
   ],
   order: ['createdAt' => 'DESC']
 )]

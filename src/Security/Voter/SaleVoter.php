@@ -10,7 +10,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class SaleDeleteVoter extends Voter {
+class SaleVoter extends Voter {
+  public const UPDATE = 'SALE_UPDATE';
   public const DELETE = 'SALE_DELETE';
 
   public function __construct(
@@ -19,7 +20,7 @@ class SaleDeleteVoter extends Voter {
   }
 
   protected function supports(string $attribute, mixed $subject): bool {
-    return $attribute == self::DELETE && $subject instanceof Sale;
+    return $subject instanceof Sale && in_array($attribute, [self::UPDATE, self::DELETE]);
   }
 
   protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool {

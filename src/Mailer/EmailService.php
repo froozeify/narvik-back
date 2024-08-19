@@ -7,6 +7,8 @@ use Symfony\Bridge\Twig\Mime\BodyRenderer;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Mime\Address;
 use Twig\Environment;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -16,6 +18,7 @@ class EmailService {
   public function __construct(
     private readonly GlobalSettingService $globalSettingService,
     private readonly Environment $twig,
+    private readonly MessageBusInterface $bus,
   ) {
   }
 
@@ -67,6 +70,13 @@ class EmailService {
     $dsn = '';
 
     // We load the smtp configuration
+    $transport = $this->getMailerTransport();
+
+    $mailer = new Mailer($transport, $this->bus);
+    $mailer->send($email);
+  }
+
+  public function getMailerTransport(): TransportInterface {
     $smtpHost = $this->globalSettingService->getSettingValue(GlobalSetting::SMTP_HOST);
     $smtpPort = $this->globalSettingService->getSettingValue(GlobalSetting::SMTP_PORT) ?? '25';
     $smtpUsername = $this->globalSettingService->getSettingValue(GlobalSetting::SMTP_USERNAME);
@@ -77,11 +87,8 @@ class EmailService {
 
     $dsn .= $smtpHost . ':' . $smtpPort;
 
-    $transport = Transport::fromDsn('smtp://' . $dsn);
-
-    // We send the mail TODO: Make it async
-    $mailer = new Mailer($transport);
-    $mailer->send($email);
+    //$transport = Transport::fromDsn('smtp://' . $dsn);
+    return Transport::fromDsn('smtp://mail:1025');
   }
 
   /**

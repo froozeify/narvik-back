@@ -77,13 +77,11 @@ class EmailService {
 
     $dsn .= $smtpHost . ':' . $smtpPort;
 
-
     $transport = Transport::fromDsn('smtp://' . $dsn);
 
     // We send the mail TODO: Make it async
     $mailer = new Mailer($transport);
     $mailer->send($email);
-    dump('sent');
   }
 
   /**

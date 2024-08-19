@@ -20,12 +20,12 @@
             }
 
             body {
-                padding: 2rem !important;
+                padding: 0 !important;
                 margin: 0 auto !important;
                 display: block !important;
                 min-width: 100% !important;
                 width: 100% !important;
-                background: #fafafa;
+                background: transparent;
                 -webkit-text-size-adjust: none;
 
                 font-family: ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
@@ -35,8 +35,12 @@
                 text-align: center;
             }
 
+            .container-wrapper {
+                padding: 32px;
+            }
+
             .container {
-                border-radius: .5rem;
+                border-radius: 8px;
                 background: #ffffff;
                 overflow: hidden;
                 box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.1);
@@ -48,19 +52,20 @@
             }
 
             a:hover {
-                color: #1e3a8a;
+                color: #1e3a8a !important;
             }
 
             a.button {
                 color: #60a5fa;
                 border-radius: 9999px;
-                padding: .375rem .625rem;
+                padding: 6px 10px;
 
                 background-color: #172554;
             }
 
             a.button:hover {
-                background-color: #1e3a8a;
+                color: #60a5fa !important;
+                background-color: #1e3a8a !important;
             }
 
             .main-title {
@@ -88,7 +93,7 @@
             .footer {
                 background-color: #0f172a;
                 margin: 0;
-                padding: 28px 30px;
+                padding: 30px 20px;
                 width: 100%;
                 height: 100%;
             }
@@ -106,8 +111,8 @@
 
             /* Mobile */
             @media only screen and (max-device-width: 640px), only screen and (max-width: 640px) {
-                body {
-                    padding: 1rem !important;
+                .container-wrapper {
+                    padding: 10px !important;
                 }
 
                 .td,
@@ -121,7 +126,7 @@
         </style>
     </head>
     <body class="body">
-    <center>
+    <center class="container-wrapper">
         <table width="100%" border="0" cellspacing="0" cellpadding="0"
                style="margin: 0; padding: 0; width: 100%; height: 100%;">
             <tr>
@@ -138,7 +143,7 @@
                                                     <td style="padding: 24px 0;">
                                                         <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                             <tr>
-                                                                <td class="center">
+                                                                <td class="center" style="padding: 0 16px;">
                                                                     <a href="{{ home_url }}" target="_blank">
                                                                         {% if logo is not empty %}
                                                                             <img src="{{ logo }}" width="80" alt="Logo"
@@ -166,7 +171,7 @@
                                                                            cellpadding="0">
                                                                         <tr>
                                                                             <td class=""
-                                                                                style="border-top: 1px solid #eaeaeb; padding: 40px 30px;">
+                                                                                style="border-top: 1px solid #eaeaeb; padding: 30px 20px;">
                                                                                 <table width="100%" border="0"
                                                                                        cellspacing="0" cellpadding="0">
                                                                                     <tr>

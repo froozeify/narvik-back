@@ -64,12 +64,26 @@ class EmailService {
       return;
     }
 
+    $dsn = '';
+
     // We load the smtp configuration
-    $transport = Transport::fromDsn('smtp://mail:1025');
+    $smtpHost = $this->globalSettingService->getSettingValue(GlobalSetting::SMTP_HOST);
+    $smtpPort = $this->globalSettingService->getSettingValue(GlobalSetting::SMTP_PORT) ?? '25';
+    $smtpUsername = $this->globalSettingService->getSettingValue(GlobalSetting::SMTP_USERNAME);
+    $smtpPassword = $this->globalSettingService->getSettingValue(GlobalSetting::SMTP_PASSWORD);
+    if (!empty($smtpUsername)) {
+      $dsn = urlencode($smtpUsername) . ':' . urlencode($smtpPassword) . '@';
+    }
+
+    $dsn .= $smtpHost . ':' . $smtpPort;
+
+
+    $transport = Transport::fromDsn('smtp://' . $dsn);
 
     // We send the mail TODO: Make it async
     $mailer = new Mailer($transport);
     $mailer->send($email);
+    dump('sent');
   }
 
   /**

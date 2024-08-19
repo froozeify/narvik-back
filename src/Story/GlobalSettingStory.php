@@ -19,5 +19,15 @@ final class GlobalSettingStory extends Story {
       'name'  => GlobalSetting::CONTROL_SHOOTING_ACTIVITY_ID->name,
       'value' => null,
     ]));
+
+    $this->addToPool('required_settings', GlobalSettingFactory::createOne([
+      'name'  => GlobalSetting::SMTP_HOST->name,
+      'value' => 'mail',
+    ]));
+
+    $this->addToPool('required_settings', GlobalSettingFactory::createOne([
+      'name'  => GlobalSetting::SMTP_PORT->name,
+      'value' => '1025',
+    ]));
   }
 }

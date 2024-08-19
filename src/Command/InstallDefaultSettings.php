@@ -60,7 +60,8 @@ class InstallDefaultSettings extends Command {
       GlobalSetting::SMTP_PORT,
       GlobalSetting::SMTP_USERNAME,
       GlobalSetting::SMTP_PASSWORD,
-      GlobalSetting::SMTP_SENDER
+      GlobalSetting::SMTP_SENDER,
+      GlobalSetting::SMTP_SENDER_NAME,
     ];
     foreach ($smtpFields as $field) {
       if (!$this->globalSettingService->settingExist($field)) {

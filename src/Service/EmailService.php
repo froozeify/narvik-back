@@ -7,6 +7,7 @@ use Symfony\Bridge\Twig\Mime\BodyRenderer;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mime\Address;
 use Twig\Environment;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Mailer\EventListener\MessageListener;
@@ -32,13 +33,25 @@ class EmailService {
     return false;
   }
 
-  public function getEmail(string $template, string $subject, array $context = []): TemplatedEmail {
+  public function getEmail(string $template, string $subject, array $context = []): ?TemplatedEmail {
+    if (!$this->canSendEmail()) {
+      return null;
+    }
+
+    $context['subject'] = $subject;
+    $context['home_url'] = '';
+    $context['logo'] = '';
+
+    // We render the html
     $htmlBody = $this->twig->render('email/' . $template, $context);
 
     // We load the default sender configuration
+    $smtpSender = $this->globalSettingService->getSettingValue(GlobalSetting::SMTP_SENDER);
+    $smtpSenderName = $this->globalSettingService->getSettingValue(GlobalSetting::SMTP_SENDER_NAME) ?? 'Narvik';
+
     $email = new TemplatedEmail();
     $email
-      ->from('tochange@test.fr')
+      ->from(new Address($smtpSender, $smtpSenderName))
       ->subject($subject)
       ->html($htmlBody)
       ->context($context);
@@ -46,8 +59,8 @@ class EmailService {
     return $email;
   }
 
-  public function sendEmail(TemplatedEmail $email): void {
-    if (!$this->canSendEmail()) {
+  public function sendEmail(?TemplatedEmail $email): void {
+    if (!$this->canSendEmail() || !$email) {
       return;
     }
 

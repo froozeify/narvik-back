@@ -18,8 +18,11 @@ class GlobalSettingTestEmail extends AbstractController {
     $json = $this->checkAndGetJsonValues($request, ['to']);
 
     $email = $emailService->getEmail('test.html.twig', 'Test configuration SMTP');
-    $email->to($json['to']);
+    if (!$email) {
+      return new JsonResponse();
+    }
 
+    $email->to($json['to']);
     $emailService->sendEmail($email);
 
     return new JsonResponse();

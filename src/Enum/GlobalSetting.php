@@ -18,4 +18,5 @@ enum GlobalSetting {
   case SMTP_USERNAME;
   case SMTP_PASSWORD;
   case SMTP_SENDER;
+  case SMTP_SENDER_NAME;
 }

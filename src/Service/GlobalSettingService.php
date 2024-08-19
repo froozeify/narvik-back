@@ -8,15 +8,24 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class GlobalSettingService {
   public function __construct(
-    private readonly EntityManagerInterface $em
+    private readonly EntityManagerInterface $em,
   ) {
 
+  }
+
+  public function settingExist(GlobalSetting $setting): bool {
+    $dbSetting = $this->em->getRepository(GlobalSettingEntity::class)
+      ->findOneBy([
+        "name" => $setting->name,
+      ]);
+
+    return (bool) $dbSetting;
   }
 
   public function getSettingValue(GlobalSetting $setting): ?string {
     $dbSetting = $this->em->getRepository(GlobalSettingEntity::class)
       ->findOneBy([
-        "name" => $setting->name
+        "name" => $setting->name,
       ]);
 
     if (!$dbSetting) {
@@ -38,7 +47,7 @@ class GlobalSettingService {
   public function updateSettingValue(GlobalSetting $setting, ?string $value): void {
     $dbSetting = $this->em->getRepository(GlobalSettingEntity::class)
       ->findOneBy([
-        "name" => $setting->name
+        "name" => $setting->name,
       ]);
 
     if (!$dbSetting) {

@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\GlobalSettingGetPublic;
 use App\Controller\GlobalSettingImportLogo;
+use App\Controller\GlobalSettingTestEmail;
 use App\Repository\GlobalSettingRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -41,6 +42,27 @@ use Doctrine\ORM\Mapping as ORM;
                     'type' => 'string',
                     'format' => 'binary'
                   ]
+                ]
+              ]
+            ]
+          ])
+        )
+      ),
+      security: "is_granted('ROLE_ADMIN')",
+      deserialize: false,
+    ),
+
+    new Post(
+      uriTemplate: '/global-settings/-/test-email',
+      controller: GlobalSettingTestEmail::class,
+      openapi: new Model\Operation(
+        requestBody: new Model\RequestBody(
+          content: new \ArrayObject([
+            'application/json' => [
+              'schema' => [
+                'type' => 'object',
+                'properties' => [
+                  'to' => ['type' => 'string'],
                 ]
               ]
             ]

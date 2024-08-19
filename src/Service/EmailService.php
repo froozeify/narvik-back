@@ -52,7 +52,7 @@ class EmailService {
     }
 
     // We load the smtp configuration
-    $transport = Transport::fromDsn('smtp://host.docker.internal:1025');
+    $transport = Transport::fromDsn('smtp://mail:1025');
 
     // We send the mail TODO: Make it async
     $mailer = new Mailer($transport);

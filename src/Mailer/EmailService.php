@@ -4,6 +4,7 @@ namespace App\Mailer;
 
 use App\Enum\GlobalSetting;
 use App\Service\GlobalSettingService;
+use App\Service\ImageService;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\Transport;
@@ -15,8 +16,9 @@ use Twig\Environment;
 class EmailService {
   public function __construct(
     private readonly GlobalSettingService $globalSettingService,
-    private readonly Environment $twig,
     private readonly MessageBusInterface $bus,
+    private readonly ImageService $imageService,
+    private readonly Environment $twig,
   ) {
   }
 
@@ -41,7 +43,8 @@ class EmailService {
 
     $context['subject'] = $subject;
     $context['home_url'] = '';
-    $context['logo'] = '';
+    $logo = $this->imageService->getLogo();
+    $context['logo'] = $logo?->getBase64();
 
     // We render the html
     $htmlBody = $this->twig->render('email/' . $template, $context);

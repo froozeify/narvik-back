@@ -122,7 +122,7 @@ class MetricProvider implements ProviderInterface {
   }
 
   protected function getImportBatches(string $identifier): Metric {
-    $sql = "SELECT count(m.id) FROM messenger_messages m WHERE m.queue_name = 'csv_import'";
+    $sql = "SELECT count(m.id) FROM messenger_messages m WHERE m.queue_name IN ('medium', 'low')";
 
     $res = $this->entityManager->getConnection()->prepare($sql)->executeQuery()->fetchOne();
 

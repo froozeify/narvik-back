@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Service;
+namespace App\Mailer;
 
 use App\Enum\GlobalSetting;
-use Symfony\Bridge\Twig\Mime\BodyRenderer;
+use App\Service\GlobalSettingService;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\Transport;
@@ -11,8 +11,6 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Mime\Address;
 use Twig\Environment;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Mailer\EventListener\MessageListener;
 
 class EmailService {
   public function __construct(
@@ -87,8 +85,7 @@ class EmailService {
 
     $dsn .= $smtpHost . ':' . $smtpPort;
 
-    //$transport = Transport::fromDsn('smtp://' . $dsn);
-    return Transport::fromDsn('smtp://mail:1025');
+    return Transport::fromDsn('smtp://' . $dsn);
   }
 
   /**

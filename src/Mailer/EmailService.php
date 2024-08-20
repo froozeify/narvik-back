@@ -68,8 +68,6 @@ class EmailService {
       return;
     }
 
-    $dsn = '';
-
     // We load the smtp configuration
     $transport = $this->getMailerTransport();
 
@@ -82,6 +80,8 @@ class EmailService {
     $smtpPort = $this->globalSettingService->getSettingValue(GlobalSetting::SMTP_PORT) ?? '25';
     $smtpUsername = $this->globalSettingService->getSettingValue(GlobalSetting::SMTP_USERNAME);
     $smtpPassword = $this->globalSettingService->getSettingValue(GlobalSetting::SMTP_PASSWORD);
+
+    $dsn = '';
     if (!empty($smtpUsername)) {
       $dsn = urlencode($smtpUsername) . ':' . urlencode($smtpPassword) . '@';
     }

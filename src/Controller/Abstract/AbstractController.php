@@ -2,6 +2,8 @@
 
 namespace App\Controller\Abstract;
 
+use App\Entity\Member;
+use App\Entity\Metric;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as SymfonyAbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,8 +23,7 @@ abstract class AbstractController extends SymfonyAbstractController {
     $json = $this->getJsonBody($request);
 
     foreach ($requiredParams as $requiredParam) {
-      $value = $json[$requiredParam] ?? null;
-      if (is_null($value)) {
+      if (!array_key_exists($requiredParam, $json)) {
         throw new HttpException(Response::HTTP_BAD_REQUEST, "Missing required field: '$requiredParam'");
       }
     }
@@ -33,6 +34,15 @@ abstract class AbstractController extends SymfonyAbstractController {
     $json = json_decode($request->getContent(), true);
     if (!$json && $required) throw new HttpException(Response::HTTP_BAD_REQUEST, "Body must be in json");
     return $json;
+  }
+
+  protected function getMember(): ?Member {
+    $user = $this->getUser();
+    if (!$user instanceof Member) {
+      return null;
+    }
+
+    return $user;
   }
 
   protected function toBoolean($value): bool {

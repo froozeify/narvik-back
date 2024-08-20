@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\GlobalSettingGetPublic;
 use App\Controller\GlobalSettingImportLogo;
+use App\Controller\GlobalSettingSmtp;
 use App\Controller\GlobalSettingTestEmail;
 use App\Repository\GlobalSettingRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -71,7 +72,34 @@ use Doctrine\ORM\Mapping as ORM;
       ),
       security: "is_granted('ROLE_ADMIN')",
       deserialize: false,
-    )
+    ),
+
+    new Post(
+      uriTemplate: '/global-settings/-/smtp',
+      controller: GlobalSettingSmtp::class,
+      openapi: new Model\Operation(
+        requestBody: new Model\RequestBody(
+          content: new \ArrayObject([
+            'application/json' => [
+              'schema' => [
+                'type' => 'object',
+                'properties' => [
+                  'on'         => ['type' => 'string'],
+                  'host'       => ['type' => 'string'],
+                  'port'       => ['type' => 'string'],
+                  'username'   => ['type' => 'string'],
+                  'password'   => ['type' => 'string'],
+                  'sender'     => ['type' => 'string'],
+                  'senderName' => ['type' => 'string'],
+                ]
+              ]
+            ]
+          ])
+        )
+      ),
+      security: "is_granted('ROLE_ADMIN')",
+      deserialize: false,
+    ),
   ]
 )]
 class GlobalSetting {

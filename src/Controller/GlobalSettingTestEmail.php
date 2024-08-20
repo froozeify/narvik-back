@@ -12,7 +12,7 @@ class GlobalSettingTestEmail extends AbstractController {
   public function __invoke(Request $request, EmailService $emailService) {
     $json = $this->checkAndGetJsonValues($request, ['to']);
 
-    $email = $emailService->getEmail('test.html.twig', 'Configuration SMTP');
+    $email = $emailService->getEmail('smtp-test.html.twig', 'Configuration SMTP');
     if (!$email) {
       return new JsonResponse();
     }

@@ -14,6 +14,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\Mime\Part\File;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ImageService {
@@ -32,12 +33,21 @@ class ImageService {
   }
 
   public function getLogo(): ?Image {
-    $publicFolder = $this->params->get('app.public_image');
+    $publicFolder = $this->params->get('app.public_images');
     return $this->loadImageFromPath('logo.png', "$publicFolder/logo.png");
   }
 
+  public function getLogoFile(): ?File {
+    $logo = $this->getLogo();
+    if (!$logo) {
+      return null;
+    }
+    $publicFolder = $this->params->get('app.public_images');
+    return new File("$publicFolder/{$logo->getName()}");
+  }
+
   public function importLogo(UploadedFile $file): string {
-    $publicFolder = $this->params->get('app.public_image');
+    $publicFolder = $this->params->get('app.public_images');
     $this->createFolderIfNotExist($publicFolder);
 
     $file->move($publicFolder, "logo.png");
@@ -96,7 +106,7 @@ class ImageService {
       return null;
     }
 
-    $imageFolder = $this->params->get('app.public_image');
+    $imageFolder = $this->params->get('app.public_images');
     return $this->loadImageFromPath($publicId, "$imageFolder/$path");
   }
 

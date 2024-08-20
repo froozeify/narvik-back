@@ -11,6 +11,7 @@ use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Part\DataPart;
 use Twig\Environment;
 
 class EmailService {
@@ -43,8 +44,13 @@ class EmailService {
 
     $context['subject'] = $subject;
     $context['home_url'] = '';
+
     $logo = $this->imageService->getLogo();
-    $context['logo'] = $logo?->getBase64();
+    $context['logo'] = '';
+    if ($logo) {
+      $logoPart = (new DataPart($this->imageService->getLogoFile(), 'logo', $logo->getMimeType()));
+      $context['logo'] = 'logo';
+    }
 
     // We render the html
     $htmlBody = $this->twig->render('email/' . $template, $context);
@@ -59,6 +65,10 @@ class EmailService {
       ->subject($subject)
       ->html($htmlBody)
       ->context($context);
+
+    if ($logo) {
+      $email->addPart($logoPart->asInline());
+    }
 
     return $email;
   }

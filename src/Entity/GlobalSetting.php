@@ -18,7 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 
 #[ORM\Entity(repositoryClass: GlobalSettingRepository::class)]
-#[ApiResource(
+#[ApiResource( // GlobalSetting are only available for super admin
   operations: [
     new GetCollection(),
     new Get(),

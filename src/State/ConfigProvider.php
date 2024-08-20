@@ -9,6 +9,7 @@ use App\Entity\Config;
 use App\Entity\Member;
 use App\Enum\GlobalSetting;
 use App\Enum\MemberRole;
+use App\Mailer\EmailService;
 use App\Service\GlobalSettingService;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
@@ -21,6 +22,7 @@ class ConfigProvider implements ProviderInterface {
     private readonly AuthorizationCheckerInterface $authorizationChecker,
     private readonly GlobalSettingService $globalSettingService,
     private readonly ContainerBagInterface $params,
+    private readonly EmailService $emailService,
   ) {
   }
 
@@ -38,7 +40,7 @@ class ConfigProvider implements ProviderInterface {
       return $config;
     }
 
-    $this->getUserConfig($config);
+    $this->getUserConfig($config, $member);
 
     return $config;
   }
@@ -51,10 +53,22 @@ class ConfigProvider implements ProviderInterface {
     }
 
     $config->setLogo($this->globalSettingService->getSettingValue(GlobalSetting::LOGO));
+
+    // Email notifications
+    $config->addModule('notifications', [
+      'enabled' => $this->emailService->canSendEmail(),
+    ]);
   }
 
-  public function getUserConfig(Config $config): void {
+  public function getUserConfig(Config $config, Member $member): void {
     $config->setId('user');
+
+    // User a supervisor, he can have access to the sale management
+    if ($this->authorizationChecker->isGranted(MemberRole::supervisor->value)) {
+      $config->addModule('sales', [
+        'enabled' => true,
+      ]);
+    }
   }
 
 }

@@ -19,13 +19,13 @@ class GlobalSettingSmtp extends AbstractController {
     $json = $this->checkAndGetJsonValues($request, ['on', 'host', 'port', 'username', 'password', 'sender', 'senderName']);
 
     // We apply the settings
-    $globalSettingService->updateSettingValue(GlobalSetting::SMTP_ON, $json['on'] ? '1' : '0');
+    $globalSettingService->updateSettingValue(GlobalSetting::SMTP_ON, $this->toBoolean($json['on']) ? '1' : '0');
     $globalSettingService->updateSettingValue(GlobalSetting::SMTP_HOST, $json['host']);
     $globalSettingService->updateSettingValue(GlobalSetting::SMTP_PORT, (string) $json['port']);
-    $globalSettingService->updateSettingValue(GlobalSetting::SMTP_USERNAME, $json['username']);
-    $globalSettingService->updateSettingValue(GlobalSetting::SMTP_PASSWORD, $json['password']);
+    $globalSettingService->updateSettingValue(GlobalSetting::SMTP_USERNAME, !empty($json['username']) ? $json['username'] : null);
+    $globalSettingService->updateSettingValue(GlobalSetting::SMTP_PASSWORD, !empty($json['password']) ? $json['password'] : null);
     $globalSettingService->updateSettingValue(GlobalSetting::SMTP_SENDER, $json['sender']);
-    $globalSettingService->updateSettingValue(GlobalSetting::SMTP_SENDER_NAME, $json['senderName']);
+    $globalSettingService->updateSettingValue(GlobalSetting::SMTP_SENDER_NAME, !empty($json['senderName']) ? $json['senderName'] : 'Narvik');
 
     // We restart the messenger so the cache is refreshed
     $application = new Application($kernel);

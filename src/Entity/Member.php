@@ -15,6 +15,7 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\MemberImportFromItac;
 use App\Controller\MemberImportSecondaryClubFromItac;
+use App\Controller\MemberPasswordReset;
 use App\Controller\MemberPasswordResetInitiate;
 use App\Controller\MemberPhotosImportFromItac;
 use App\Controller\MemberSearchByLicenceOrName;
@@ -102,7 +103,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     ),
     new Post(
       uriTemplate: '/members/-/reset-password',
-      controller: MemberSearchByLicenceOrName::class,
+      controller: MemberPasswordReset::class,
       openapi: new Model\Operation(
         summary: 'Change the password for an user. If securityCode is invalid a new one will be sent.',
         requestBody: new Model\RequestBody(

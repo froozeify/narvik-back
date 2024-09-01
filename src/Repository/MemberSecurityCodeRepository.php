@@ -16,16 +16,16 @@ class MemberSecurityCodeRepository extends ServiceEntityRepository {
     parent::__construct($registry, MemberSecurityCode::class);
   }
 
-  public function findOneBySecurityCode(Member $member, MemberSecurityCodeTrigger $trigger, string $securityCode): ?MemberSecurityCode {
+  public function findLastOneForMember(Member $member, MemberSecurityCodeTrigger $trigger): ?MemberSecurityCode {
     return $this->createQueryBuilder('m')
                 ->andWhere('m.member = :member')
                 ->andWhere('m.trigger = :trigger')
-                ->andWhere('m.code = :code')
-                ->andWhere('m.expireAt <= :expire_at')
+                ->andWhere(':expire_at <= m.expireAt')
                 ->setParameter('member', $member)
                 ->setParameter('trigger', $trigger)
-                ->setParameter('code', $securityCode)
                 ->setParameter('expire_at', new \DateTimeImmutable())
+                ->orderBy('m.createdAt', 'DESC')
+                ->setMaxResults(1)
                 ->getQuery()
                 ->getOneOrNullResult();
   }

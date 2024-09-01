@@ -11,7 +11,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(name: 'clean', description: 'Clean expired data from app')]
+#[AsCommand(name: 'clean', description: 'Remove expired data from the app (database & storage)')]
 class CleanupCommand extends Command {
   private SymfonyStyle $io;
 

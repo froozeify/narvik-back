@@ -43,12 +43,12 @@ class MemberSecurityCodeRepository extends ServiceEntityRepository {
   /**
    * Return codes that have expired and can be removed.
    *
-   * @return array
+   * @return MemberSecurityCode[]
    */
   public function findExpired(): array {
     return $this->createQueryBuilder('m')
-                ->andWhere('m.exampleField > :expire_at')
-                ->setParameter('expire_at', new \DateTimeImmutable('+1 days'))
+                ->andWhere('m.expireAt <= :expire_at')
+                ->setParameter('expire_at', new \DateTimeImmutable('-1 days'))
                 ->getQuery()
                 ->getResult();
   }

@@ -30,17 +30,26 @@ class MemberSecurityCodeRepository extends ServiceEntityRepository {
                 ->getOneOrNullResult();
   }
 
+  public function findAllByTrigger(Member $member, MemberSecurityCodeTrigger $trigger): array {
+    return $this->createQueryBuilder('m')
+                ->andWhere('m.member = :member')
+                ->andWhere('m.trigger = :trigger')
+                ->setParameter('member', $member)
+                ->setParameter('trigger', $trigger)
+                ->getQuery()
+                ->getResult();
+  }
+
   /**
-   * Return codes that have expired more than one day ago
-   * So they can be safely removed
+   * Return codes that have expired and can be removed.
    *
    * @return array
    */
   public function findExpired(): array {
     return $this->createQueryBuilder('m')
-            ->andWhere('m.exampleField > :expire_at')
-            ->setParameter('expire_at', new \DateTimeImmutable('+1 days'))
-            ->getQuery()
-            ->getResult();
+                ->andWhere('m.exampleField > :expire_at')
+                ->setParameter('expire_at', new \DateTimeImmutable('+1 days'))
+                ->getQuery()
+                ->getResult();
   }
 }

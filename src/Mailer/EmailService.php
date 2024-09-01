@@ -73,9 +73,13 @@ class EmailService {
     return $email;
   }
 
-  public function sendEmail(?TemplatedEmail $email): void {
+  public function sendEmail(?TemplatedEmail $email, string $to = null): void {
     if (!$this->canSendEmail() || !$email) {
       return;
+    }
+
+    if (!empty($to)) {
+      $email->to($to);
     }
 
     // We load the smtp configuration

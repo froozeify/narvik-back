@@ -1,0 +1,24 @@
+{% extends 'email/layout.html.twig' %}
+
+{% block css %}
+    <style type="text/css" media="screen">
+    .security-code {
+        text-align: center;
+        padding-top: 14px;
+    }
+
+    .security-code > span {
+        font-size: 20px;
+        font-weight: bold;
+        margin: 0 6px;
+        padding: 10px;
+        border: 1px solid #eaeaeb;
+        border-radius: 24px;
+    }
+    </style
+{% endblock %}
+
+{% block content %}
+    <div>Votre code de sécurité est :</div>
+    <div class="security-code">{% for code in security_code|split('') %}<span>{{ code }}</span>{% endfor %}</div>
+{% endblock %}

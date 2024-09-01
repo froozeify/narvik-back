@@ -32,7 +32,7 @@ class MemberSecurityCode implements TimestampEntityInterface {
   private \DateTimeImmutable $expireAt;
 
   public function __construct() {
-    $this->code = strtoupper(bin2hex(random_bytes(10)));
+    $this->code = substr(str_shuffle(strtoupper(bin2hex(random_bytes(10)))), 0, 6);
     $this->expireAt = new \DateTimeImmutable('+ 10 minutes');
   }
 

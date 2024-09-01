@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Controller\Abstract\AbstractController;
 use App\Enum\GlobalSetting;
-use App\Mailer\EmailService;
 use App\Service\GlobalSettingService;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -15,7 +14,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class GlobalSettingSmtp extends AbstractController {
 
-  public function __invoke(Request $request, KernelInterface $kernel, GlobalSettingService $globalSettingService, EmailService $emailService) {
+  public function __invoke(Request $request, KernelInterface $kernel, GlobalSettingService $globalSettingService) {
     $json = $this->checkAndGetJsonValues($request, ['on', 'host', 'port', 'username', 'password', 'sender', 'senderName']);
 
     // We apply the settings
@@ -33,14 +32,6 @@ class GlobalSettingSmtp extends AbstractController {
       'command' => 'messenger:stop-workers',
     ]);
     $application->doRun($command, new NullOutput());
-
-    $email = $emailService->getEmail('smtp-test.html.twig', 'Configuration SMTP');
-    if (!$email || !$this->getMember()) {
-      return new JsonResponse();
-    }
-
-    $email->to($this->getMember()->getEmail());
-    $emailService->sendEmail($email);
 
     return new JsonResponse();
   }

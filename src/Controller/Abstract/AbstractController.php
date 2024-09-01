@@ -3,7 +3,6 @@
 namespace App\Controller\Abstract;
 
 use App\Entity\Member;
-use App\Entity\Metric;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as SymfonyAbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

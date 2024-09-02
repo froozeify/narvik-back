@@ -110,7 +110,7 @@ class MemberService {
 
   public function validateSecurityCode(Member $member, MemberSecurityCodeTrigger $trigger, string $securityCode): bool {
     $securityCodeQuery = $this->memberSecurityCodeRepository->findLastOneForMember($member, $trigger);
-    if (!$securityCodeQuery || $securityCodeQuery->getCode() !== trim($securityCode)) {
+    if (!$securityCodeQuery || !$member->isAccountActivated() || $securityCodeQuery->getCode() !== trim($securityCode)) {
       return false;
     }
 

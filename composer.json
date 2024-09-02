@@ -3,7 +3,7 @@
     "version": "1.4.2",
     "type": "project",
     "license": "GNU AGPLv3",
-    "description": "App to manage member presence in a french shooting club",
+    "description": "App to manage a french shooting club",
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {

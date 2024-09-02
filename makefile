@@ -23,7 +23,7 @@ build: ## Builds the Docker images
 	@$(DOCKER_COMP) build --pull --no-cache
 
 build-prod:
-	@docker build --pull --no-cache -t benoitvignal/narvik-back:latest -t benoitvignal/narvik-back:1 -t benoitvignal/narvik-back:1.4 --target frankenphp_prod .
+	@docker build --pull --no-cache -t benoitvignal/narvik-back:latest -t benoitvignal/narvik-back:1 -t benoitvignal/narvik-back:1.5 --target frankenphp_prod .
 
 up: ## Start the docker hub in detached mode (no logs)
 	@$(DOCKER_COMP) up --detach

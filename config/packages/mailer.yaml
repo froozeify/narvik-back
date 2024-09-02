@@ -1,0 +1,3 @@
+framework:
+    mailer:
+        dsn: 'narvik://global-settings' # We use the config form the database

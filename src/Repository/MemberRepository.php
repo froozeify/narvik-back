@@ -95,6 +95,7 @@ class MemberRepository extends ServiceEntityRepository implements PasswordUpgrad
     return $this->createQueryBuilder('m')
       ->andWhere('m.licence = :licence')
       ->setParameter('licence', $licence)
+      ->setMaxResults(1)
       ->getQuery()
       ->getOneOrNullResult();
   }
@@ -103,6 +104,7 @@ class MemberRepository extends ServiceEntityRepository implements PasswordUpgrad
     return $this->createQueryBuilder('m')
       ->andWhere('m.email = :email')
       ->setParameter('email', $email)
+      ->setMaxResults(1)
       ->getQuery()
       ->getOneOrNullResult();
   }

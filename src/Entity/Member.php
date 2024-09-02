@@ -15,6 +15,8 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\MemberImportFromItac;
 use App\Controller\MemberImportSecondaryClubFromItac;
+use App\Controller\MemberPasswordReset;
+use App\Controller\MemberPasswordResetInitiate;
 use App\Controller\MemberPhotosImportFromItac;
 use App\Controller\MemberSearchByLicenceOrName;
 use App\Controller\MemberSelf;
@@ -74,6 +76,55 @@ use Symfony\Component\Validator\Constraints as Assert;
       ),
       read: false,
       write: false
+    ),
+
+    new Post(
+      uriTemplate: '/members/-/initiate-reset-password',
+      controller: MemberPasswordResetInitiate::class,
+      openapi: new Model\Operation(
+        summary: 'Trigger the reset password logic. Will send an email with a securityCode. Email must be enabled for this to work',
+        requestBody: new Model\RequestBody(
+          content: new \ArrayObject([
+            'application/json' => [
+              'schema' => [
+                'type' => 'object',
+                'properties' => [
+                  'email' => ['type' => 'string'],
+                ]
+              ]
+            ]
+          ])
+        ),
+      ),
+      read: false,
+      deserialize: false,
+      write: false,
+      serialize: false,
+    ),
+    new Post(
+      uriTemplate: '/members/-/reset-password',
+      controller: MemberPasswordReset::class,
+      openapi: new Model\Operation(
+        summary: 'Change the password for an user. If securityCode is invalid a new one will be sent.',
+        requestBody: new Model\RequestBody(
+          content: new \ArrayObject([
+            'application/json' => [
+              'schema' => [
+                'type' => 'object',
+                'properties' => [
+                  'email' => ['type' => 'string'],
+                  'password' => ['type' => 'string'],
+                  'securityCode' => ['type' => 'string'],
+                ]
+              ]
+            ]
+          ])
+        ),
+      ),
+      read: false,
+      deserialize: false,
+      write: false,
+      serialize: false,
     ),
 
 

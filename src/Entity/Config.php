@@ -12,11 +12,11 @@ use Symfony\Component\Serializer\Attribute\Groups;
   operations: [
     new Get(
       uriTemplate: '/public/config',
-      name: 'config'
+      name: 'config',
     ),
   ],
   normalizationContext: [
-    'groups' => ['config']
+    'groups' => ['config'],
   ],
   provider: ConfigProvider::class,
 )]
@@ -68,6 +68,11 @@ class Config {
 
   public function setModules(?array $modules): Config {
     $this->modules = $modules;
+    return $this;
+  }
+
+  public function addModule(string $name, array $moduleConfig): Config {
+    $this->modules[$name] = $moduleConfig;
     return $this;
   }
 }

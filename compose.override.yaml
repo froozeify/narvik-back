@@ -28,3 +28,14 @@ services:
     ports:
       - "5432:5432"
 ###< doctrine/doctrine-bundle ###
+
+###> symfony/mailer ###
+  mail:
+    image: axllent/mailpit
+    ports:
+      - "1025:1025" # SMTP
+      - "8025:8025" # UI
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+###< symfony/mailer ###

@@ -10,4 +10,13 @@ enum GlobalSetting {
   case LAST_SECONDARY_CLUB_ITAC_IMPORT;
 
   case LOGO;
+
+  // Email configuration
+  case SMTP_ON;
+  case SMTP_HOST;
+  case SMTP_PORT;
+  case SMTP_USERNAME;
+  case SMTP_PASSWORD;
+  case SMTP_SENDER;
+  case SMTP_SENDER_NAME;
 }

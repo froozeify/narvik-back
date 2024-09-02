@@ -8,7 +8,7 @@ parameters:
     app.expose_version: '%env(bool:resolve:EXPOSE_VERSION)%'
     
     app.images: '%kernel.project_dir%/private/images'
-    app.public_image: '%kernel.project_dir%/private/images/public'
+    app.public_images: '%kernel.project_dir%/private/images/public'
     app.members_photos: '%app.images%/members'
 
 services:

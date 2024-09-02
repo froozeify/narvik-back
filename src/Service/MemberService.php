@@ -85,7 +85,7 @@ class MemberService {
   }
 
   public function initiateResetPassword(Member $member): bool {
-    if (!$this->emailService->canSendEmail()) {
+    if (!$member->isAccountActivated() || !$this->emailService->canSendEmail()) {
       return false;
     }
 
@@ -110,7 +110,7 @@ class MemberService {
 
   public function validateSecurityCode(Member $member, MemberSecurityCodeTrigger $trigger, string $securityCode): bool {
     $securityCodeQuery = $this->memberSecurityCodeRepository->findLastOneForMember($member, $trigger);
-    if (!$securityCodeQuery || !$member->isAccountActivated() || $securityCodeQuery->getCode() !== trim($securityCode)) {
+    if (!$securityCodeQuery || $securityCodeQuery->getCode() !== trim($securityCode)) {
       return false;
     }
 

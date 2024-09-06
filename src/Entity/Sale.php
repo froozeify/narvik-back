@@ -43,7 +43,8 @@ use Symfony\Component\Validator\Constraints as Assert;
   denormalizationContext: [
     'groups' => ['sale', 'sale-write', 'timestamp-write-create']
   ],
-  order: ['createdAt' => 'DESC']
+  order: ['createdAt' => 'DESC'],
+  paginationClientEnabled: true,
 )]
 #[ApiFilter(OrderFilter::class, properties: ['createdAt' => 'DESC'])]
 #[ApiFilter(SearchFilter::class, properties: ['seller.id' => 'exact'])]

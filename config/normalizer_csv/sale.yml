@@ -1,0 +1,25 @@
+App\Entity\Sale:
+    id: ~
+    createdAt: ~ 
+    updatedAt: ~ 
+    price: ~ 
+    comment: ~ 
+    
+    seller:
+        prefix: seller
+        fields:
+            fullName: ~
+        
+    paymentMode:
+        prefix: paymentMode
+        fields:
+            name: ~
+            
+    salePurchasedItems:
+        prefix: item
+        fields:
+            id: ~
+            itemName: name
+            itemCategory: category
+            itemPrice: price
+            quantity: ~

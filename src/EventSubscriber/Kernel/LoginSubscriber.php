@@ -39,7 +39,13 @@ final class LoginSubscriber implements EventSubscriberInterface {
     }
 
     $this->request = $event->getRequest();
-    $ipLimiter = $this->ipLoginLimiter->create($event->getRequest()->getClientIp());
+
+    $ip = $event->getRequest()->getClientIp();
+    if (!$ip) {
+      return;
+    }
+
+    $ipLimiter = $this->ipLoginLimiter->create($ip);
     $ipLimiter->consume(1)->ensureAccepted();
 
     $memberLimiter = $this->getMemberLimiter();

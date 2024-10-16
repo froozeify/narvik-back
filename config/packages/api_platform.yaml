@@ -18,13 +18,11 @@ api_platform:
             vary: ['Content-Type', 'Authorization', 'Origin']
         extra_properties:
             standard_put: true
-            rfc_7807_compliant_errors: true
         pagination_client_items_per_page: true
         collection:
             pagination:
                 items_per_page_parameter_name: itemsPerPage
     use_symfony_listeners: true
-    keep_legacy_inflector: false
     path_segment_name_generator: api_platform.metadata.path_segment_name_generator.dash
     
     swagger:

@@ -1,6 +1,6 @@
 {
     "name": "benoit-vignal/narvik-back",
-    "version": "1.5.3",
+    "version": "1.6.0",
     "type": "project",
     "license": "GNU AGPLv3",
     "description": "App to manage a french shooting club",
@@ -10,7 +10,8 @@
         "php": ">=8.2.11",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "api-platform/core": "^3.3",
+        "api-platform/doctrine-orm": "^4.0",
+        "api-platform/symfony": "^4.0",
         "doctrine/annotations": "^2.0",
         "doctrine/doctrine-bundle": "^2.12",
         "doctrine/doctrine-migrations-bundle": "^3.3",

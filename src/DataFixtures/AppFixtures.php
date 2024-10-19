@@ -34,13 +34,13 @@ class AppFixtures extends Fixture {
     // We create the users
     $adminMember = MemberFactory::new()->admin("admin@admin.com")->create();
     MemberFactory::new()->badger()->create();
-    MemberFactory::createMany(faker()->numberBetween(60, 120), [
+    MemberFactory::createMany(faker()->numberBetween(30, 40), [
       'memberPresences' => MemberPresenceFactory::new()->many(1, 4),
       'memberSeasons'   => MemberSeasonFactory::new()->many(0, 4),
     ]);
 
     // We record some external presence
-    ExternalPresenceFactory::new()->many(40, 80)->create();
+    ExternalPresenceFactory::new()->many(20, 40)->create();
 
     /*******************************************************
      *                    INVENTORY                        *
@@ -72,7 +72,7 @@ class AppFixtures extends Fixture {
     }
 
     SalePaymentModeStory::load();
-    SaleFactory::createMany(faker()->numberBetween(20, 50), [
+    SaleFactory::createMany(faker()->numberBetween(10, 30), [
       'seller' => $adminMember,
     ]);
   }

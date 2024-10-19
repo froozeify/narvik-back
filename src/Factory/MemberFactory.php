@@ -61,8 +61,8 @@ final class MemberFactory extends PersistentProxyObjectFactory {
    */
   protected function defaults(): array {
     return [
-      'firstname' => self::faker()->firstName,
-      'lastname'  => self::faker()->lastName,
+      'firstname' => self::faker()->firstName(),
+      'lastname'  => self::faker()->lastName(),
       'email'     => self::faker()->unique()->safeEmail(),
       'licence'   => str_pad(self::faker()->numberBetween(1000000, 99999999), 8, "0", STR_PAD_LEFT),
       'role'      => MemberRole::user,
@@ -75,7 +75,7 @@ final class MemberFactory extends PersistentProxyObjectFactory {
       'firstname'        => 'admin',
       'lastname'         => 'admin',
       'email'            => $email ?? self::faker()->unique()->safeEmail(),
-      'plainPassword'    => $password ?? 'admin',
+      'plainPassword'    => $password ?? 'admin123',
       'accountActivated' => true,
       'role'             => MemberRole::admin,
     ]);
@@ -94,7 +94,7 @@ final class MemberFactory extends PersistentProxyObjectFactory {
       'firstname'        => 'badger',
       'lastname'         => 'badger',
       'email'            => 'badger',
-      'plainPassword'    => 'badger',
+      'plainPassword'    => 'badger123',
       'accountActivated' => false,
       'role'             => MemberRole::badger,
     ]);

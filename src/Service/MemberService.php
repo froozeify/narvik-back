@@ -74,12 +74,12 @@ class MemberService {
    * @param string $password
    * @return string|null Error message or null if ever everything is ok
    */
-  public function changeMemberPassword(Member $member, string $password): ?string {
+  public function changeMemberPassword(Member $member, string $password, bool $flush = true): ?string {
     if (empty($password) || strlen($password) < 8) {
       return 'Password must be at least 8 letters long';
     }
 
-    $this->memberRepository->upgradePassword($member, $this->passwordHasher->hashPassword($member, $password));
+    $this->memberRepository->upgradePassword($member, $this->passwordHasher->hashPassword($member, $password), $flush);
 
     return null;
   }

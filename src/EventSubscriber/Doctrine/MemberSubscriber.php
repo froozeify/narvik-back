@@ -30,7 +30,7 @@ class MemberSubscriber extends AbstractEventSubscriber {
 
   private function updatePassword(Member $member): void {
     if (!empty($member->getPlainPassword())) {
-      $changeError = $this->memberService->changeMemberPassword($member, $member->getPlainPassword());
+      $changeError = $this->memberService->changeMemberPassword($member, $member->getPlainPassword(), false);
       if ($changeError) {
         throw new HttpException(Response::HTTP_BAD_REQUEST, $changeError);
       }

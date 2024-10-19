@@ -33,14 +33,17 @@ class MemberRepository extends ServiceEntityRepository implements PasswordUpgrad
   /**
    * Used to upgrade (rehash) the user's password automatically over time.
    */
-  public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void {
+  public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword, bool $flush = true): void {
     if (!$user instanceof Member) {
       throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', $user::class));
     }
 
     $user->setPassword($newHashedPassword);
-    $this->getEntityManager()->persist($user);
-    $this->getEntityManager()->flush();
+    $user->setPlainPassword(null);
+    if ($flush) {
+      $this->getEntityManager()->persist($user);
+      $this->getEntityManager()->flush();
+    }
   }
 
   public function loadUserByIdentifier(string $identifier): ?UserInterface {

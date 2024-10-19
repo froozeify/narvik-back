@@ -7,10 +7,9 @@ use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
+use App\Entity\Abstract\UuidEntity;
 use App\Entity\Interface\TimestampEntityInterface;
-use App\Entity\Interface\UuidEntityInterface;
 use App\Entity\Trait\TimestampTrait;
-use App\Entity\Trait\UuidTrait;
 use App\Repository\InventoryItemHistoryRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -31,9 +30,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
   order: ['createdAt' => 'DESC'],
 )]
 #[ApiFilter(OrderFilter::class, properties: ['createdAt' => 'DESC'])]
-class InventoryItemHistory implements UuidEntityInterface, TimestampEntityInterface {
+class InventoryItemHistory extends UuidEntity implements TimestampEntityInterface {
   use TimestampTrait;
-  use UuidTrait;
 
   #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2, nullable: true)]
   #[Groups(['inventory-item-history-read'])]

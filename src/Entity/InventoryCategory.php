@@ -13,9 +13,8 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\InventoryCategoryMove;
+use App\Entity\Abstract\UuidEntity;
 use App\Entity\Interface\SortableEntityInterface;
-use App\Entity\Interface\UuidEntityInterface;
-use App\Entity\Trait\UuidTrait;
 use App\Repository\InventoryCategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -75,8 +74,7 @@ use Symfony\Component\Validator\Constraints as Assert;
   order: ['weight' => 'asc'],
 )]
 #[ApiFilter(OrderFilter::class, properties: ['weight' => 'ASC', 'name' => 'ASC'])]
-class InventoryCategory implements UuidEntityInterface, SortableEntityInterface {
-  use UuidTrait;
+class InventoryCategory extends UuidEntity implements SortableEntityInterface {
 
   #[ORM\Column(length: 255)]
   #[Groups(['inventory-category', 'inventory-item-read'])]
@@ -92,6 +90,7 @@ class InventoryCategory implements UuidEntityInterface, SortableEntityInterface 
   private Collection $items;
 
   public function __construct() {
+    parent::__construct();
     $this->items = new ArrayCollection();
   }
 

@@ -13,10 +13,9 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Entity\Abstract\UuidEntity;
 use App\Entity\Interface\TimestampEntityInterface;
-use App\Entity\Interface\UuidEntityInterface;
 use App\Entity\Trait\TimestampTrait;
-use App\Entity\Trait\UuidTrait;
 use App\Filter\MultipleFilter;
 use App\Repository\InventoryItemRepository;
 use App\Service\UtilsService;
@@ -55,9 +54,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(SearchFilter::class, properties: ['category.uuid' => 'exact'])]
 #[ApiFilter(BooleanFilter::class, properties: ['canBeSold'])]
 #[ApiFilter(ExistsFilter::class, properties: ['sellingPrice'])]
-class InventoryItem implements UuidEntityInterface, TimestampEntityInterface {
+class InventoryItem extends UuidEntity implements TimestampEntityInterface {
   use TimestampTrait;
-  use UuidTrait;
 
   #[ORM\Column(length: 255)]
   #[Groups(['inventory-item', 'sale-read'])]

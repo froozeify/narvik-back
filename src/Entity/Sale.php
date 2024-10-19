@@ -12,10 +12,9 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Entity\Abstract\UuidEntity;
 use App\Entity\Interface\TimestampEntityInterface;
-use App\Entity\Interface\UuidEntityInterface;
 use App\Entity\Trait\TimestampTrait;
-use App\Entity\Trait\UuidTrait;
 use App\Repository\SaleRepository;
 use App\Service\UtilsService;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -51,9 +50,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(OrderFilter::class, properties: ['createdAt' => 'DESC'])]
 #[ApiFilter(SearchFilter::class, properties: ['seller.id' => 'exact'])]
 #[ApiFilter(DateFilter::class, properties: ['createdAt' => DateFilter::EXCLUDE_NULL])]
-class Sale implements UuidEntityInterface, TimestampEntityInterface {
+class Sale extends UuidEntity implements TimestampEntityInterface {
   use TimestampTrait;
-  use UuidTrait;
 
   #[ORM\ManyToOne(inversedBy: 'sales')]
   #[Groups(['sale'])]
@@ -84,6 +82,7 @@ class Sale implements UuidEntityInterface, TimestampEntityInterface {
   private Collection $salePurchasedItems;
 
   public function __construct() {
+    parent::__construct();
     $this->salePurchasedItems = new ArrayCollection();
   }
 

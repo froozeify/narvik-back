@@ -13,13 +13,13 @@ trait UuidTrait {
   #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
   #[ORM\Column]
   #[ApiProperty(identifier: false)]
-  private ?int $id = null;
+  protected ?int $id = null;
 
   #[ApiProperty(identifier: true)]
   #[ORM\Column(type: 'uuid', unique: true)]
   #[ORM\CustomIdGenerator(class: UuidV7Generator::class)]
   #[Groups(['common-read'])]
-  private ?UuidInterface $uuid = null;
+  protected ?UuidInterface $uuid = null;
 
   public function getId(): ?int {
     return $this->id;

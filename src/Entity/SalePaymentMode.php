@@ -14,9 +14,8 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\SalePaymentModeMove;
+use App\Entity\Abstract\UuidEntity;
 use App\Entity\Interface\SortableEntityInterface;
-use App\Entity\Interface\UuidEntityInterface;
-use App\Entity\Trait\UuidTrait;
 use App\Repository\SalePaymentModeRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -74,8 +73,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[ApiFilter(OrderFilter::class, properties: ['weight' => 'ASC'])]
 #[ApiFilter(BooleanFilter::class, properties: ['available'])]
-class SalePaymentMode implements UuidEntityInterface, SortableEntityInterface {
-  use UuidTrait;
+class SalePaymentMode extends UuidEntity implements SortableEntityInterface {
 
   #[ORM\Column(length: 255)]
   #[Groups(['sale-payment-mode', 'sale-read'])]

@@ -2,10 +2,9 @@
 
 namespace App\Entity;
 
+use App\Entity\Abstract\UuidEntity;
 use App\Entity\Interface\TimestampEntityInterface;
-use App\Entity\Interface\UuidEntityInterface;
 use App\Entity\Trait\TimestampTrait;
-use App\Entity\Trait\UuidTrait;
 use App\Repository\SalePurchasedItemRepository;
 use App\Service\UtilsService;
 use Doctrine\DBAL\Types\Types;
@@ -14,9 +13,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SalePurchasedItemRepository::class)]
-class SalePurchasedItem implements UuidEntityInterface, TimestampEntityInterface {
+class SalePurchasedItem extends UuidEntity implements TimestampEntityInterface {
   use TimestampTrait;
-  use UuidTrait;
 
   #[ORM\ManyToOne]
   #[Groups(['sale'])]

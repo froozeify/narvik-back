@@ -31,6 +31,7 @@ RUN set -eux; \
 		zip \
     	gd \
     	fileinfo \
+    	gmp \
 	;
 
 # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser

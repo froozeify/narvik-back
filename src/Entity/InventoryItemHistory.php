@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     'itemId' => new Link(toProperty: 'item', fromClass: InventoryItem::class),
   ],
   normalizationContext: [
-    'groups' => ['inventory-item-history', 'inventory-item-history-read', 'timestamp']
+    'groups' => ['inventory-item-history', 'inventory-item-history-read']
   ],
   order: ['createdAt' => 'DESC'],
 )]

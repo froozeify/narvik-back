@@ -44,7 +44,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     )
   ],
   normalizationContext: [
-    'groups' => ['external-presence', 'external-presence-read', 'timestamp']
+    'groups' => ['external-presence', 'external-presence-read']
   ],
   denormalizationContext: [
     'groups' => ['external-presence', 'external-presence-write']

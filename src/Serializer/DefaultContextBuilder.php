@@ -29,10 +29,13 @@ final readonly class DefaultContextBuilder implements SerializerContextBuilderIn
 
     // Normalization context
     if ($normalization) {
+      $context['groups'][] = 'common-read';
+      $context['groups'][] = 'timestamp';
       if ($this->authorizationChecker->isGranted(MemberRole::admin->value)) {
         $context['groups'][] = 'admin-read';
       }
     } else {
+      $context['groups'][] = 'common-write';
       if ($this->authorizationChecker->isGranted(MemberRole::admin->value)) {
         $context['groups'][] = 'admin-write';
       }

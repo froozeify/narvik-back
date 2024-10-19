@@ -41,7 +41,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     ),
   ],
   normalizationContext: [
-    'groups' => ['inventory-item', 'inventory-item-read', 'timestamp']
+    'groups' => ['inventory-item', 'inventory-item-read']
   ],
   denormalizationContext: [
     'groups' => ['inventory-item', 'inventory-item-write']

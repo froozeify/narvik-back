@@ -13,7 +13,9 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Entity\Interface\TimestampEntityInterface;
+use App\Entity\Interface\UuidEntityInterface;
 use App\Entity\Trait\TimestampTrait;
+use App\Entity\Trait\UuidTrait;
 use App\Repository\SaleRepository;
 use App\Service\UtilsService;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -38,7 +40,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     ),
   ],
   normalizationContext: [
-    'groups' => ['sale', 'sale-read', 'timestamp']
+    'groups' => ['sale', 'sale-read']
   ],
   denormalizationContext: [
     'groups' => ['sale', 'sale-write', 'timestamp-write-create']
@@ -49,14 +51,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(OrderFilter::class, properties: ['createdAt' => 'DESC'])]
 #[ApiFilter(SearchFilter::class, properties: ['seller.id' => 'exact'])]
 #[ApiFilter(DateFilter::class, properties: ['createdAt' => DateFilter::EXCLUDE_NULL])]
-class Sale implements TimestampEntityInterface {
+class Sale implements UuidEntityInterface, TimestampEntityInterface {
   use TimestampTrait;
-
-  #[ORM\Id]
-  #[ORM\GeneratedValue]
-  #[ORM\Column]
-  #[Groups(['sale-read'])]
-  private ?int $id = null;
+  use UuidTrait;
 
   #[ORM\ManyToOne(inversedBy: 'sales')]
   #[Groups(['sale'])]
@@ -88,10 +85,6 @@ class Sale implements TimestampEntityInterface {
 
   public function __construct() {
     $this->salePurchasedItems = new ArrayCollection();
-  }
-
-  public function getId(): ?int {
-    return $this->id;
   }
 
   public function getSeller(): ?Member {

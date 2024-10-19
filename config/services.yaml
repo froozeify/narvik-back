@@ -33,3 +33,7 @@ services:
         decorates: 'api_platform.serializer.context_builder'
         arguments: [ '@App\Serializer\DefaultContextBuilder.inner' ]
         autoconfigure: false
+    
+    App\Identifier\UuidUriVariableTransformer:
+        tags:
+            - { name: api_platform.uri_variables.transformer }

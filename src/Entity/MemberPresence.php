@@ -105,7 +105,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     )
   ],
   normalizationContext: [
-    'groups' => ['member-presence', 'member-presence-read', 'timestamp']
+    'groups' => ['member-presence', 'member-presence-read']
   ],
   denormalizationContext: [
     'groups' => ['member-presence', 'member-presence-write']
@@ -119,7 +119,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
   ], uriVariables: [
     'memberId' => new Link(fromClass: Member::class, toProperty: 'member'),
   ], normalizationContext: [
-    'groups' => ['member-presence', 'member-presence-read', 'timestamp']
+    'groups' => ['member-presence', 'member-presence-read']
   ],
   paginationClientEnabled: true,
 )]

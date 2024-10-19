@@ -59,12 +59,6 @@ class InventoryItem implements UuidEntityInterface, TimestampEntityInterface {
   use TimestampTrait;
   use UuidTrait;
 
-  #[ORM\Id]
-  #[ORM\GeneratedValue]
-  #[ORM\Column]
-  #[Groups(['inventory-item-read', 'sale-read'])]
-  private ?int $id = null;
-
   #[ORM\Column(length: 255)]
   #[Groups(['inventory-item', 'sale-read'])]
   #[Assert\NotBlank]

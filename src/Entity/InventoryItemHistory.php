@@ -8,7 +8,9 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use App\Entity\Interface\TimestampEntityInterface;
+use App\Entity\Interface\UuidEntityInterface;
 use App\Entity\Trait\TimestampTrait;
+use App\Entity\Trait\UuidTrait;
 use App\Repository\InventoryItemHistoryRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -29,14 +31,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
   order: ['createdAt' => 'DESC'],
 )]
 #[ApiFilter(OrderFilter::class, properties: ['createdAt' => 'DESC'])]
-class InventoryItemHistory implements TimestampEntityInterface {
+class InventoryItemHistory implements UuidEntityInterface, TimestampEntityInterface {
   use TimestampTrait;
-
-  #[ORM\Id]
-  #[ORM\GeneratedValue]
-  #[ORM\Column]
-  #[Groups(['inventory-item-history-read'])]
-  private ?int $id = null;
+  use UuidTrait;
 
   #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2, nullable: true)]
   #[Groups(['inventory-item-history-read'])]
@@ -49,10 +46,6 @@ class InventoryItemHistory implements TimestampEntityInterface {
   #[ORM\ManyToOne]
   #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
   private ?InventoryItem $item = null;
-
-  public function getId(): ?int {
-    return $this->id;
-  }
 
   public function getSellingPrice(): ?string {
     return $this->sellingPrice;

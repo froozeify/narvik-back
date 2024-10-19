@@ -14,7 +14,9 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Entity\Interface\TimestampEntityInterface;
+use App\Entity\Interface\UuidEntityInterface;
 use App\Entity\Trait\TimestampTrait;
+use App\Entity\Trait\UuidTrait;
 use App\Filter\MultipleFilter;
 use App\Repository\InventoryItemRepository;
 use App\Service\UtilsService;
@@ -50,11 +52,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[ApiFilter(OrderFilter::class, properties: ['name' => 'ASC', 'category.name' => 'ASC', 'category.weight' => 'ASC', 'quantity' => ['default_direction' => 'ASC', 'nulls_comparison' => OrderFilter::NULLS_ALWAYS_LAST ]])]
 #[ApiFilter(MultipleFilter::class, properties: ['name', 'barcode'])]
-#[ApiFilter(SearchFilter::class, properties: ['category.id' => 'exact'])]
+#[ApiFilter(SearchFilter::class, properties: ['category.uuid' => 'exact'])]
 #[ApiFilter(BooleanFilter::class, properties: ['canBeSold'])]
 #[ApiFilter(ExistsFilter::class, properties: ['sellingPrice'])]
-class InventoryItem implements TimestampEntityInterface {
+class InventoryItem implements UuidEntityInterface, TimestampEntityInterface {
   use TimestampTrait;
+  use UuidTrait;
 
   #[ORM\Id]
   #[ORM\GeneratedValue]
@@ -105,10 +108,6 @@ class InventoryItem implements TimestampEntityInterface {
   #[ORM\ManyToOne(inversedBy: 'items')]
   #[Groups(['inventory-item'])]
   private ?InventoryCategory $category = null;
-
-  public function getId(): ?int {
-    return $this->id;
-  }
 
   public function getName(): ?string {
     return $this->name;

@@ -3,7 +3,6 @@
 namespace App\Entity\Trait;
 
 use ApiPlatform\Metadata\ApiProperty;
-use App\Service\UuidService;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidV7Generator;
 use Ramsey\Uuid\UuidInterface;
@@ -26,8 +25,8 @@ trait UuidTrait {
     return $this->id;
   }
 
-  public function getUuid(): string {
-    return UuidService::encodeForUri($this->uuid?->toString());
+  public function getUuid(): ?UuidInterface {
+    return $this->uuid;
   }
 
   public function setUuid(UuidInterface $uuid): static {

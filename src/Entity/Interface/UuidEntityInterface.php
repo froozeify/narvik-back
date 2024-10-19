@@ -7,6 +7,6 @@ use Ramsey\Uuid\UuidInterface;
 interface UuidEntityInterface {
 
   public function getId(): ?int;
-  public function getUuid(): string;
+  public function getUuid(): ?UuidInterface;
   public function setUuid(UuidInterface $uuid): static;
 }

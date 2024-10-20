@@ -9,7 +9,6 @@
     "require": {
         "php": ">=8.2.11",
         "ext-ctype": "*",
-        "ext-gmp": "*",
         "ext-iconv": "*",
         "api-platform/doctrine-orm": "^4.0",
         "api-platform/symfony": "^4.0",

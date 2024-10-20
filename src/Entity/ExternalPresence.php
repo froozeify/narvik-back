@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\ExternalPresenceToday;
+use App\Entity\Abstract\UuidEntity;
 use App\Entity\Interface\TimestampEntityInterface;
 use App\Entity\Trait\TimestampTrait;
 use App\Filter\MultipleFilter;
@@ -53,14 +54,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ApiFilter(DateFilter::class, properties: ['date' => DateFilter::EXCLUDE_NULL])]
 #[ApiFilter(OrderFilter::class, properties: ['date' => 'DESC', 'createdAt' => 'DESC'])]
 #[ApiFilter(MultipleFilter::class, properties: ['firstname', 'lastname', 'licence'])]
-class ExternalPresence implements TimestampEntityInterface {
+class ExternalPresence extends UuidEntity implements TimestampEntityInterface {
   use TimestampTrait;
-
-  #[ORM\Id]
-  #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
-  #[ORM\Column]
-  #[Groups(['external-presence-read'])]
-  private ?int $id = null;
 
   #[ORM\Column(type: 'string', nullable: true)]
   #[Groups(['external-presence'])]
@@ -87,12 +82,9 @@ class ExternalPresence implements TimestampEntityInterface {
   private Collection $activities;
 
   public function __construct() {
+    parent::__construct();
     $this->activities = new ArrayCollection();
     $this->date = new \DateTimeImmutable();
-  }
-
-  public function getId(): ?int {
-    return $this->id;
   }
 
   public function getLicence(): ?string {

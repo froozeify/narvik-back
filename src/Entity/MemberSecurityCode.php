@@ -9,6 +9,8 @@ use App\Repository\MemberSecurityCodeRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+// TODO: Change it for UserSecurityCode
+
 #[ORM\Entity(repositoryClass: MemberSecurityCodeRepository::class)]
 class MemberSecurityCode implements TimestampEntityInterface {
   use TimestampTrait;

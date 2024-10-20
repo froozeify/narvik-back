@@ -54,7 +54,7 @@ final class ActivityFactory extends PersistentProxyObjectFactory {
     '25M toutes armes',
     '50M rameneurs',
     '50M 22Hunter',
-    'Tir Contrôlé'.
+    'Tir Contrôlé',
     'Permanence',
     'Travaux',
     'Bureau',

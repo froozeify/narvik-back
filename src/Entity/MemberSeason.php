@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
+use App\Entity\Abstract\UuidEntity;
 use App\Repository\MemberSeasonRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -19,24 +20,19 @@ use Symfony\Component\Serializer\Attribute\Groups;
   ]
 )]
 #[ApiResource(
-  uriTemplate: '/members/{id}/seasons.{_format}',
+  uriTemplate: '/members/{uuid}/seasons.{_format}',
   operations: [
     new GetCollection(),
   ],
   uriVariables: [
-    'id' => new Link(toProperty: 'member', fromClass: Member::class),
+    'uuid' => new Link(toProperty: 'member', fromClass: Member::class),
   ],
   normalizationContext: [
     'groups' => ['member-season', 'member-season-read']
   ],
   order: ['season.name' => 'DESC'],
 )]
-class MemberSeason {
-  #[ORM\Id]
-  #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
-  #[ORM\Column]
-  #[Groups(['member-season-read', 'member-read', 'member-presence-read'])]
-  private ?int $id = null;
+class MemberSeason extends UuidEntity {
 
   #[ORM\ManyToOne(targetEntity: Member::class, inversedBy: 'memberSeasons')]
   #[Groups(['member-season-read'])]
@@ -53,12 +49,6 @@ class MemberSeason {
   #[ORM\Column(type: 'boolean', options: ["default" => 0])]
   #[Groups(['member-season-read', 'member-read', 'member-presence-read'])]
   private bool $isSecondaryClub = false;
-
-  public function __construct() { }
-
-  public function getId(): ?int {
-    return $this->id;
-  }
 
   public function getSeason(): ?Season {
     return $this->season;

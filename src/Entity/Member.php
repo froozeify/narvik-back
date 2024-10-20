@@ -21,6 +21,7 @@ use App\Controller\MemberPhotosImportFromItac;
 use App\Controller\MemberSearchByLicenceOrName;
 use App\Controller\MemberSelf;
 use App\Controller\MemberSelfUpdatePassword;
+use App\Entity\Abstract\UuidEntity;
 use App\Enum\MemberRole;
 use App\Filter\CurrentSeasonFilter;
 use App\Filter\MultipleFilter;
@@ -235,13 +236,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(OrderFilter::class, properties: ['lastname' => 'ASC', 'firstname' => 'ASC'])]
 #[ApiFilter(MultipleFilter::class, properties: ['firstname', 'lastname', 'licence'])]
 #[ApiFilter(CurrentSeasonFilter::class, properties: ['memberSeasons.season'])]
-class Member implements UserInterface, PasswordAuthenticatedUserInterface {
-
-  #[ORM\Id]
-  #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
-  #[ORM\Column]
-  #[Groups(['member-read', 'member-presence-read', 'autocomplete'])]
-  private ?int $id = null;
+class Member extends UuidEntity implements UserInterface, PasswordAuthenticatedUserInterface {
+  // TODO: User Interface should move to User, also password fields && all, Member should be only member detail
+  // A JOIN table should be create Between User <> Member, with in it also the role like that an user can be linked to multiple club and have different role
 
   #[Groups(['member-read', 'member-presence-read'])]
   private ?string $profileImage = null;
@@ -376,13 +373,10 @@ class Member implements UserInterface, PasswordAuthenticatedUserInterface {
   private Collection $sales;
 
   public function __construct() {
+    parent::__construct();
     $this->memberPresences = new ArrayCollection();
     $this->memberSeasons = new ArrayCollection();
     $this->sales = new ArrayCollection();
-  }
-
-  public function getId(): ?int {
-    return $this->id;
   }
 
   public function getProfileImage(): ?string {

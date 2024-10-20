@@ -21,6 +21,16 @@ final class GlobalSettingStory extends Story {
     ]));
 
     $this->addToPool('required_settings', GlobalSettingFactory::createOne([
+      'name'  => GlobalSetting::IGNORED_ACTIVITIES_OPENING_STATS->name,
+      'value' => null,
+    ]));
+
+    $this->addToPool('required_settings', GlobalSettingFactory::createOne([
+      'name'  => GlobalSetting::SMTP_ON->name,
+      'value' => '1',
+    ]));
+
+    $this->addToPool('required_settings', GlobalSettingFactory::createOne([
       'name'  => GlobalSetting::SMTP_HOST->name,
       'value' => 'mail',
     ]));
@@ -28,6 +38,11 @@ final class GlobalSettingStory extends Story {
     $this->addToPool('required_settings', GlobalSettingFactory::createOne([
       'name'  => GlobalSetting::SMTP_PORT->name,
       'value' => '1025',
+    ]));
+
+    $this->addToPool('required_settings', GlobalSettingFactory::createOne([
+      'name'  => GlobalSetting::SMTP_SENDER->name,
+      'value' => 'narvik@example.com',
     ]));
   }
 }

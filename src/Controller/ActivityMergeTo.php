@@ -10,7 +10,12 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ActivityMergeTo extends AbstractController {
 
-  public function __invoke(Activity $activity, Activity $targetActivity, ActivityRepository $activityRepository): Response {
+  public function __invoke(Activity $activity, string $targetUuid, ActivityRepository $activityRepository): Response {
+    $targetActivity = $activityRepository->findOneByUuid($targetUuid);
+    if (!$targetActivity) {
+      throw new HttpException(Response::HTTP_BAD_REQUEST, "Target activity not found");
+    }
+
     if ($activity->getId() === $targetActivity->getId()) {
       throw new HttpException(Response::HTTP_BAD_REQUEST, "Can't migrate to self activity");
     }

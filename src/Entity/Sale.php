@@ -48,7 +48,7 @@ use Symfony\Component\Validator\Constraints as Assert;
   paginationClientEnabled: true,
 )]
 #[ApiFilter(OrderFilter::class, properties: ['createdAt' => 'DESC'])]
-#[ApiFilter(SearchFilter::class, properties: ['seller.id' => 'exact'])]
+#[ApiFilter(SearchFilter::class, properties: ['seller.uuid' => 'exact'])]
 #[ApiFilter(DateFilter::class, properties: ['createdAt' => DateFilter::EXCLUDE_NULL])]
 class Sale extends UuidEntity implements TimestampEntityInterface {
   use TimestampTrait;

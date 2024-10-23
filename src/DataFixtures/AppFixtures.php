@@ -11,6 +11,7 @@ use App\Factory\MemberPresenceFactory;
 use App\Factory\MemberSeasonFactory;
 use App\Factory\SaleFactory;
 use App\Factory\SeasonFactory;
+use App\Factory\UserFactory;
 use App\Story\ActivityStory;
 use App\Story\GlobalSettingStory;
 use App\Story\InventoryCategoryStory;
@@ -32,8 +33,12 @@ class AppFixtures extends Fixture {
     GlobalSettingStory::load();
 
     // We create the users
-    $adminMember = MemberFactory::new()->admin("admin@admin.com")->create();
-    MemberFactory::new()->badger()->create();
+    $adminMember = UserFactory::new()->admin("admin@admin.com")->create();
+    UserFactory::new()->badger()->create();
+
+    // TODO: Create some clubs and links user to them
+
+    // We create some member
     MemberFactory::createMany(faker()->numberBetween(30, 40), [
       'memberPresences' => MemberPresenceFactory::new()->many(1, 4),
       'memberSeasons'   => MemberSeasonFactory::new()->many(0, 4),
@@ -72,8 +77,8 @@ class AppFixtures extends Fixture {
     }
 
     SalePaymentModeStory::load();
-    SaleFactory::createMany(faker()->numberBetween(10, 30), [
-      'seller' => $adminMember,
-    ]);
+//    SaleFactory::createMany(faker()->numberBetween(10, 30), [
+//      'seller' => $clubSupervisor,
+//    ]);
   }
 }

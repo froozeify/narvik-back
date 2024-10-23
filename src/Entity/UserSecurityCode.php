@@ -4,15 +4,13 @@ namespace App\Entity;
 
 use App\Entity\Interface\TimestampEntityInterface;
 use App\Entity\Trait\TimestampTrait;
-use App\Enum\MemberSecurityCodeTrigger;
-use App\Repository\MemberSecurityCodeRepository;
+use App\Enum\UserSecurityCodeTrigger;
+use App\Repository\UserSecurityCodeRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-// TODO: Change it for UserSecurityCode
-
-#[ORM\Entity(repositoryClass: MemberSecurityCodeRepository::class)]
-class MemberSecurityCode implements TimestampEntityInterface {
+#[ORM\Entity(repositoryClass: UserSecurityCodeRepository::class)]
+class UserSecurityCode implements TimestampEntityInterface {
   use TimestampTrait;
 
   #[ORM\Id]
@@ -23,12 +21,12 @@ class MemberSecurityCode implements TimestampEntityInterface {
   #[ORM\Column(length: 10)]
   private string $code;
 
-  #[ORM\ManyToOne(targetEntity: Member::class)]
+  #[ORM\ManyToOne(targetEntity: User::class)]
   #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-  private ?Member $member = null;
+  private ?User $user = null;
 
-  #[ORM\Column(type: "string", enumType: MemberSecurityCodeTrigger::class)]
-  private ?MemberSecurityCodeTrigger $trigger = null;
+  #[ORM\Column(type: "string", enumType: UserSecurityCodeTrigger::class)]
+  private ?UserSecurityCodeTrigger $trigger = null;
 
   #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
   private \DateTimeImmutable $expireAt;
@@ -51,20 +49,20 @@ class MemberSecurityCode implements TimestampEntityInterface {
     return $this;
   }
 
-  public function getMember(): ?Member {
-    return $this->member;
+  public function getUser(): ?User {
+    return $this->user;
   }
 
-  public function setMember(?Member $member): static {
-    $this->member = $member;
+  public function setUser(?User $user): static {
+    $this->user = $user;
     return $this;
   }
 
-  public function getTrigger(): ?MemberSecurityCodeTrigger {
+  public function getTrigger(): ?UserSecurityCodeTrigger {
     return $this->trigger;
   }
 
-  public function setTrigger(MemberSecurityCodeTrigger $trigger): static {
+  public function setTrigger(UserSecurityCodeTrigger $trigger): static {
     $this->trigger = $trigger;
     return $this;
   }

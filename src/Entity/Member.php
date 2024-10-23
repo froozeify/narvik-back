@@ -11,16 +11,11 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\MemberImportFromItac;
 use App\Controller\MemberImportSecondaryClubFromItac;
-use App\Controller\MemberPasswordReset;
-use App\Controller\MemberPasswordResetInitiate;
 use App\Controller\MemberPhotosImportFromItac;
 use App\Controller\MemberSearchByLicenceOrName;
-use App\Controller\MemberSelf;
-use App\Controller\MemberSelfUpdatePassword;
 use App\Entity\Abstract\UuidEntity;
 use App\Enum\MemberRole;
 use App\Filter\CurrentSeasonFilter;
@@ -32,8 +27,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -46,88 +39,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     new Get(),
     new Patch(),
     // No POST/DELETE since we import them
-
-
-    new Get(
-      uriTemplate: '/self',
-      controller: MemberSelf::class,
-      openapi: new Model\Operation(
-        summary: 'Return current logged user information',
-      ),
-      read: false
-    ),
-    new Put(
-      uriTemplate: '/self/update-password',
-      controller: MemberSelfUpdatePassword::class,
-      openapi: new Model\Operation(
-        summary: 'Change current user password',
-        requestBody: new Model\RequestBody(
-          content: new \ArrayObject([
-            'application/json' => [
-              'schema' => [
-                'type' => 'object',
-                'properties' => [
-                  'current' => ['type' => 'string'],
-                  'new' => ['type' => 'string']
-                ]
-              ]
-            ]
-          ])
-        )
-      ),
-      read: false,
-      write: false
-    ),
-
-    new Post(
-      uriTemplate: '/members/-/initiate-reset-password',
-      controller: MemberPasswordResetInitiate::class,
-      openapi: new Model\Operation(
-        summary: 'Trigger the reset password logic. Will send an email with a securityCode. Email must be enabled for this to work',
-        requestBody: new Model\RequestBody(
-          content: new \ArrayObject([
-            'application/json' => [
-              'schema' => [
-                'type' => 'object',
-                'properties' => [
-                  'email' => ['type' => 'string'],
-                ]
-              ]
-            ]
-          ])
-        ),
-      ),
-      read: false,
-      deserialize: false,
-      write: false,
-      serialize: false,
-    ),
-    new Post(
-      uriTemplate: '/members/-/reset-password',
-      controller: MemberPasswordReset::class,
-      openapi: new Model\Operation(
-        summary: 'Change the password for an user. If securityCode is invalid a new one will be sent.',
-        requestBody: new Model\RequestBody(
-          content: new \ArrayObject([
-            'application/json' => [
-              'schema' => [
-                'type' => 'object',
-                'properties' => [
-                  'email' => ['type' => 'string'],
-                  'password' => ['type' => 'string'],
-                  'securityCode' => ['type' => 'string'],
-                ]
-              ]
-            ]
-          ])
-        ),
-      ),
-      read: false,
-      deserialize: false,
-      write: false,
-      serialize: false,
-    ),
-
 
     new Post(
       uriTemplate: '/members/-/search',
@@ -236,7 +147,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(OrderFilter::class, properties: ['lastname' => 'ASC', 'firstname' => 'ASC'])]
 #[ApiFilter(MultipleFilter::class, properties: ['firstname', 'lastname', 'licence'])]
 #[ApiFilter(CurrentSeasonFilter::class, properties: ['memberSeasons.season'])]
-class Member extends UuidEntity implements UserInterface, PasswordAuthenticatedUserInterface {
+class Member extends UuidEntity {
   // TODO: User Interface should move to User, also password fields && all, Member should be only member detail
   // A JOIN table should be create Between User <> Member, with in it also the role like that an user can be linked to multiple club and have different role
 
@@ -252,32 +163,12 @@ class Member extends UuidEntity implements UserInterface, PasswordAuthenticatedU
   #[Groups(['autocomplete', 'member-read', 'member-presence-read', 'sale-read'])]
   private ?string $fullName = null;
 
-  #[ORM\Column]
-  private array $roles = [];
-
   #[ORM\Column(type: "string", enumType: MemberRole::class)]
   #[Groups(['member-read', 'admin-write'])]
   private MemberRole $role = MemberRole::user;
 
-  /**
-   * @var string The hashed password
-   */
-  #[ORM\Column(nullable: true)]
-  private ?string $password = null;
-
-  /**
-   * Not in database, use for update password
-   * @var string|null
-   */
-  #[Groups(['admin-write'])]
-  private ?string $plainPassword = null;
-
   #[ORM\OneToMany(mappedBy: 'member', targetEntity: MemberPresence::class, orphanRemoval: true)]
   private Collection $memberPresences;
-
-  #[ORM\Column]
-  #[Groups(['member-read', 'admin-write'])]
-  private bool $accountActivated = false;
 
   #[ORM\OneToMany(mappedBy: 'member', targetEntity: MemberSeason::class, orphanRemoval: true)]
   private Collection $memberSeasons;
@@ -400,69 +291,13 @@ class Member extends UuidEntity implements UserInterface, PasswordAuthenticatedU
     return $this;
   }
 
-  /**
-   * A visual identifier that represents this user.
-   *
-   * @see UserInterface
-   */
-  public function getUserIdentifier(): string {
-    return $this->email;
-  }
-
-  /**
-   * @see UserInterface
-   */
-  public function getRoles(): array {
-    $roles = $this->roles;
-    // We ensure every member has at least the ROLE_USER
-    if ($this->role !== MemberRole::badger) {
-      $roles[] = MemberRole::user->value;
-    }
-    return array_unique($roles);
-  }
-
-  public function setRoles(array $roles): static {
-    $this->roles = $roles;
-    return $this;
-  }
-
   public function getRole(): MemberRole {
     return $this->role;
   }
 
   public function setRole(MemberRole $role): Member {
-    $this->roles = [$role->value]; // We are in a mono-role logic
     $this->role = $role;
     return $this;
-  }
-
-  /**
-   * @see PasswordAuthenticatedUserInterface
-   */
-  public function getPassword(): string {
-    return $this->password;
-  }
-
-  public function setPassword(string $password): static {
-    $this->password = $password;
-    return $this;
-  }
-
-  public function getPlainPassword(): ?string {
-    return $this->plainPassword;
-  }
-
-  public function setPlainPassword(?string $plainPassword): Member {
-    $this->plainPassword = $plainPassword;
-    return $this;
-  }
-
-  /**
-   * @see UserInterface
-   */
-  public function eraseCredentials(): void {
-    // If you store any temporary, sensitive data on the user, clear it here
-    $this->plainPassword = null;
   }
 
   public function getLicence(): ?string {
@@ -520,14 +355,6 @@ class Member extends UuidEntity implements UserInterface, PasswordAuthenticatedU
       }
     }
     return $this;
-  }
-
-  public function isAccountActivated(): bool {
-    return $this->accountActivated;
-  }
-
-  public function setAccountActivated(bool $accountActivated): void {
-    $this->accountActivated = $accountActivated;
   }
 
   public function getGender(): string {

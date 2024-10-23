@@ -5,7 +5,6 @@ namespace App\Repository;
 use App\DQL\CustomExpr;
 use App\Entity\Member;
 use App\Entity\MemberPresence;
-use App\Entity\Season;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
@@ -13,7 +12,6 @@ use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use function Doctrine\ORM\QueryBuilder;
 
 /**
  * @extends ServiceEntityRepository<Member>
@@ -25,32 +23,9 @@ use function Doctrine\ORM\QueryBuilder;
  * @method Member[]    findAll()
  * @method Member[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class MemberRepository extends ServiceEntityRepository implements PasswordUpgraderInterface, UserLoaderInterface {
+class MemberRepository extends ServiceEntityRepository {
   public function __construct(ManagerRegistry $registry) {
     parent::__construct($registry, Member::class);
-  }
-
-  /**
-   * Used to upgrade (rehash) the user's password automatically over time.
-   */
-  public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword, bool $flush = true): void {
-    if (!$user instanceof Member) {
-      throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', $user::class));
-    }
-
-    $user->setPassword($newHashedPassword);
-    $user->setPlainPassword(null);
-    if ($flush) {
-      $this->getEntityManager()->persist($user);
-      $this->getEntityManager()->flush();
-    }
-  }
-
-  public function loadUserByIdentifier(string $identifier): ?UserInterface {
-    return $this->getEntityManager()->getRepository(Member::class)->findOneBy([
-        'email'            => $identifier,
-        'accountActivated' => true,
-      ]);
   }
 
   /**

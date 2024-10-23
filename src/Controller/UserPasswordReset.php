@@ -3,36 +3,36 @@
 namespace App\Controller;
 
 use App\Controller\Abstract\AbstractController;
-use App\Enum\MemberSecurityCodeTrigger;
-use App\Repository\MemberRepository;
-use App\Service\MemberService;
+use App\Enum\UserSecurityCodeTrigger;
+use App\Repository\UserRepository;
+use App\Service\UserService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class MemberPasswordReset extends AbstractController {
+class UserPasswordReset extends AbstractController {
 
-  public function __invoke(Request $request, MemberRepository $memberRepository, MemberService $memberService): JsonResponse {
+  public function __invoke(Request $request, UserRepository $userRepository, UserService $userService): JsonResponse {
     $payload = $this->checkAndGetJsonValues($request, ['email', 'password', 'securityCode']);
     $email = $payload['email'];
     $password = $payload['password'];
     $securityCode = $payload['securityCode'];
 
-    $member = $memberRepository->findOneByEmail($email);
-    if (!$member) {
+    $user = $userRepository->findOneByEmail($email);
+    if (!$user) {
       throw new HttpException(Response::HTTP_BAD_REQUEST);
     }
 
-    $validated = $memberService->validateSecurityCode($member, MemberSecurityCodeTrigger::resetPassword, $securityCode);
+    $validated = $userService->validateSecurityCode($user, UserSecurityCodeTrigger::resetPassword, $securityCode);
     if (!$validated) {
-      $memberService->initiateResetPassword($member); // We trigger a new password query
+      $userService->initiateResetPassword($user); // We trigger a new password query
       throw new HttpException(Response::HTTP_BAD_REQUEST);
     }
 
-    $changeError = $memberService->changeMemberPassword($member, $password);
+    $changeError = $userService->changeUserPassword($user, $password);
     if ($changeError) {
-      $memberService->initiateResetPassword($member); // We trigger a new password query
+      $userService->initiateResetPassword($user); // We trigger a new password query
       throw new HttpException(Response::HTTP_BAD_REQUEST, $changeError);
     }
 

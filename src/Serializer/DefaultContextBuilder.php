@@ -33,11 +33,17 @@ final readonly class DefaultContextBuilder implements SerializerContextBuilderIn
       $context['groups'][] = 'timestamp';
       if ($this->authorizationChecker->isGranted(MemberRole::admin->value)) {
         $context['groups'][] = 'admin-read';
+        if ($this->authorizationChecker->isGranted('ROLE_SUPER_ADMIN')) {
+          $context['groups'][] = 'super-admin-read';
+        }
       }
     } else {
       $context['groups'][] = 'common-write';
       if ($this->authorizationChecker->isGranted(MemberRole::admin->value)) {
         $context['groups'][] = 'admin-write';
+        if ($this->authorizationChecker->isGranted('ROLE_SUPER_ADMIN')) {
+          $context['groups'][] = 'super-admin-write';
+        }
       }
     }
 

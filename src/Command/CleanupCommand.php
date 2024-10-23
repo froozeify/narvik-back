@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Repository\MemberSecurityCodeRepository;
+use App\Repository\UserSecurityCodeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -17,7 +17,7 @@ class CleanupCommand extends Command {
 
   public function __construct(
     private readonly EntityManagerInterface $entityManager,
-    private readonly MemberSecurityCodeRepository $memberSecurityCodeRepository,
+    private readonly UserSecurityCodeRepository $memberSecurityCodeRepository,
   ) {
     parent::__construct();
   }

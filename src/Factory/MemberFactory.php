@@ -69,37 +69,6 @@ final class MemberFactory extends PersistentProxyObjectFactory {
     ];
   }
 
-  public function admin(string $email = null, string $password = null): self {
-    return $this->with([
-      'licence'          => null,
-      'firstname'        => 'admin',
-      'lastname'         => 'admin',
-      'email'            => $email ?? self::faker()->unique()->safeEmail(),
-      'plainPassword'    => $password ?? 'admin123',
-      'accountActivated' => true,
-      'role'             => MemberRole::admin,
-    ]);
-  }
-
-  /**
-   * Badger user is needed for login and register presence on the site
-   * This special user is here so we can have the site publicly exposed
-   * And protected behind a login page
-   *
-   * @return self
-   */
-  public function badger(): self {
-    return $this->with([
-      'licence'          => null,
-      'firstname'        => 'badger',
-      'lastname'         => 'badger',
-      'email'            => 'badger',
-      'plainPassword'    => 'badger123',
-      'accountActivated' => false,
-      'role'             => MemberRole::badger,
-    ]);
-  }
-
   /**
    * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
    */

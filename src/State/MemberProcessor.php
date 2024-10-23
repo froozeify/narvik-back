@@ -24,6 +24,7 @@ class MemberProcessor implements ProcessorInterface {
   ) {
   }
 
+  // TODO: Migrate to UserProcessor
   public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Member|null {
     if ($operation instanceof DeleteOperationInterface) {
       return $this->removeProcessor->process($data, $operation, $uriVariables, $context);

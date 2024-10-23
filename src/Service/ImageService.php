@@ -34,7 +34,7 @@ class ImageService {
 
   public function getLogo(): ?Image {
     $publicFolder = $this->params->get('app.public_images');
-    return $this->loadImageFromPath('logo.png', "$publicFolder/logo.png");
+    return $this->loadImageFromPath('logo.png', "$publicFolder/logo.png", true);
   }
 
   public function getLogoFile(): ?File {
@@ -42,8 +42,7 @@ class ImageService {
     if (!$logo) {
       return null;
     }
-    $publicFolder = $this->params->get('app.public_images');
-    return new File("$publicFolder/{$logo->getName()}");
+    return new File($logo->getPath());
   }
 
   public function importLogo(UploadedFile $file): string {
@@ -80,13 +79,13 @@ class ImageService {
     $memberImage = $this->params->get('app.members_photos') . "/$licence";
     foreach ($possibleExtensions as $extension) {
       if ($this->fs->exists("$memberImage.$extension")) {
-        return "/images/" . bin2hex("members/$licence.$extension");
+        return bin2hex("members/$licence.$extension");
       }
     }
     return null;
   }
 
-  public function loadImageFromProtectedPath(string $publicId): ?Image {
+  public function loadImageFromProtectedPath(string $publicId, bool $isInline = false): ?Image {
     $path = $this->decodeEncodedUriId($publicId);
 
     if (!$path || str_contains('./', $path)) {
@@ -95,10 +94,10 @@ class ImageService {
 
     // Image accessible to everyone logged
     $imageFolder = $this->params->get('app.images');
-    return $this->loadImageFromPath($publicId, "$imageFolder/$path");
+    return $this->loadImageFromPath($publicId, "$imageFolder/$path", $isInline);
   }
 
-  public function loadImageFromPublicPath(string $publicId): ?Image {
+  public function loadImageFromPublicPath(string $publicId, bool $isInline = false): ?Image {
     $path = $this->decodeEncodedUriId($publicId);
 
     // Public resource is at root
@@ -107,19 +106,22 @@ class ImageService {
     }
 
     $imageFolder = $this->params->get('app.public_images');
-    return $this->loadImageFromPath($publicId, "$imageFolder/$path");
+    return $this->loadImageFromPath($publicId, "$imageFolder/$path", $isInline);
   }
 
-  private function loadImageFromPath(string $publicId, string $path): ?Image {
+  private function loadImageFromPath(string $publicId, string $path, bool $isInline = false): ?Image {
     if ($this->fs->exists($path)) {
       $filename = explode("/", $path);
       $filename = end($filename);
 
       $image = new Image();
       $image->setId($publicId)
-            ->setName($filename);
+            ->setName($filename)
+            ->setPath($path);
 
-      $this->setDataUri($path, $image);
+      if (!$isInline) {
+        $this->setDataUri($path, $image);
+      }
 
       return $image;
     }

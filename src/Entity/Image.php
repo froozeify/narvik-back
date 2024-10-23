@@ -12,10 +12,18 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ApiResource(
   operations: [
     new Get(),
+    new Get(
+      uriTemplate: '/images/inline/{id}',
+      name: 'inline_image'
+    ),
 
     new Get(
       uriTemplate: '/public/images/{id}',
       name: 'public_image'
+    ),
+    new Get(
+      uriTemplate: '/public/images/inline/{id}',
+      name: 'inline_public_image'
     ),
   ],
   normalizationContext: [
@@ -37,6 +45,8 @@ class Image {
 
   #[Groups(['image'])]
   private string $mimeType;
+
+  private string $path;
 
   public function getId(): string {
     return $this->id;
@@ -71,6 +81,15 @@ class Image {
 
   public function setMimeType(string $mimeType): Image {
     $this->mimeType = $mimeType;
+    return $this;
+  }
+
+  public function getPath(): string {
+    return $this->path;
+  }
+
+  public function setPath(string $path): Image {
+    $this->path = $path;
     return $this;
   }
 

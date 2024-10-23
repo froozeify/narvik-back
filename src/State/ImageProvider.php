@@ -14,6 +14,8 @@ use App\Service\ImageService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class ImageProvider implements ProviderInterface {
 
@@ -27,13 +29,25 @@ class ImageProvider implements ProviderInterface {
       return null;
     }
 
-    if ($operation->getName()) {
-      if ($operation->getName() === "public_image") {
-        return $this->imageService->loadImageFromPublicPath($uriVariables['id']);
-      }
+    $response = null;
+
+    $isInline = false;
+    if (str_starts_with($operation->getName(), 'inline_')) {
+      $isInline = true;
     }
 
-    return $this->imageService->loadImageFromProtectedPath($uriVariables['id']);
+    if (str_contains($operation->getName(), 'public_image')) {
+      $response = $this->imageService->loadImageFromPublicPath($uriVariables['id'], $isInline);
+    } else {
+      $response = $this->imageService->loadImageFromProtectedPath($uriVariables['id'], $isInline);
+    }
+
+    if ($response && $isInline) {
+      // We return the image directly
+      return new BinaryFileResponse($response->getPath());
+    }
+
+    return $response;
   }
 
 

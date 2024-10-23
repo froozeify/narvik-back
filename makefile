@@ -23,7 +23,13 @@ build: ## Builds the Docker images
 	@$(DOCKER_COMP) build --pull --no-cache
 
 build-prod:
-	@docker build --pull --no-cache -t benoitvignal/narvik-back:latest -t benoitvignal/narvik-back:2 -t benoitvignal/narvik-back:2.0 --target frankenphp_prod .
+	@docker build --pull --no-cache -t benoitvignal/narvik-back:latest -t benoitvignal/narvik-back:`cat composer.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o | grep '^[0-9]\+' -o` -t benoitvignal/narvik-back:`cat composer.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o | grep '^[0-9]\+\.[0-9]\+' -o` -t benoitvignal/narvik-back:`cat composer.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o` --target frankenphp_prod .
+
+push-build-prod:
+	@docker image push benoitvignal/narvik-back:latest
+	@docker image push benoitvignal/narvik-back:`cat composer.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o | grep '^[0-9]\+' -o`
+	@docker image push benoitvignal/narvik-back:`cat composer.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o | grep '^[0-9]\+\.[0-9]\+' -o`
+	@docker image push benoitvignal/narvik-back:`cat composer.json | grep version | grep '\([0-9]\+\.\?\)\{3\}' -o`
 
 up: ## Start the docker hub in detached mode (no logs)
 	@$(DOCKER_COMP) up --detach

@@ -7,7 +7,7 @@ security:
         # used to reload user from session & other features (e.g. switch_user)
         app_user_provider:
             entity:
-                class: App\Entity\Member
+                class: App\Entity\User
                 property: email
 
     firewalls:
@@ -45,7 +45,8 @@ security:
 
 
     role_hierarchy:
-        ROLE_ADMIN: [ ROLE_SUPERVISOR, ROLE_MEMBER, ROLE_BADGER ]
+        ROLE_SUPER_ADMIN: [ ROLE_ADMIN ]
+        ROLE_ADMIN: [ ROLE_SUPERVISOR ]
         ROLE_SUPERVISOR: [ ROLE_MEMBER, ROLE_BADGER ]
         ROLE_MEMBER: [ ROLE_USER ] # To enable when member will be able to log-in
 
@@ -67,7 +68,7 @@ security:
         - { path: ^/activities, roles: [ROLE_SUPERVISOR, ROLE_BADGER]}
 
         - { path: ^/external-presences, roles: [ROLE_SUPERVISOR, ROLE_BADGER]}
-        - { path: ^/global-settings, roles: [ROLE_ADMIN]}
+        - { path: ^/global-settings, roles: [ROLE_SUPER_ADMIN]}
             
         - { path: ^/inventory-categories, roles: [ROLE_SUPERVISOR]}
         - { path: ^/inventory-items, roles: [ROLE_SUPERVISOR]}

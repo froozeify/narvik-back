@@ -3,19 +3,19 @@
 namespace App\Controller;
 
 use App\Controller\Abstract\AbstractController;
-use App\Entity\Member;
-use App\Service\MemberService;
+use App\Entity\User;
+use App\Service\UserService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class MemberSelfUpdatePassword extends AbstractController {
+class UserSelfUpdatePassword extends AbstractController {
 
-  public function __invoke(Request $request, UserPasswordHasherInterface $passwordHasher, MemberService $memberService): JsonResponse {
+  public function __invoke(Request $request, UserPasswordHasherInterface $passwordHasher, UserService $userService): JsonResponse {
     $user = $this->getUser();
-    if (!$user instanceof Member) {
+    if (!$user instanceof User) {
       throw new HttpException(Response::HTTP_BAD_REQUEST);
     }
 
@@ -28,7 +28,7 @@ class MemberSelfUpdatePassword extends AbstractController {
       throw new HttpException(Response::HTTP_BAD_REQUEST, "Invalid password");
     }
 
-    $changeError = $memberService->changeMemberPassword($user, $newPwd);
+    $changeError = $userService->changeUserPassword($user, $newPwd);
     if ($changeError) {
       throw new HttpException(Response::HTTP_BAD_REQUEST, $changeError);
     }

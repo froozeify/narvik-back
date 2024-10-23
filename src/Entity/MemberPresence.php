@@ -13,12 +13,12 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\MemberPresencesFromCsv;
 use App\Controller\MemberPresencesFromItac;
 use App\Controller\MemberPresencesImportFromExternal;
 use App\Controller\MemberPresenceToday;
+use App\Entity\Abstract\UuidEntity;
 use App\Entity\Interface\TimestampEntityInterface;
 use App\Entity\Trait\TimestampTrait;
 use App\Filter\MultipleFilter;
@@ -105,7 +105,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     )
   ],
   normalizationContext: [
-    'groups' => ['member-presence', 'member-presence-read', 'timestamp']
+    'groups' => ['member-presence', 'member-presence-read']
   ],
   denormalizationContext: [
     'groups' => ['member-presence', 'member-presence-write']
@@ -119,22 +119,16 @@ use Symfony\Component\Serializer\Attribute\Groups;
   ], uriVariables: [
     'memberId' => new Link(fromClass: Member::class, toProperty: 'member'),
   ], normalizationContext: [
-    'groups' => ['member-presence', 'member-presence-read', 'timestamp']
+    'groups' => ['member-presence', 'member-presence-read']
   ],
   paginationClientEnabled: true,
 )]
 #[ApiFilter(DateFilter::class, properties: ['date' => DateFilter::EXCLUDE_NULL])]
 #[ApiFilter(OrderFilter::class, properties: ['date' => 'DESC', 'createdAt' => 'DESC'])]
 #[ApiFilter(MultipleFilter::class, properties: ['member.firstname', 'member.lastname', 'member.licence'])]
-#[ApiFilter(SearchFilter::class, properties: ['activities.id' => 'exact'])]
-class MemberPresence implements TimestampEntityInterface {
+#[ApiFilter(SearchFilter::class, properties: ['activities.uuid' => 'exact'])]
+class MemberPresence extends UuidEntity implements TimestampEntityInterface {
   use TimestampTrait;
-
-  #[ORM\Id]
-  #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
-  #[ORM\Column]
-  #[Groups(['member-presence-read'])]
-  private ?int $id = null;
 
   #[ORM\ManyToOne(targetEntity: Member::class, inversedBy: 'memberPresences')]
   #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -151,12 +145,9 @@ class MemberPresence implements TimestampEntityInterface {
   private Collection $activities;
 
   public function __construct() {
+    parent::__construct();
     $this->activities = new ArrayCollection();
     $this->date = new \DateTimeImmutable();
-  }
-
-  public function getId(): ?int {
-    return $this->id;
   }
 
   public function getMember(): ?Member {

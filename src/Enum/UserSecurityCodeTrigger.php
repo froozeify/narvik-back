@@ -2,6 +2,6 @@
 
 namespace App\Enum;
 
-enum MemberSecurityCodeTrigger: string {
+enum UserSecurityCodeTrigger: string {
   case resetPassword = 'RESET_PASSWORD';
 }

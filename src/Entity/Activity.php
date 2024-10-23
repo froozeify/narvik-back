@@ -10,14 +10,15 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\OpenApi\Model;
 use App\Controller\ActivityMergeTo;
+use App\Entity\Abstract\UuidEntity;
 use App\Repository\ActivityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use ApiPlatform\OpenApi\Model;
 
 
 #[ORM\Entity(repositoryClass: ActivityRepository::class)]
@@ -36,11 +37,7 @@ use ApiPlatform\OpenApi\Model;
     ),
 
     new Post(
-      uriTemplate: '/activities/{id}/merge-to/{targetActivity}',
-      requirements: [
-        'id' => '\d+',
-        'targetActivity' => '\d+'
-      ],
+      uriTemplate: '/activities/{uuid}/merge-to/{targetUuid}',
       controller: ActivityMergeTo::class,
       openapi: new Model\Operation(
         summary: 'Merge (and then delete) with another activity',
@@ -65,12 +62,7 @@ use ApiPlatform\OpenApi\Model;
   paginationEnabled: false
 )]
 #[ApiFilter(OrderFilter::class, properties: ['name' => 'ASC', 'isEnabled' => 'ASC'])]
-class Activity {
-  #[ORM\Id]
-  #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
-  #[ORM\Column]
-  #[Groups(['activity-read', 'member-read', 'member-presence', 'external-presence'])]
-  private ?int $id = null;
+class Activity extends UuidEntity {
 
   #[ORM\Column(length: 255)]
   #[Groups(['admin-write', 'activity-read','member-read', 'member-presence', 'external-presence'])]
@@ -88,12 +80,9 @@ class Activity {
   private Collection $externalPresences;
 
   public function __construct() {
+    parent::__construct();
     $this->memberPresences = new ArrayCollection();
     $this->externalPresences = new ArrayCollection();
-  }
-
-  public function getId(): ?int {
-    return $this->id;
   }
 
   public function getName(): string {

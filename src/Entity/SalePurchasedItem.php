@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Abstract\UuidEntity;
 use App\Entity\Interface\TimestampEntityInterface;
 use App\Entity\Trait\TimestampTrait;
 use App\Repository\SalePurchasedItemRepository;
@@ -12,14 +13,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SalePurchasedItemRepository::class)]
-class SalePurchasedItem implements TimestampEntityInterface {
+class SalePurchasedItem extends UuidEntity implements TimestampEntityInterface {
   use TimestampTrait;
-
-  #[ORM\Id]
-  #[ORM\GeneratedValue]
-  #[ORM\Column]
-  #[Groups(['sale'])]
-  private ?int $id = null;
 
   #[ORM\ManyToOne]
   #[Groups(['sale'])]
@@ -51,10 +46,6 @@ class SalePurchasedItem implements TimestampEntityInterface {
   #[Assert\GreaterThanOrEqual(value: 1)]
   #[Assert\NotBlank]
   private int $quantity = 1;
-
-  public function getId(): ?int {
-    return $this->id;
-  }
 
   public function getItem(): ?InventoryItem {
     return $this->item;

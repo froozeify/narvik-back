@@ -8,7 +8,6 @@ use App\Enum\MemberRole;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 class SaleVoter extends Voter {
   public const UPDATE = 'SALE_UPDATE';

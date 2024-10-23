@@ -3,25 +3,26 @@
 namespace App\Repository;
 
 use App\Entity\Member;
-use App\Entity\MemberSecurityCode;
-use App\Enum\MemberSecurityCodeTrigger;
+use App\Entity\User;
+use App\Entity\UserSecurityCode;
+use App\Enum\UserSecurityCodeTrigger;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<MemberSecurityCode>
+ * @extends ServiceEntityRepository<UserSecurityCode>
  */
-class MemberSecurityCodeRepository extends ServiceEntityRepository {
+class UserSecurityCodeRepository extends ServiceEntityRepository {
   public function __construct(ManagerRegistry $registry) {
-    parent::__construct($registry, MemberSecurityCode::class);
+    parent::__construct($registry, UserSecurityCode::class);
   }
 
-  public function findLastOneForMember(Member $member, MemberSecurityCodeTrigger $trigger): ?MemberSecurityCode {
+  public function findLastOneForUser(User $user, UserSecurityCodeTrigger $trigger): ?UserSecurityCode {
     return $this->createQueryBuilder('m')
-                ->andWhere('m.member = :member')
+                ->andWhere('m.user = :user')
                 ->andWhere('m.trigger = :trigger')
                 ->andWhere(':expire_at <= m.expireAt')
-                ->setParameter('member', $member)
+                ->setParameter('user', $user)
                 ->setParameter('trigger', $trigger)
                 ->setParameter('expire_at', new \DateTimeImmutable())
                 ->orderBy('m.createdAt', 'DESC')
@@ -30,11 +31,11 @@ class MemberSecurityCodeRepository extends ServiceEntityRepository {
                 ->getOneOrNullResult();
   }
 
-  public function findAllByTrigger(Member $member, MemberSecurityCodeTrigger $trigger): array {
+  public function findAllByTrigger(User $user, UserSecurityCodeTrigger $trigger): array {
     return $this->createQueryBuilder('m')
-                ->andWhere('m.member = :member')
+                ->andWhere('m.user = :user')
                 ->andWhere('m.trigger = :trigger')
-                ->setParameter('member', $member)
+                ->setParameter('user', $user)
                 ->setParameter('trigger', $trigger)
                 ->getQuery()
                 ->getResult();
@@ -43,7 +44,7 @@ class MemberSecurityCodeRepository extends ServiceEntityRepository {
   /**
    * Return codes that have expired and can be removed.
    *
-   * @return MemberSecurityCode[]
+   * @return UserSecurityCode[]
    */
   public function findExpired(): array {
     return $this->createQueryBuilder('m')

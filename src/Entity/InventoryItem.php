@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Entity\Abstract\UuidEntity;
 use App\Entity\Interface\TimestampEntityInterface;
 use App\Entity\Trait\TimestampTrait;
 use App\Filter\MultipleFilter;
@@ -41,7 +42,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     ),
   ],
   normalizationContext: [
-    'groups' => ['inventory-item', 'inventory-item-read', 'timestamp']
+    'groups' => ['inventory-item', 'inventory-item-read']
   ],
   denormalizationContext: [
     'groups' => ['inventory-item', 'inventory-item-write']
@@ -50,17 +51,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[ApiFilter(OrderFilter::class, properties: ['name' => 'ASC', 'category.name' => 'ASC', 'category.weight' => 'ASC', 'quantity' => ['default_direction' => 'ASC', 'nulls_comparison' => OrderFilter::NULLS_ALWAYS_LAST ]])]
 #[ApiFilter(MultipleFilter::class, properties: ['name', 'barcode'])]
-#[ApiFilter(SearchFilter::class, properties: ['category.id' => 'exact'])]
+#[ApiFilter(SearchFilter::class, properties: ['category.uuid' => 'exact'])]
 #[ApiFilter(BooleanFilter::class, properties: ['canBeSold'])]
 #[ApiFilter(ExistsFilter::class, properties: ['sellingPrice'])]
-class InventoryItem implements TimestampEntityInterface {
+class InventoryItem extends UuidEntity implements TimestampEntityInterface {
   use TimestampTrait;
-
-  #[ORM\Id]
-  #[ORM\GeneratedValue]
-  #[ORM\Column]
-  #[Groups(['inventory-item-read', 'sale-read'])]
-  private ?int $id = null;
 
   #[ORM\Column(length: 255)]
   #[Groups(['inventory-item', 'sale-read'])]
@@ -105,10 +100,6 @@ class InventoryItem implements TimestampEntityInterface {
   #[ORM\ManyToOne(inversedBy: 'items')]
   #[Groups(['inventory-item'])]
   private ?InventoryCategory $category = null;
-
-  public function getId(): ?int {
-    return $this->id;
-  }
 
   public function getName(): ?string {
     return $this->name;

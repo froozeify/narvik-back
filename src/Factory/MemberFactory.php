@@ -61,43 +61,12 @@ final class MemberFactory extends PersistentProxyObjectFactory {
    */
   protected function defaults(): array {
     return [
-      'firstname' => self::faker()->firstName,
-      'lastname'  => self::faker()->lastName,
+      'firstname' => self::faker()->firstName(),
+      'lastname'  => self::faker()->lastName(),
       'email'     => self::faker()->unique()->safeEmail(),
       'licence'   => str_pad(self::faker()->numberBetween(1000000, 99999999), 8, "0", STR_PAD_LEFT),
       'role'      => MemberRole::user,
     ];
-  }
-
-  public function admin(string $email = null, string $password = null): self {
-    return $this->with([
-      'licence'          => null,
-      'firstname'        => 'admin',
-      'lastname'         => 'admin',
-      'email'            => $email ?? self::faker()->unique()->safeEmail(),
-      'plainPassword'    => $password ?? 'admin',
-      'accountActivated' => true,
-      'role'             => MemberRole::admin,
-    ]);
-  }
-
-  /**
-   * Badger user is needed for login and register presence on the site
-   * This special user is here so we can have the site publicly exposed
-   * And protected behind a login page
-   *
-   * @return self
-   */
-  public function badger(): self {
-    return $this->with([
-      'licence'          => null,
-      'firstname'        => 'badger',
-      'lastname'         => 'badger',
-      'email'            => 'badger',
-      'plainPassword'    => 'badger',
-      'accountActivated' => false,
-      'role'             => MemberRole::badger,
-    ]);
   }
 
   /**

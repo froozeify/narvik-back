@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\InventoryCategoryMove;
+use App\Entity\Abstract\UuidEntity;
 use App\Entity\Interface\SortableEntityInterface;
 use App\Repository\InventoryCategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -41,7 +42,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     ),
 
     new Put(
-      uriTemplate: '/inventory-categories/{id}/move',
+      uriTemplate: '/inventory-categories/{uuid}/move',
       controller: InventoryCategoryMove::class,
       openapi: new Model\Operation(
         description: 'Move `up` or `down` an inventory category',
@@ -73,12 +74,7 @@ use Symfony\Component\Validator\Constraints as Assert;
   order: ['weight' => 'asc'],
 )]
 #[ApiFilter(OrderFilter::class, properties: ['weight' => 'ASC', 'name' => 'ASC'])]
-class InventoryCategory implements SortableEntityInterface {
-  #[ORM\Id]
-  #[ORM\GeneratedValue]
-  #[ORM\Column]
-  #[Groups(['inventory-category-read', 'inventory-item-read'])]
-  private ?int $id = null;
+class InventoryCategory extends UuidEntity implements SortableEntityInterface {
 
   #[ORM\Column(length: 255)]
   #[Groups(['inventory-category', 'inventory-item-read'])]
@@ -94,11 +90,8 @@ class InventoryCategory implements SortableEntityInterface {
   private Collection $items;
 
   public function __construct() {
-      $this->items = new ArrayCollection();
-  }
-
-  public function getId(): ?int {
-    return $this->id;
+    parent::__construct();
+    $this->items = new ArrayCollection();
   }
 
   public function getName(): ?string {

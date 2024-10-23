@@ -14,6 +14,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\SalePaymentModeMove;
+use App\Entity\Abstract\UuidEntity;
 use App\Entity\Interface\SortableEntityInterface;
 use App\Repository\SalePaymentModeRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -39,7 +40,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     ),
 
     new Put(
-      uriTemplate: '/sale-payment-modes/{id}/move',
+      uriTemplate: '/sale-payment-modes/{uuid}/move',
       controller: SalePaymentModeMove::class,
       openapi: new Model\Operation(
         description: 'Move `up` or `down` a payment mode',
@@ -72,12 +73,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[ApiFilter(OrderFilter::class, properties: ['weight' => 'ASC'])]
 #[ApiFilter(BooleanFilter::class, properties: ['available'])]
-class SalePaymentMode implements SortableEntityInterface {
-  #[ORM\Id]
-  #[ORM\GeneratedValue]
-  #[ORM\Column]
-  #[Groups(['sale-payment-mode-read', 'sale-read'])]
-  private ?int $id = null;
+class SalePaymentMode extends UuidEntity implements SortableEntityInterface {
 
   #[ORM\Column(length: 255)]
   #[Groups(['sale-payment-mode', 'sale-read'])]
@@ -97,10 +93,6 @@ class SalePaymentMode implements SortableEntityInterface {
   #[ORM\Column(nullable: true)]
   #[Groups(['sale-payment-mode-read'])]
   private ?int $weight = null;
-
-  public function getId(): ?int {
-    return $this->id;
-  }
 
   public function getName(): ?string {
     return $this->name;

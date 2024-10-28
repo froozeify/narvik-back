@@ -7,7 +7,7 @@ use App\Entity\Image;
 use App\Entity\Member;
 use App\Entity\Season;
 use App\Enum\ItacCsvHeaderMapping;
-use App\Enum\MemberRole;
+use App\Enum\ClubRole;
 use Doctrine\ORM\EntityManagerInterface;
 use League\Csv\Reader;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;

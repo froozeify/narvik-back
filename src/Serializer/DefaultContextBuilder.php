@@ -3,7 +3,7 @@
 namespace App\Serializer;
 
 use ApiPlatform\State\SerializerContextBuilderInterface;
-use App\Enum\MemberRole;
+use App\Enum\ClubRole;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -31,7 +31,7 @@ final readonly class DefaultContextBuilder implements SerializerContextBuilderIn
     if ($normalization) {
       $context['groups'][] = 'common-read';
       $context['groups'][] = 'timestamp';
-      if ($this->authorizationChecker->isGranted(MemberRole::admin->value)) {
+      if ($this->authorizationChecker->isGranted(ClubRole::admin->value)) {
         $context['groups'][] = 'admin-read';
         if ($this->authorizationChecker->isGranted('ROLE_SUPER_ADMIN')) {
           $context['groups'][] = 'super-admin-read';
@@ -39,7 +39,7 @@ final readonly class DefaultContextBuilder implements SerializerContextBuilderIn
       }
     } else {
       $context['groups'][] = 'common-write';
-      if ($this->authorizationChecker->isGranted(MemberRole::admin->value)) {
+      if ($this->authorizationChecker->isGranted(ClubRole::admin->value)) {
         $context['groups'][] = 'admin-write';
         if ($this->authorizationChecker->isGranted('ROLE_SUPER_ADMIN')) {
           $context['groups'][] = 'super-admin-write';

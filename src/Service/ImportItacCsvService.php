@@ -8,7 +8,7 @@ use App\Entity\MemberSeason;
 use App\Entity\Season;
 use App\Enum\GlobalSetting;
 use App\Enum\ItacCsvHeaderMapping;
-use App\Enum\MemberRole;
+use App\Enum\ClubRole;
 use App\Message\ItacMembersMessage;
 use App\Message\ItacSecondaryClubMembersMessage;
 use Doctrine\ORM\EntityManagerInterface;

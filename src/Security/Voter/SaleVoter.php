@@ -4,7 +4,7 @@ namespace App\Security\Voter;
 
 use App\Entity\Member;
 use App\Entity\Sale;
-use App\Enum\MemberRole;
+use App\Enum\ClubRole;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -29,7 +29,7 @@ class SaleVoter extends Voter {
     if (
       !$user instanceof Member ||
       !$subject instanceof Sale ||
-      !$this->security->isGranted(MemberRole::supervisor->value)
+      !$this->security->isGranted(ClubRole::supervisor->value)
     ) {
       return false;
     }

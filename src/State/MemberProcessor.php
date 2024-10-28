@@ -6,7 +6,7 @@ use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Entity\Member;
-use App\Enum\MemberRole;
+use App\Enum\ClubRole;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -36,17 +36,17 @@ class MemberProcessor implements ProcessorInterface {
     }
 
     // Can't deactivate another admin
-    if (in_array(MemberRole::admin->value, $data->getRoles())) {
+    if (in_array(ClubRole::admin->value, $data->getRoles())) {
       if (!$data->isAccountActivated()) {
         throw new HttpException(Response::HTTP_FORBIDDEN, "You can't deactivate an administrator account");
       }
     }
 
     // Admin can change the password (no requirements for super admin)
-    if ($this->authorizationChecker->isGranted(MemberRole::admin->value)) {
+    if ($this->authorizationChecker->isGranted(ClubRole::admin->value)) {
       if ($data->getPlainPassword()) {
         // Admin can't change other admin
-        if (in_array(MemberRole::admin->value, $data->getRoles())) {
+        if (in_array(ClubRole::admin->value, $data->getRoles())) {
           throw new HttpException(Response::HTTP_FORBIDDEN, "You can't change the password of an administrator");
         }
         $data->setPassword($this->passwordHasher->hashPassword($data, $data->getPlainPassword()));

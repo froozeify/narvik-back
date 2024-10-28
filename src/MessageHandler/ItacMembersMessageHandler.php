@@ -7,7 +7,7 @@ use App\Entity\Member;
 use App\Entity\MemberSeason;
 use App\Entity\Season;
 use App\Enum\ItacCsvHeaderMapping;
-use App\Enum\MemberRole;
+use App\Enum\ClubRole;
 use App\Message\ItacMembersMessage;
 use App\Repository\AgeCategoryRepository;
 use App\Repository\MemberRepository;
@@ -63,7 +63,7 @@ class ItacMembersMessageHandler implements ResetInterface {
         if (!$member) {
           $member = new Member();
           $member->setLicence($record[ItacCsvHeaderMapping::LICENCE->value]);
-          $member->setRole(MemberRole::member);
+          $member->setRole(ClubRole::member);
         }
         $this->members[$record[ItacCsvHeaderMapping::LICENCE->value]] = $member;
       }

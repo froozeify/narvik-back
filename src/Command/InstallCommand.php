@@ -4,7 +4,7 @@ namespace App\Command;
 
 use App\Entity\Member;
 use App\Enum\GlobalSetting;
-use App\Enum\MemberRole;
+use App\Enum\ClubRole;
 use App\Repository\MemberRepository;
 use App\Service\GlobalSettingService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -107,7 +107,7 @@ class InstallCommand extends Command {
     $command = new ArrayInput([
       'command' => 'member:create',
       '--licence' => 'null',
-      '--role' => MemberRole::admin->value,
+      '--role' => ClubRole::admin->value,
       '--firstname' => 'Admin',
       '--lastname' => 'ADMIN',
     ]);
@@ -126,7 +126,7 @@ class InstallCommand extends Command {
     $command = new ArrayInput([
       'command' => 'member:create',
       '--licence' => 'null',
-      '--role' => MemberRole::badger->value,
+      '--role' => ClubRole::badger->value,
       '--email' => 'badger',
       '--password' => 'badger',
       '--firstname' => 'Badger',

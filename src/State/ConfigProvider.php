@@ -8,7 +8,7 @@ use ApiPlatform\State\ProviderInterface;
 use App\Entity\Config;
 use App\Entity\Member;
 use App\Enum\GlobalSetting;
-use App\Enum\MemberRole;
+use App\Enum\ClubRole;
 use App\Mailer\EmailService;
 use App\Service\GlobalSettingService;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -46,7 +46,7 @@ class ConfigProvider implements ProviderInterface {
   }
 
   public function getDefaultConfig(Config $config): void {
-    if ($this->authorizationChecker->isGranted(MemberRole::admin->value) ||
+    if ($this->authorizationChecker->isGranted(ClubRole::admin->value) ||
         $this->params->get('app.expose_version')
     ) {
       $config->setAppVersion(\Composer\InstalledVersions::getRootPackage()['pretty_version']);
@@ -64,7 +64,7 @@ class ConfigProvider implements ProviderInterface {
     $config->setId('user');
 
     // User a supervisor, he can have access to the sale management
-    if ($this->authorizationChecker->isGranted(MemberRole::supervisor->value)) {
+    if ($this->authorizationChecker->isGranted(ClubRole::supervisor->value)) {
       $config->addModule('sales', [
         'enabled' => true,
       ]);

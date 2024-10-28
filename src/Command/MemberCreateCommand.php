@@ -3,7 +3,7 @@
 namespace App\Command;
 
 use App\Entity\Member;
-use App\Enum\MemberRole;
+use App\Enum\ClubRole;
 use App\Repository\MemberRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -32,7 +32,7 @@ class MemberCreateCommand extends Command {
     $this->addOption('password', null,InputOption::VALUE_OPTIONAL, 'Mot de passe');
     $this->addOption('firstname', null,InputOption::VALUE_OPTIONAL, 'Prénom');
     $this->addOption('lastname', null,InputOption::VALUE_OPTIONAL, 'Nom');
-    $this->addOption('role', null,InputOption::VALUE_OPTIONAL, 'Rôle. Valeurs possibles : ' . implode(', ', array_column(MemberRole::cases(), 'value')));
+    $this->addOption('role', null,InputOption::VALUE_OPTIONAL, 'Rôle. Valeurs possibles : ' . implode(', ', array_column(ClubRole::cases(), 'value')));
     $this->addOption('licence', null,InputOption::VALUE_OPTIONAL, 'Licence. Écrire `null` pour ne pas en définir');
   }
 
@@ -91,9 +91,9 @@ class MemberCreateCommand extends Command {
 
     $role = $input->getOption('role');
     if (!$role) {
-      $role = $this->io->askQuestion(new Question("Rôle. Valeurs possibles : " . implode(', ', array_column(MemberRole::cases(), 'value')), MemberRole::admin->value));
+      $role = $this->io->askQuestion(new Question("Rôle. Valeurs possibles : " . implode(', ', array_column(ClubRole::cases(), 'value')), ClubRole::admin->value));
     }
-    $role = MemberRole::tryFrom($role) ?? MemberRole::admin;
+    $role = ClubRole::tryFrom($role) ?? ClubRole::admin;
 
     $licence = $input->getOption('licence');
     if (!$licence) {
@@ -108,7 +108,7 @@ class MemberCreateCommand extends Command {
     return Command::SUCCESS;
   }
 
-  private function createAccount(string $email, string $password, string $firstname, string $lastname, MemberRole $role, ?string $licence = null): void {
+  private function createAccount(string $email, string $password, string $firstname, string $lastname, ClubRole $role, ?string $licence = null): void {
     $member = new Member();
     $member
       ->setFirstname($firstname)

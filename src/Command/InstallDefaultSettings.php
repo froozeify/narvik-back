@@ -4,7 +4,7 @@ namespace App\Command;
 
 use App\Entity\Member;
 use App\Enum\GlobalSetting;
-use App\Enum\MemberRole;
+use App\Enum\ClubRole;
 use App\Repository\MemberRepository;
 use App\Service\GlobalSettingService;
 use Doctrine\ORM\EntityManagerInterface;

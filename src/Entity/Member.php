@@ -17,7 +17,8 @@ use App\Controller\MemberImportSecondaryClubFromItac;
 use App\Controller\MemberPhotosImportFromItac;
 use App\Controller\MemberSearchByLicenceOrName;
 use App\Entity\Abstract\UuidEntity;
-use App\Enum\MemberRole;
+use App\Entity\Interface\ClubLinkedEntityInterface;
+use App\Enum\ClubRole;
 use App\Filter\CurrentSeasonFilter;
 use App\Filter\MultipleFilter;
 use App\Repository\MemberRepository;
@@ -147,9 +148,22 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(OrderFilter::class, properties: ['lastname' => 'ASC', 'firstname' => 'ASC'])]
 #[ApiFilter(MultipleFilter::class, properties: ['firstname', 'lastname', 'licence'])]
 #[ApiFilter(CurrentSeasonFilter::class, properties: ['memberSeasons.season'])]
-class Member extends UuidEntity {
-  // TODO: User Interface should move to User, also password fields && all, Member should be only member detail
-  // A JOIN table should be create Between User <> Member, with in it also the role like that an user can be linked to multiple club and have different role
+class Member extends UuidEntity implements ClubLinkedEntityInterface {
+
+  public static function getClubSqlPath(): string {
+    return 'club';
+  }
+
+  #[ORM\ManyToOne(inversedBy: 'members')]
+  #[ORM\JoinColumn(nullable: false)]
+  #[Groups(['common-read'])]
+  private ?Club $club = null;
+
+  /**
+   * @var Collection<int, Sale>
+   */
+  #[ORM\OneToMany(mappedBy: 'seller', targetEntity: Sale::class)]
+  private Collection $sales;
 
   #[Groups(['member-read', 'member-presence-read'])]
   private ?string $profileImage = null;
@@ -162,10 +176,6 @@ class Member extends UuidEntity {
 
   #[Groups(['autocomplete', 'member-read', 'member-presence-read', 'sale-read'])]
   private ?string $fullName = null;
-
-  #[ORM\Column(type: "string", enumType: MemberRole::class)]
-  #[Groups(['member-read', 'admin-write'])]
-  private MemberRole $role = MemberRole::user;
 
   #[ORM\OneToMany(mappedBy: 'member', targetEntity: MemberPresence::class, orphanRemoval: true)]
   private Collection $memberPresences;
@@ -257,12 +267,6 @@ class Member extends UuidEntity {
   #[ORM\Column(length: 1)]
   private string $licenceType = "C";
 
-  /**
-   * @var Collection<int, Sale>
-   */
-  #[ORM\OneToMany(mappedBy: 'seller', targetEntity: Sale::class)]
-  private Collection $sales;
-
   public function __construct() {
     parent::__construct();
     $this->memberPresences = new ArrayCollection();
@@ -288,15 +292,6 @@ class Member extends UuidEntity {
       $email = null;
     }
     $this->email = $email;
-    return $this;
-  }
-
-  public function getRole(): MemberRole {
-    return $this->role;
-  }
-
-  public function setRole(MemberRole $role): Member {
-    $this->role = $role;
     return $this;
   }
 
@@ -558,6 +553,15 @@ class Member extends UuidEntity {
         $sale->setSeller(null);
       }
     }
+    return $this;
+  }
+
+  public function getClub(): ?Club {
+    return $this->club;
+  }
+
+  public function setClub(?Club $club): static {
+    $this->club = $club;
     return $this;
   }
 }

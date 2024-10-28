@@ -17,10 +17,13 @@ use App\Controller\UserPasswordResetInitiate;
 use App\Controller\UserSelf;
 use App\Controller\UserSelfUpdatePassword;
 use App\Entity\Abstract\UuidEntity;
-use App\Enum\MemberRole;
+use App\Enum\ClubRole;
+use App\Enum\UserRole;
 use App\Filter\MultipleFilter;
 use App\Repository\UserRepository;
 use App\State\MemberProcessor;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -31,101 +34,101 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[UniqueEntity(fields: ['email'])]
-#[ApiResource(
-  operations: [
-    new GetCollection(),
-    new Get(),
-    new Patch(),
-    // No POST/DELETE since we import them
+#[ApiResource(operations: [
+  new GetCollection(),
+  new Get(),
+  new Patch(),
+  // No POST/DELETE since we import them
 
 
-    new Get(
-      uriTemplate: '/self',
-      controller: UserSelf::class,
-      openapi: new Model\Operation(
-        summary: 'Return current logged user information',
-      ),
-      read: false
-    ),
-    new Put(
-      uriTemplate: '/self/update-password',
-      controller: UserSelfUpdatePassword::class,
-      openapi: new Model\Operation(
+  new Get(
+    uriTemplate: '/self',
+    controller: UserSelf::class,
+    openapi: new Model\Operation(summary: 'Return current logged user information',),
+    read: false,
+  ),
+  new Put(
+    uriTemplate: '/self/update-password',
+    controller: UserSelfUpdatePassword::class,
+    openapi:
+      new Model\Operation(
         summary: 'Change current user password',
-        requestBody: new Model\RequestBody(
-          content: new \ArrayObject([
-            'application/json' => [
-              'schema' => [
-                'type' => 'object',
-                'properties' => [
-                  'current' => ['type' => 'string'],
-                  'new' => ['type' => 'string']
-                ]
-              ]
-            ]
-          ])
-        )
+        requestBody:
+          new Model\RequestBody(
+            content: new \ArrayObject([
+              'application/json' => [
+                'schema' => [
+                  'type'       => 'object',
+                  'properties' => [
+                    'current' => ['type' => 'string'],
+                    'new'     => ['type' => 'string'],
+                  ],
+                ],
+              ],
+            ]),
+          ),
       ),
-      read: false,
-      write: false
-    ),
+    read: false,
+    write: false),
 
-    new Post(
-      uriTemplate: '/users/-/initiate-reset-password',
-      controller: UserPasswordResetInitiate::class,
-      openapi: new Model\Operation(
+  new Post(
+    uriTemplate: '/users/-/initiate-reset-password',
+    controller: UserPasswordResetInitiate::class,
+    openapi:
+      new Model\Operation(
         summary: 'Trigger the reset password logic. Will send an email with a securityCode. Email must be enabled for this to work',
-        requestBody: new Model\RequestBody(
+        requestBody:
+          new Model\RequestBody(
+            content: new \ArrayObject([
+              'application/json' => [
+                'schema' => [
+                  'type'       => 'object',
+                  'properties' => [
+                    'email' => ['type' => 'string'],
+                  ],
+                ],
+              ],
+            ]),
+          )
+        ,
+      ),
+    read: false,
+    deserialize: false,
+    write: false,
+    serialize: false,
+  ),
+  new Post(
+    uriTemplate: '/users/-/reset-password',
+    controller: UserPasswordReset::class,
+    openapi:
+      new Model\Operation(
+      summary: 'Change the password for an user. If securityCode is invalid a new one will be sent.',
+      requestBody:
+        new Model\RequestBody(
           content: new \ArrayObject([
-            'application/json' => [
-              'schema' => [
-                'type' => 'object',
-                'properties' => [
-                  'email' => ['type' => 'string'],
-                ]
-              ]
-            ]
-          ])
+          'application/json' => [
+            'schema' => [
+              'type'       => 'object',
+              'properties' => [
+                'email'        => ['type' => 'string'],
+                'password'     => ['type' => 'string'],
+                'securityCode' => ['type' => 'string'],
+              ],
+            ],
+          ],
+        ]),
         ),
       ),
-      read: false,
-      deserialize: false,
-      write: false,
-      serialize: false,
-    ),
-    new Post(
-      uriTemplate: '/users/-/reset-password',
-      controller: UserPasswordReset::class,
-      openapi: new Model\Operation(
-        summary: 'Change the password for an user. If securityCode is invalid a new one will be sent.',
-        requestBody: new Model\RequestBody(
-          content: new \ArrayObject([
-            'application/json' => [
-              'schema' => [
-                'type' => 'object',
-                'properties' => [
-                  'email' => ['type' => 'string'],
-                  'password' => ['type' => 'string'],
-                  'securityCode' => ['type' => 'string'],
-                ]
-              ]
-            ]
-          ])
-        ),
-      ),
-      read: false,
-      deserialize: false,
-      write: false,
-      serialize: false,
-    ),
+    read: false,
+    deserialize: false,
+    write: false,
+    serialize: false),
 
-  ], normalizationContext: [
-    'groups' => ['user', 'user-read']
-  ], denormalizationContext: [
-    'groups' => ['user', 'user-write']
-  ],
-  processor: MemberProcessor::class,
-)]
+], normalizationContext: [
+  'groups' => ['user', 'user-read'],
+], denormalizationContext: [
+  'groups' => ['user', 'user-write'],
+], processor: MemberProcessor::class,)]
 #[ApiFilter(SearchFilter::class, properties: ['role' => 'exact'])]
 #[ApiFilter(OrderFilter::class, properties: ['lastname' => 'ASC', 'firstname' => 'ASC'])]
 #[ApiFilter(MultipleFilter::class, properties: ['firstname', 'lastname'])]
@@ -141,6 +144,9 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
   #[Groups(['autocomplete', 'user-read', 'member-read', 'member-presence-read', 'sale-read'])]
   private ?string $fullName = null;
 
+  #[Groups(['user'])]
+  private UserRole $role = UserRole::member;
+
   #[ORM\Column]
   private array $roles = [];
 
@@ -152,6 +158,7 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
 
   /**
    * Not in database, use for update password
+   *
    * @var string|null
    */
   #[Groups(['super-admin-write'])]
@@ -172,6 +179,18 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
   #[ORM\Column(length: 255)]
   #[Groups(['autocomplete', 'user-read', 'admin-write'])]
   private ?string $lastname = null;
+
+  /**
+   * @var Collection<int, UserMember>
+   */
+  #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserMember::class, orphanRemoval: true)]
+  private Collection $memberships;
+
+  public function __construct()
+  {
+      parent::__construct();
+      $this->memberships = new ArrayCollection();
+  }
 
   public function getEmail(): ?string {
     return $this->email;
@@ -200,15 +219,25 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
   public function getRoles(): array {
     $roles = $this->roles;
     // We ensure every member has at least the ROLE_USER
-    if (!in_array(MemberRole::badger->value, $roles)) {
-      $roles[] = MemberRole::user->value;
+    if (!in_array(UserRole::badger->value, $roles)) {
+      $roles[] = UserRole::user->value;
     }
     return array_unique($roles);
   }
 
   public function setRoles(array $roles): static {
+    // We only save the first role passed
     $this->roles = $roles;
     return $this;
+  }
+
+  public function getRole(): UserRole {
+    $userRole = UserRole::tryFrom($this->getRoles()[0]);
+    return $userRole ?? UserRole::user;
+  }
+
+  public function setRole(UserRole $role): static {
+    return $this->setRoles([$role->value]);
   }
 
   /**
@@ -268,5 +297,35 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
 
   public function setAccountActivated(bool $accountActivated): void {
     $this->accountActivated = $accountActivated;
+  }
+
+  /**
+   * @return Collection<int, UserMember>
+   */
+  public function getMemberships(): Collection
+  {
+      return $this->memberships;
+  }
+
+  public function addMembership(UserMember $membership): static
+  {
+      if (!$this->memberships->contains($membership)) {
+          $this->memberships->add($membership);
+          $membership->setUser($this);
+      }
+
+      return $this;
+  }
+
+  public function removeMembership(UserMember $membership): static
+  {
+      if ($this->memberships->removeElement($membership)) {
+          // set the owning side to null (unless already changed)
+          if ($membership->getUser() === $this) {
+              $membership->setUser(null);
+          }
+      }
+
+      return $this;
   }
 }

@@ -65,18 +65,18 @@ final class UserFactory extends PersistentProxyObjectFactory {
       'firstname' => self::faker()->firstName(),
       'lastname'  => self::faker()->lastName(),
       'email'     => self::faker()->unique()->safeEmail(),
-      'roles'     => [UserRole::user],
+      'roles'     => [UserRole::member->value],
     ];
   }
 
-  public function admin(string $email = null, string $password = null): self {
+  public function superAdmin(string $email = null, string $password = null): self {
     return $this->with([
       'firstname'        => 'admin',
       'lastname'         => 'admin',
       'email'            => $email ?? self::faker()->unique()->safeEmail(),
       'plainPassword'    => $password ?? 'admin123',
       'accountActivated' => true,
-      'roles'            => [UserRole::super_admin],
+      'roles'            => [UserRole::super_admin->value],
     ]);
   }
 
@@ -94,7 +94,7 @@ final class UserFactory extends PersistentProxyObjectFactory {
       'email'            => 'badger',
       'plainPassword'    => 'badger123',
       'accountActivated' => false,
-      'roles'            => [UserRole::badger],
+      'roles'            => [UserRole::badger->value],
     ]);
   }
 

@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Factory\ClubFactory;
 use App\Factory\ExternalPresenceFactory;
 use App\Factory\InventoryCategoryFactory;
 use App\Factory\InventoryItemFactory;
@@ -12,6 +13,7 @@ use App\Factory\MemberSeasonFactory;
 use App\Factory\SaleFactory;
 use App\Factory\SeasonFactory;
 use App\Factory\UserFactory;
+use App\Factory\UserMemberFactory;
 use App\Story\ActivityStory;
 use App\Story\GlobalSettingStory;
 use App\Story\InventoryCategoryStory;
@@ -33,16 +35,24 @@ class AppFixtures extends Fixture {
     GlobalSettingStory::load();
 
     // We create the users
-    $adminMember = UserFactory::new()->admin("admin@admin.com")->create();
-    UserFactory::new()->badger()->create();
+    $adminMember = UserFactory::new()->superAdmin("admin@admin.com")->create();
+//    UserFactory::new()->badger()->create();
 
     // TODO: Create some clubs and links user to them
+    ClubFactory::createMany(faker()->numberBetween(2, 5));
+    $users = UserFactory::createMany(faker()->numberBetween(5, 10));
 
     // We create some member
-    MemberFactory::createMany(faker()->numberBetween(30, 40), [
+    $members = MemberFactory::createMany(faker()->numberBetween(30, 40), [
       'memberPresences' => MemberPresenceFactory::new()->many(1, 4),
       'memberSeasons'   => MemberSeasonFactory::new()->many(0, 4),
     ]);
+
+    foreach ($members as $member) {
+      UserMemberFactory::createOne([
+        'member' => $member,
+      ]);
+    }
 
     // We record some external presence
     ExternalPresenceFactory::new()->many(20, 40)->create();

@@ -3,7 +3,7 @@
 namespace App\Factory;
 
 use App\Entity\Member;
-use App\Enum\MemberRole;
+use App\Enum\ClubRole;
 use App\Repository\MemberRepository;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
@@ -61,11 +61,11 @@ final class MemberFactory extends PersistentProxyObjectFactory {
    */
   protected function defaults(): array {
     return [
+      'club'      => ClubFactory::random(),
       'firstname' => self::faker()->firstName(),
       'lastname'  => self::faker()->lastName(),
       'email'     => self::faker()->unique()->safeEmail(),
       'licence'   => str_pad(self::faker()->numberBetween(1000000, 99999999), 8, "0", STR_PAD_LEFT),
-      'role'      => MemberRole::user,
     ];
   }
 

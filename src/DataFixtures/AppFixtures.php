@@ -19,6 +19,7 @@ use App\Story\GlobalSettingStory;
 use App\Story\InventoryCategoryStory;
 use App\Story\SalePaymentModeStory;
 use App\Story\SeasonStory;
+use App\Tests\Story\UserStory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use function Zenstruck\Foundry\faker;
@@ -35,8 +36,7 @@ class AppFixtures extends Fixture {
     GlobalSettingStory::load();
 
     // We create the users
-    $adminMember = UserFactory::new()->superAdmin("admin@admin.com")->create();
-//    UserFactory::new()->badger()->create();
+    UserStory::load();
 
     // TODO: Create some clubs and links user to them
     ClubFactory::createMany(faker()->numberBetween(2, 5));

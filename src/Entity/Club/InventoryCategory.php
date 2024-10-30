@@ -8,12 +8,14 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\InventoryCategoryMove;
 use App\Entity\Abstract\UuidEntity;
+use App\Entity\Interface\ClubLinkedEntityInterface;
 use App\Entity\Interface\SortableEntityInterface;
 use App\Repository\InventoryCategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -25,10 +27,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 
 #[ORM\Entity(repositoryClass: InventoryCategoryRepository::class)]
-#[UniqueEntity(fields: ['weight'], ignoreNull: true)]
-#[UniqueEntity(fields: ['name'], ignoreNull: true)]
+#[UniqueEntity(fields: ['club', 'weight'], ignoreNull: true)]
+#[UniqueEntity(fields: ['club', 'name'], ignoreNull: true)]
 #[ApiResource(
+  uriTemplate: '/clubs/{clubId}/inventory-categories.{_format}',
   operations: [
+    new GetCollection(),
     new GetCollection(),
     new Get(),
     new Post(
@@ -65,6 +69,9 @@ use Symfony\Component\Validator\Constraints as Assert;
       write: false,
     )
   ],
+  uriVariables: [
+    'clubId' => new Link(toProperty: 'club', fromClass: Club::class),
+  ],
   normalizationContext: [
     'groups' => ['inventory-category', 'inventory-category-read']
   ],
@@ -74,7 +81,14 @@ use Symfony\Component\Validator\Constraints as Assert;
   order: ['weight' => 'asc'],
 )]
 #[ApiFilter(OrderFilter::class, properties: ['weight' => 'ASC', 'name' => 'ASC'])]
-class InventoryCategory extends UuidEntity implements SortableEntityInterface {
+class InventoryCategory extends UuidEntity implements ClubLinkedEntityInterface, SortableEntityInterface {
+  public static function getClubSqlPath(): string {
+    return "club";
+  }
+
+  #[ORM\ManyToOne(cascade: ['remove'])]
+  #[ORM\JoinColumn(nullable: false)]
+  private ?Club $club = null;
 
   #[ORM\Column(length: 255)]
   #[Groups(['inventory-category', 'inventory-item-read'])]
@@ -85,7 +99,7 @@ class InventoryCategory extends UuidEntity implements SortableEntityInterface {
   #[Groups(['inventory-category-read'])]
   private ?int $weight = null;
 
-  #[ORM\OneToMany(mappedBy: 'category', targetEntity: InventoryItem::class)]
+  #[ORM\OneToMany(mappedBy: 'category', targetEntity: InventoryItem::class, orphanRemoval: true)]
   #[Groups(['inventory-category-read'])]
   private Collection $items;
 
@@ -135,5 +149,14 @@ class InventoryCategory extends UuidEntity implements SortableEntityInterface {
           }
       }
       return $this;
+  }
+
+  public function getClub(): ?Club {
+    return $this->club;
+  }
+
+  public function setClub(?Club $club): static {
+    $this->club = $club;
+    return $this;
   }
 }

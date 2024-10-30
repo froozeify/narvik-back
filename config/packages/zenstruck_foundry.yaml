@@ -4,4 +4,8 @@ when@dev: &dev
         # Whether to auto-refresh proxies by default (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#auto-refresh)
         auto_refresh_proxies: true
 
-when@test: *dev
+when@test:
+    zenstruck_foundry:
+        auto_refresh_proxies: true
+        global_state:
+            - App\Tests\Story\UserStory

@@ -53,7 +53,6 @@ jobs:
         run: docker compose exec -T php bin/console -e test doctrine:migrations:migrate --no-interaction
       -
         name: Run PHPUnit
-        if: false # Remove this line if PHPUnit is installed
         run: docker compose exec -T php bin/phpunit
       -
         name: Doctrine Schema Validator

@@ -48,6 +48,9 @@ jobs:
         name: Create test database
         run: docker compose exec -T php bin/console -e test doctrine:database:create
       -
+        name: Create JWT keys
+        run: docker compose exec -T php bin/console -e test lexik:jwt:generate-keypair --overwrite
+      -
         name: Run migrations
         if: false # Remove this line if Doctrine Migrations is installed
         run: docker compose exec -T php bin/console -e test doctrine:migrations:migrate --no-interaction

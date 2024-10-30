@@ -2,7 +2,7 @@
 
 namespace App\Tests;
 
-use App\Entity\Club\Club;
+use App\Entity\Club;
 
 class LoginTest extends AbstractTest {
   public function testLoginAsSuperAdmin(): void {

@@ -9,7 +9,6 @@ use ApiPlatform\Metadata\Operation;
 use App\Entity\Club;
 use App\Entity\Interface\ClubLinkedEntityInterface;
 use App\Entity\User;
-use App\Enum\ClubRole;
 use App\Enum\UserRole;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\SecurityBundle\Security;

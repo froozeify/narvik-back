@@ -117,7 +117,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
   operations: [
     new GetCollection(),
   ], uriVariables: [
-    'memberId' => new Link(fromClass: Member::class, toProperty: 'member'),
+    'memberId' => new Link(toProperty: 'member', fromClass: Member::class),
   ], normalizationContext: [
     'groups' => ['member-presence', 'member-presence-read']
   ],

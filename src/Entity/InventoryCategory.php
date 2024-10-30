@@ -30,9 +30,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[UniqueEntity(fields: ['club', 'weight'], ignoreNull: true)]
 #[UniqueEntity(fields: ['club', 'name'], ignoreNull: true)]
 #[ApiResource(
-  uriTemplate: '/clubs/{clubId}/inventory-categories.{_format}',
   operations: [
-    new GetCollection(),
     new GetCollection(),
     new Get(),
     new Post(
@@ -43,10 +41,23 @@ use Symfony\Component\Validator\Constraints as Assert;
     ),
     new Delete(
       security: "is_granted('ROLE_ADMIN')"
-    ),
+    )
+  ],
+  normalizationContext: [
+    'groups' => ['inventory-category', 'inventory-category-read']
+  ],
+  denormalizationContext: [
+    'groups' => ['inventory-category', 'inventory-category-write']
+  ],
+  order: ['weight' => 'asc'],
+)]
+#[ApiResource(
+  uriTemplate: '/clubs/{clubUuid}/inventory-categories.{_format}',
+  operations: [
+    new GetCollection(),
 
     new Put(
-      uriTemplate: '/inventory-categories/{uuid}/move',
+      uriTemplate: '/clubs/{clubUuid}/inventory-categories/{uuid}/move',
       controller: InventoryCategoryMove::class,
       openapi: new Model\Operation(
         description: 'Move `up` or `down` an inventory category',
@@ -70,13 +81,10 @@ use Symfony\Component\Validator\Constraints as Assert;
     )
   ],
   uriVariables: [
-    'clubId' => new Link(toProperty: 'club', fromClass: Club::class),
+    'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
   ],
   normalizationContext: [
     'groups' => ['inventory-category', 'inventory-category-read']
-  ],
-  denormalizationContext: [
-    'groups' => ['inventory-category', 'inventory-category-write']
   ],
   order: ['weight' => 'asc'],
 )]
@@ -88,6 +96,7 @@ class InventoryCategory extends UuidEntity implements ClubLinkedEntityInterface,
 
   #[ORM\ManyToOne(cascade: ['remove'])]
   #[ORM\JoinColumn(nullable: false)]
+  #[Groups(['inventory-category-write'])]
   private ?Club $club = null;
 
   #[ORM\Column(length: 255)]

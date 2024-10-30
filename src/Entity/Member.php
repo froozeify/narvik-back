@@ -18,7 +18,6 @@ use App\Controller\MemberPhotosImportFromItac;
 use App\Controller\MemberSearchByLicenceOrName;
 use App\Entity\Abstract\UuidEntity;
 use App\Entity\Interface\ClubLinkedEntityInterface;
-use App\Enum\ClubRole;
 use App\Filter\CurrentSeasonFilter;
 use App\Filter\MultipleFilter;
 use App\Repository\MemberRepository;

@@ -6,7 +6,8 @@ use App\Entity\Club;
 
 class LoginTest extends AbstractTest {
   public function testLoginAsSuperAdmin(): void {
-    $this->loginAsSuperAdmin(); // We log as super admin
+    $this->loggedAsSuperAdmin(); // We log as super admin
+    $this->assertResponseIsSuccessful();
 
     // We request a super admin only route
     $this->createClientWithCredentials()->request('GET', '/clubs');

@@ -71,6 +71,12 @@ sf: ## List all Symfony commands or pass the parameter "c=" to run a given comma
 cc: c=c:c ## Clear the cache
 cc: sf
 
+test: ## Run the test suit on the app
+	@$(COMPOSER) test
+
+test-with-coverage: ## Run the test suit on the app with coverage report
+	@$(COMPOSER) test-with-coverage
+
 ## —— Database 📦 ——————————————————————————————————————————————————————————————
 db-dump: ## Dump the current database
 	@$(DB_CONT) sh -c 'pg_dumpall -c -U $$POSTGRES_USER | gzip' > ./dump/dump_`date +%Y-%m-%d"_"%H_%M_%S`.sql.gz

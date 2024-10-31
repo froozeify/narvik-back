@@ -41,3 +41,4 @@ supervisord.log
 supervisord.pid
 
 dump/
+tests/coverage/

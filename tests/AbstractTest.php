@@ -4,6 +4,9 @@ namespace App\Tests;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Symfony\Bundle\Test\Client;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
@@ -28,23 +31,51 @@ abstract class AbstractTest extends ApiTestCase {
     ]);
   }
 
-  protected function login(string $email, string $password): ?string {
-    $response = static::createClient()->request('POST', '/auth', [
+  protected function loggedAs(string $email, string $password): bool {
+    $response = static::createClient()->request(Request::METHOD_POST, '/auth', [
       'json' => [
         'email' => $email,
         'password' => $password,
-      ]
+      ],
     ]);
 
-    $this->assertResponseIsSuccessful();
+    if ($response->getStatusCode() !== Response::HTTP_OK) {
+      return false;
+    }
+
     $data = $response->toArray();
     $this->accessToken = $data['token'];
     $this->refreshToken = $data['refresh_token'];
-    return $this->accessToken;
+    return true;
   }
 
-  public function loginAsSuperAdmin(): ?string {
-    return $this->login('admin@admin.com', 'admin123');
+  public function loggedAsSuperAdmin(): bool {
+    return $this->loggedAs('admin@admin.com', 'admin123');
+  }
+
+  private function prepareRequestOptions(?array $data = null, array $uriParameters = []): array {
+    $options = [];
+
+    if (!empty($uriParameters)) {
+      $options['extra']['parameters'] = $uriParameters;
+    }
+
+    if (!empty($data)) {
+      $options['json'] = $data;
+    }
+    return $options;
+  }
+
+  public function makeNotLoggedRequest(string $method, string $url, ?array $data = null, array $uriParameters = []): ResponseInterface {
+    $options = $this->prepareRequestOptions($data, $uriParameters);
+    $response = static::createClient()->request($method, $url, $options);
+    return $response;
+  }
+
+  public function makeLoggedRequest(string $method, string $url, ?array $data = null, array $uriParameters = []): ResponseInterface {
+    $options = $this->prepareRequestOptions($data, $uriParameters);
+    $response = static::createClientWithCredentials()->request($method, $url, $options);
+    return $response;
   }
 
 }

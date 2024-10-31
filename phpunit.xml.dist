@@ -20,7 +20,7 @@
     </php>
 
     <testsuites>
-        <testsuite name="Project Test Suite">
+        <testsuite name="Narvik - API">
             <directory>tests</directory>
         </testsuite>
     </testsuites>

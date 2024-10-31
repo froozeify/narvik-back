@@ -127,6 +127,9 @@
         ],
         "test": [
             "bin/phpunit"
+        ],
+        "test-with-coverage": [
+            "XDEBUG_MODE=coverage bin/phpunit --coverage-html=tests/coverage/html"
         ]
     },
     "conflict": {

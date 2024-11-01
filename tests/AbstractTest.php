@@ -78,4 +78,26 @@ abstract class AbstractTest extends ApiTestCase {
     return $response;
   }
 
+  // CRUD Requests
+
+  public function makeGetRequest(string $url, array $uriParameters = []): ResponseInterface {
+    return $this->makeLoggedRequest(Request::METHOD_GET, $url, uriParameters: $uriParameters);
+  }
+
+  public function makePostRequest(string $url, array $data = null, array $uriParameters = []): ResponseInterface {
+    return $this->makeLoggedRequest(Request::METHOD_POST, $url, $data, $uriParameters);
+  }
+
+  public function makePutRequest(string $url, array $data = null, array $uriParameters = []): ResponseInterface {
+    return $this->makeLoggedRequest(Request::METHOD_PUT, $url, $data, $uriParameters);
+  }
+
+  public function makePatchRequest(string $url, array $data = null, array $uriParameters = []): ResponseInterface {
+    return $this->makeLoggedRequest(Request::METHOD_PATCH, $url, $data, $uriParameters);
+  }
+
+  public function makeDeleteRequest(string $url, array $data = null, array $uriParameters = []): ResponseInterface {
+    return $this->makeLoggedRequest(Request::METHOD_DELETE, $url, $data, $uriParameters);
+  }
+
 }

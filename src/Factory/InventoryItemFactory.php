@@ -4,7 +4,7 @@ namespace App\Factory;
 
 use App\Entity\InventoryItem;
 use App\Repository\InventoryItemRepository;
-use App\Story\InventoryCategoryStory;
+use App\Tests\Story\InventoryCategoryStory;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;

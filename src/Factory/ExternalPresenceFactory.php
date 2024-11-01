@@ -4,7 +4,7 @@ namespace App\Factory;
 
 use App\Entity\ExternalPresence;
 use App\Repository\ExternalPresenceRepository;
-use App\Story\ActivityStory;
+use App\Tests\Story\ActivityStory;
 use DateTimeImmutable;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;

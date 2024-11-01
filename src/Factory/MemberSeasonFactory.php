@@ -4,7 +4,7 @@ namespace App\Factory;
 
 use App\Entity\MemberSeason;
 use App\Repository\MemberSeasonRepository;
-use App\Story\SeasonStory;
+use App\Tests\Story\SeasonStory;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;

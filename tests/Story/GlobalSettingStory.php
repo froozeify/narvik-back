@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Story;
+namespace App\Tests\Story;
 
 use App\Enum\GlobalSetting;
 use App\Factory\GlobalSettingFactory;

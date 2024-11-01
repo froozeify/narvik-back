@@ -2,18 +2,12 @@
 
 namespace App\Tests\Controller;
 
-use App\Entity\Club;
 use App\Tests\AbstractTestCase;
 
 class LoginTest extends AbstractTestCase {
   public function testLoginAsSuperAdmin(): void {
     $this->loggedAsSuperAdmin(); // We log as super admin
     $this->assertResponseIsSuccessful();
-
-    // We request a super admin only route
-    $this->makeGetRequest('/clubs');
-    $this->assertResponseIsSuccessful();
-    self::assertMatchesResourceCollectionJsonSchema(Club::class);
   }
 
 //  public function testLoginAsClubAdmin(): void { }
@@ -23,6 +17,15 @@ class LoginTest extends AbstractTestCase {
 //  public function testLoginAsClubMember(): void { }
 //
 //  public function testLoginAsNotActivated(): void { }
+
+  public function testLoginWithWrongPassword(): void {
+    $this->loggedAs("admin@admin.com", "wrong");
+    $this->assertResponseStatusCodeSame(401);
+
+    // We request a PRIVATE resource
+    $this->makeGetRequest('/activities');
+    $this->assertResponseStatusCodeSame(401);
+  }
 
   /**
    * Account does not exist

@@ -32,7 +32,14 @@ abstract class AbstractTestCase extends ApiTestCase {
     ]);
   }
 
+  protected function logout(): void {
+    $this->accessToken = null;
+    $this->refreshToken = null;
+  }
+
   protected function loggedAs(string $email, string $password): bool {
+    $this->logout();
+
     $response = static::createClient()->request(Request::METHOD_POST, '/auth', [
       'json' => [
         'email' => $email,

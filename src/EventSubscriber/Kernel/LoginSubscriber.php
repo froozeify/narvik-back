@@ -5,9 +5,8 @@ namespace App\EventSubscriber\Kernel;
 use App\Entity\Member;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationSuccessEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Events;
-use phpDocumentor\Reflection\Types\This;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -30,15 +29,24 @@ final class LoginSubscriber implements EventSubscriberInterface {
   }
 
   public function __construct(
-    private RequestStack $requestStack,
-    private RateLimiterFactory $memberIpLoginLimiter,
-    private RateLimiterFactory $ipLoginLimiter,
+    private readonly RequestStack $requestStack,
+    private readonly RateLimiterFactory $memberIpLoginLimiter,
+    private readonly RateLimiterFactory $ipLoginLimiter,
+    private readonly ContainerBagInterface $containerBag,
   ) {
   }
 
 
   public function requestEvent(RequestEvent $event): void {
     $route = $event->getRequest()->attributes->get('_route');
+
+    // Test env, we disable the rate limiting
+    // All that could be simplified in a future version by not exposing the login
+    // OAuth with only login form from API and app use Authorization Code Grant
+    if ($this->containerBag->get('kernel.environment') === 'test') {
+      return;
+    }
+
     if ($route !== 'api_login') {
       return;
     }

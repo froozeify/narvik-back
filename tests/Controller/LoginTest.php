@@ -3,15 +3,15 @@
 namespace App\Tests\Controller;
 
 use App\Entity\Club;
-use App\Tests\AbstractTest;
+use App\Tests\AbstractTestCase;
 
-class LoginTest extends AbstractTest {
+class LoginTest extends AbstractTestCase {
   public function testLoginAsSuperAdmin(): void {
     $this->loggedAsSuperAdmin(); // We log as super admin
     $this->assertResponseIsSuccessful();
 
     // We request a super admin only route
-    $this->createClientWithCredentials()->request('GET', '/clubs');
+    $this->makeGetRequest('/clubs');
     $this->assertResponseIsSuccessful();
     self::assertMatchesResourceCollectionJsonSchema(Club::class);
   }

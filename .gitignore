@@ -25,10 +25,9 @@ phpstan.neon
 .phpunit.result.cache
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
+tests/coverage/
 
 ###> phpunit/phpunit ###
 /phpunit.xml
 .phpunit.result.cache
 ###< phpunit/phpunit ###
-
-tests/coverage/

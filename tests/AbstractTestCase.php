@@ -10,7 +10,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
-abstract class AbstractTest extends ApiTestCase {
+abstract class AbstractTestCase extends ApiTestCase {
   use ResetDatabase;
   use Factories;
 
@@ -18,6 +18,7 @@ abstract class AbstractTest extends ApiTestCase {
   private ?string $refreshToken = null;
 
   public function setUp(): void {
+    parent::setUp();
     self::bootKernel();
   }
 

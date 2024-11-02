@@ -2,9 +2,11 @@
 
 namespace App\Tests\Entity;
 
+use App\Enum\ClubRole;
 use App\Enum\UserRole;
 use App\Tests\AbstractTestCase;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 abstract class AbstractEntityTestCase extends AbstractTestCase {
   abstract protected function getClassname() : string;
@@ -18,15 +20,21 @@ abstract class AbstractEntityTestCase extends AbstractTestCase {
   protected function getCollectionGrantedAccess() : array {
     return [
       UserRole::super_admin->value => true,
-      UserRole::admin->value => true,
 
-      UserRole::member->value => false,
-      UserRole::badger->value => false,
+      ClubRole::admin->value => false,
+      ClubRole::supervisor->value => false,
+
+      ClubRole::member->value => false,
+      ClubRole::badger->value => false,
     ];
   }
 
-  private function testGetCollectionAs(UserRole $role): void {
+  protected function testGetCollectionAs(UserRole|ClubRole $role): void {
     $this->makeGetRequest($this->getRootUri());
+
+    if (!array_key_exists($role->value, $this->getCollectionGrantedAccess())) {
+      throw new \Exception("Role '$role->value' does not match the get collection access preset");
+    }
 
     if (!$this->getCollectionGrantedAccess()[$role->value]) {
       self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);

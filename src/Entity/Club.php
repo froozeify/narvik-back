@@ -55,17 +55,8 @@ class Club extends UuidEntity implements TimestampEntityInterface {
   #[ApiProperty(security: "is_granted('CLUB_ADMIN', object)")] // Property only viewable & writable by the club admin
   private ?string $badgerToken = null;
 
-  /**
-   * To get the club member list, specific url must be call
-   *
-   * @var Collection<int, Member>
-   */
-  #[ORM\OneToMany(mappedBy: 'club', targetEntity: Member::class, orphanRemoval: true)]
-  private Collection $members;
-
   public function __construct() {
     parent::__construct();
-    $this->members = new ArrayCollection();
   }
 
   public function getName(): ?string {
@@ -92,31 +83,6 @@ class Club extends UuidEntity implements TimestampEntityInterface {
 
   public function setSalesEnabled(bool $salesEnabled): static {
     $this->salesEnabled = $salesEnabled;
-    return $this;
-  }
-
-  /**
-   * @return Collection<int, Member>
-   */
-  public function getMembers(): Collection {
-    return $this->members;
-  }
-
-  public function addMember(Member $member): static {
-    if (!$this->members->contains($member)) {
-      $this->members->add($member);
-      $member->setClub($this);
-    }
-    return $this;
-  }
-
-  public function removeMember(Member $member): static {
-    if ($this->members->removeElement($member)) {
-      // set the owning side to null (unless already changed)
-      if ($member->getClub() === $this) {
-        $member->setClub(null);
-      }
-    }
     return $this;
   }
 

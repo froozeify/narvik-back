@@ -42,7 +42,7 @@ class MemberSeason extends UuidEntity {
   #[Groups(['member-season-read'])]
   private ?Season $season = null;
 
-  #[ORM\ManyToOne(targetEntity: AgeCategory::class, inversedBy: 'memberSeasons')]
+  #[ORM\ManyToOne(targetEntity: AgeCategory::class)]
   #[Groups(['member-season-read', 'member-read', 'member-presence-read'])]
   private ?AgeCategory $ageCategory = null;
 

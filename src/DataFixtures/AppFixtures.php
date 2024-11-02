@@ -23,9 +23,6 @@ use function Zenstruck\Foundry\faker;
 
 class AppFixtures extends Fixture {
   public function load(ObjectManager $manager): void {
-    // We generate the activities
-    ActivityStory::load();
-
     // We create the default season
     SeasonStory::load();
 
@@ -38,6 +35,9 @@ class AppFixtures extends Fixture {
     // TODO: Create some clubs and links user to them
     ClubFactory::createMany(faker()->numberBetween(2, 5));
     $users = UserFactory::createMany(faker()->numberBetween(5, 10));
+
+    // We generate the activities
+    ActivityStory::load();
 
     // We create some member
     $members = MemberFactory::createMany(faker()->numberBetween(30, 40), [

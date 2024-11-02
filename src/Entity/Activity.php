@@ -13,6 +13,8 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\ActivityMergeTo;
 use App\Entity\Abstract\UuidEntity;
+use App\Entity\Interface\ClubLinkedEntityInterface;
+use App\Entity\Trait\SelfClubLinkedEntityTrait;
 use App\Repository\ActivityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -27,13 +29,13 @@ use Symfony\Component\Validator\Constraints as Assert;
     new GetCollection(),
     new Get(),
     new Post(
-      security: "is_granted('ROLE_ADMIN')"
+      security: "is_granted('CLUB_ADMIN', object)"
     ),
     new Patch(
-      security: "is_granted('ROLE_ADMIN')"
+      security: "is_granted('CLUB_ADMIN', object)"
     ),
     new Delete(
-      security: "is_granted('ROLE_ADMIN')"
+      security: "is_granted('CLUB_ADMIN', object)"
     ),
 
     new Post(
@@ -56,13 +58,14 @@ use Symfony\Component\Validator\Constraints as Assert;
     'groups' => ['activity', 'activity-read']
   ],
   denormalizationContext: [
-    'groups' => ['admin-write']
+    'groups' => ['club-admin-write']
   ],
   order: ['name' => 'asc'],
   paginationEnabled: false
 )]
 #[ApiFilter(OrderFilter::class, properties: ['name' => 'ASC', 'isEnabled' => 'ASC'])]
-class Activity extends UuidEntity {
+class Activity extends UuidEntity implements ClubLinkedEntityInterface {
+  use SelfClubLinkedEntityTrait;
 
   #[ORM\Column(length: 255)]
   #[Groups(['admin-write', 'activity-read','member-read', 'member-presence', 'external-presence'])]

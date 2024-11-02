@@ -17,7 +17,6 @@ use App\Controller\UserPasswordResetInitiate;
 use App\Controller\UserSelf;
 use App\Controller\UserSelfUpdatePassword;
 use App\Entity\Abstract\UuidEntity;
-use App\Enum\ClubRole;
 use App\Enum\UserRole;
 use App\Filter\MultipleFilter;
 use App\Repository\UserRepository;
@@ -25,6 +24,7 @@ use App\State\MemberProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use phpDocumentor\Reflection\Types\This;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -45,6 +45,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     uriTemplate: '/self',
     controller: UserSelf::class,
     openapi: new Model\Operation(summary: 'Return current logged user information',),
+    normalizationContext: ['groups' => ['self-read', 'user-read', 'user']],
     read: false,
   ),
   new Put(
@@ -141,14 +142,17 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
   #[Groups(['user'])]
   private ?string $profileImage = null;
 
-  #[Groups(['autocomplete', 'user-read', 'member-read', 'member-presence-read', 'sale-read'])]
+  #[Groups(['autocomplete', 'user-read', 'member-read'])]
   private ?string $fullName = null;
 
-  #[Groups(['user'])]
-  private UserRole $role = UserRole::member;
-
-  #[ORM\Column]
+  #[ORM\Column] // Roles are set based on role definition
   private array $roles = [];
+
+  #[Groups(['user'])]
+  private UserRole $role = UserRole::user;
+
+  #[Groups(['self-read'])]
+  private array $clubs = [];
 
   /**
    * @var string The hashed password
@@ -186,11 +190,42 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
   #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserMember::class, orphanRemoval: true)]
   private Collection $memberships;
 
-  public function __construct()
-  {
+  public function __construct() {
       parent::__construct();
       $this->memberships = new ArrayCollection();
   }
+
+  // Custom calculated fields
+
+  public function getClubs(): array {
+    $userClubs = [];
+    foreach ($this->getMemberships() as $membership) {
+      $club = $membership->getMember()?->getClub();
+      if ($club) {
+        $userClubs[] = [
+          'club' => $club,
+          'role' => $membership->getRole(),
+        ];
+      }
+    }
+
+    return $userClubs;
+  }
+
+  public function getFullName(): ?string {
+    return $this->lastname . " " . $this->firstname;
+  }
+
+  public function getRole(): UserRole {
+    $userRole = UserRole::tryFrom($this->getRoles()[0]);
+    return $userRole ?? UserRole::user;
+  }
+
+  public function setRole(UserRole $role): static {
+    return $this->setRoles([$role->value]);
+  }
+
+  // End custom calculated fields
 
   public function getEmail(): ?string {
     return $this->email;
@@ -218,7 +253,7 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
    */
   public function getRoles(): array {
     $roles = $this->roles;
-    // We ensure every member has at least the ROLE_USER
+    // We ensure every real user have at least the ROLE_USER
     if (!in_array(UserRole::badger->value, $roles)) {
       $roles[] = UserRole::user->value;
     }
@@ -229,15 +264,6 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
     // We only save the first role passed
     $this->roles = $roles;
     return $this;
-  }
-
-  public function getRole(): UserRole {
-    $userRole = UserRole::tryFrom($this->getRoles()[0]);
-    return $userRole ?? UserRole::user;
-  }
-
-  public function setRole(UserRole $role): static {
-    return $this->setRoles([$role->value]);
   }
 
   /**
@@ -285,10 +311,6 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
   public function setLastname(string $lastname): static {
     $this->lastname = strtoupper($lastname);
     return $this;
-  }
-
-  public function getFullName(): ?string {
-    return $this->lastname . " " . $this->firstname;
   }
 
   public function isAccountActivated(): bool {

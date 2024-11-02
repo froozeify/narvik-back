@@ -3,12 +3,20 @@
 namespace App\Enum;
 
 enum ClubRole: string {
+  case admin = 'CLUB_ADMIN';
+  case supervisor = 'CLUB_SUPERVISOR';
+  case member = 'CLUB_MEMBER';
 
-  case badger = 'ROLE_BADGER';
+  case badger = 'CLUB_BADGER';
 
-  case member = 'ROLE_MEMBER';
-  case supervisor = 'ROLE_SUPERVISOR';
-  case admin = 'ROLE_ADMIN';
+  public function hasRole(ClubRole $role): bool {
+    return match ($role->value) {
+      self::admin->value => $this->isAdmin(), // Admin have all role
+      self::supervisor->value => $this->hasSupervisorRole(),
+      // Member and badger only have their own level role
+      default => $role === $this,
+    };
+  }
 
   public function isAdmin(): bool {
     return $this->value === self::admin->value;

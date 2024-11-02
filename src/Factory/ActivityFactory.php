@@ -72,6 +72,7 @@ final class ActivityFactory extends PersistentProxyObjectFactory {
    */
   protected function defaults(): array {
     return [
+      'club' => ClubFactory::random(),
       'name' => self::faker()->randomElement(self::ACTIVITIES),
     ];
   }

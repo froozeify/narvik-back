@@ -52,11 +52,8 @@ final readonly class UserClubExtension implements QueryCollectionExtensionInterf
   private function getUserClubs(): array {
     $user = $this->getUser();
     $userClubs = [];
-    foreach ($user->getMemberships() as $membership) {
-      $club = $membership->getMember()?->getClub();
-      if ($club) {
-        $userClubs[] = $club;
-      }
+    foreach ($user->getClubs() as $club) {
+      $userClubs[] = $club['club'];
     }
 
     return $userClubs;

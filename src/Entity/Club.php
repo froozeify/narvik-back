@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -37,7 +38,7 @@ class Club extends UuidEntity implements TimestampEntityInterface {
   use TimestampTrait;
 
   #[ORM\Column(length: 255)]
-  #[Groups(['club-read', 'super-admin-write'])]
+  #[Groups(['club-read', 'self-read', 'super-admin-write'])]
   #[Assert\NotBlank]
   private ?string $name = null;
 
@@ -48,6 +49,11 @@ class Club extends UuidEntity implements TimestampEntityInterface {
   #[ORM\Column(options: ['default' => false])]
   #[Groups(['club-read', 'admin-write'])]
   private bool $salesEnabled = false;
+
+  #[ORM\Column(length: 255, nullable: true)]
+  #[Groups(['club-read', 'admin-write'])]
+  #[ApiProperty(security: "is_granted('CLUB_ADMIN', object)")] // Property only viewable & writable by the club admin
+  private ?string $badgerToken = null;
 
   /**
    * To get the club member list, specific url must be call
@@ -112,6 +118,15 @@ class Club extends UuidEntity implements TimestampEntityInterface {
       }
     }
     return $this;
+  }
+
+  public function getBadgerToken(): ?string {
+      return $this->badgerToken;
+  }
+
+  public function setBadgerToken(?string $badgerToken): static {
+      $this->badgerToken = $badgerToken;
+      return $this;
   }
 
 }

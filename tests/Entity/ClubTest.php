@@ -13,4 +13,6 @@ class ClubTest extends AbstractEntityTestCase {
   protected function getRootUri(): string {
     return '/clubs';
   }
+
+  // TODO: Create test to check only superadmin and club_admin can see the `badgerToken` field
 }

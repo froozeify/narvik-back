@@ -18,6 +18,7 @@ use App\Controller\MemberPhotosImportFromItac;
 use App\Controller\MemberSearchByLicenceOrName;
 use App\Entity\Abstract\UuidEntity;
 use App\Entity\Interface\ClubLinkedEntityInterface;
+use App\Entity\Trait\SelfClubLinkedEntityTrait;
 use App\Filter\CurrentSeasonFilter;
 use App\Filter\MultipleFilter;
 use App\Repository\MemberRepository;
@@ -148,15 +149,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(MultipleFilter::class, properties: ['firstname', 'lastname', 'licence'])]
 #[ApiFilter(CurrentSeasonFilter::class, properties: ['memberSeasons.season'])]
 class Member extends UuidEntity implements ClubLinkedEntityInterface {
+  use SelfClubLinkedEntityTrait;
 
-  public static function getClubSqlPath(): string {
-    return 'club';
-  }
+//  public static function getClubSqlPath(): string {
+//    return 'club';
+//  }
 
-  #[ORM\ManyToOne(inversedBy: 'members')]
-  #[ORM\JoinColumn(nullable: false)]
-  #[Groups(['common-read'])]
-  private ?Club $club = null;
+//  #[ORM\ManyToOne(inversedBy: 'members')]
+//  #[ORM\JoinColumn(nullable: false)]
+//  #[Groups(['common-read'])]
+//  private ?Club $club = null;
 
   /**
    * @var Collection<int, Sale>
@@ -552,15 +554,6 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
         $sale->setSeller(null);
       }
     }
-    return $this;
-  }
-
-  public function getClub(): ?Club {
-    return $this->club;
-  }
-
-  public function setClub(?Club $club): static {
-    $this->club = $club;
     return $this;
   }
 }

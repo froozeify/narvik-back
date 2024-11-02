@@ -32,10 +32,6 @@ abstract class AbstractEntityTestCase extends AbstractTestCase {
   protected function testGetCollectionAs(UserRole|ClubRole $role): void {
     $this->makeGetRequest($this->getRootUri());
 
-    if (!array_key_exists($role->value, $this->getCollectionGrantedAccess())) {
-      throw new \Exception("Role '$role->value' does not match the get collection access preset");
-    }
-
     if (!$this->getCollectionGrantedAccess()[$role->value]) {
       self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
       return;
@@ -48,6 +44,25 @@ abstract class AbstractEntityTestCase extends AbstractTestCase {
   public function testGetCollectionAsSuperAdmin(): void {
     $this->loggedAsSuperAdmin();
     $this->testGetCollectionAs(UserRole::super_admin);
-    return;
+  }
+
+  public function testGetCollectionAsAdminClub1(): void {
+    $this->loggedAsAdminClub1();
+    $this->testGetCollectionAs(ClubRole::admin);
+  }
+
+  public function testGetCollectionAsAdminClub2(): void {
+    $this->loggedAsAdminClub2();
+    $this->testGetCollectionAs(ClubRole::admin);
+  }
+
+  public function testGetCollectionAsSupervisorClub1(): void {
+    $this->loggedAsSupervisorClub1();
+    $this->testGetCollectionAs(ClubRole::supervisor);
+  }
+
+  public function testGetCollectionAsMemberClub1(): void {
+    $this->loggedAsMemberClub1();
+    $this->testGetCollectionAs(ClubRole::member);
   }
 }

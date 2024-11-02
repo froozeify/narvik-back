@@ -16,40 +16,27 @@ use App\Tests\Story\GlobalSettingStory;
 use App\Tests\Story\InventoryCategoryStory;
 use App\Tests\Story\SalePaymentModeStory;
 use App\Tests\Story\SeasonStory;
-use App\Tests\Story\UserStory;
+use App\Tests\Story\InitStory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use function Zenstruck\Foundry\faker;
 
 class AppFixtures extends Fixture {
   public function load(ObjectManager $manager): void {
+    // We create the bare minium required (some users and clubs)
+    InitStory::load();
+
     // We create the default season
     SeasonStory::load();
 
     // We create the default global settings
     GlobalSettingStory::load();
 
-    // We create the users
-    UserStory::load();
 
-    // TODO: Create some clubs and links user to them
-    ClubFactory::createMany(faker()->numberBetween(2, 5));
-    $users = UserFactory::createMany(faker()->numberBetween(5, 10));
+
 
     // We generate the activities
     ActivityStory::load();
-
-    // We create some member
-    $members = MemberFactory::createMany(faker()->numberBetween(30, 40), [
-      'memberPresences' => MemberPresenceFactory::new()->many(1, 4),
-      'memberSeasons'   => MemberSeasonFactory::new()->many(0, 4),
-    ]);
-
-    foreach ($members as $member) {
-      UserMemberFactory::createOne([
-        'member' => $member,
-      ]);
-    }
 
     // We record some external presence
     ExternalPresenceFactory::new()->many(20, 40)->create();

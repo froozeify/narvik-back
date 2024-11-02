@@ -62,10 +62,11 @@ final class UserFactory extends PersistentProxyObjectFactory {
    */
   protected function defaults(): array {
     return [
-      'firstname' => self::faker()->firstName(),
-      'lastname'  => self::faker()->lastName(),
-      'email'     => self::faker()->unique()->safeEmail(),
-      'roles'     => [UserRole::user->value],
+      'firstname'        => self::faker()->firstName(),
+      'lastname'         => self::faker()->lastName(),
+      'email'            => self::faker()->unique()->safeEmail(),
+      'accountActivated' => self::faker()->boolean(),
+      'roles'            => [UserRole::user->value],
     ];
   }
 
@@ -77,24 +78,6 @@ final class UserFactory extends PersistentProxyObjectFactory {
       'plainPassword'    => $password ?? 'admin123',
       'accountActivated' => true,
       'roles'            => [UserRole::super_admin->value],
-    ]);
-  }
-
-  /**
-   * Badger user is needed for login and register presence on the site
-   * This special user is here so we can have the site publicly exposed
-   * And protected behind a login page
-   *
-   * @return self
-   */
-  public function badger(): self {
-    return $this->with([
-      'firstname'        => 'badger',
-      'lastname'         => 'badger',
-      'email'            => 'badger',
-      'plainPassword'    => 'badger123',
-      'accountActivated' => false,
-      'roles'            => [UserRole::badger->value],
     ]);
   }
 

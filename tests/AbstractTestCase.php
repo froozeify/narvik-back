@@ -61,9 +61,20 @@ abstract class AbstractTestCase extends ApiTestCase {
     return $this->loggedAs('admin@admin.com', 'admin123');
   }
 
-  //TODO: Add logged as club1 admin/supervisor/member and club2
-  // Make an user having access in both (1 supervisor/ 1 regular)
-  // Create an admin user
+  public function loggedAsAdminClub1(): bool {
+    return $this->loggedAs('admin@club1.fr', 'admin123');
+  }
+  public function loggedAsAdminClub2(): bool {
+    return $this->loggedAs('admin@club2.fr', 'admin123');
+  }
+
+  public function loggedAsSupervisorClub1(): bool {
+    return $this->loggedAs('supervisor@club1.fr', 'admin123');
+  }
+
+  public function loggedAsMemberClub1(): bool {
+    return $this->loggedAs('member@club1.fr', 'member123');
+  }
 
   private function prepareRequestOptions(?array $data = null, array $uriParameters = []): array {
     $options = [];

@@ -8,4 +8,4 @@ when@test:
     zenstruck_foundry:
         auto_refresh_proxies: true
         global_state:
-            - App\Tests\Story\UserStory
+            - App\Tests\Story\InitStory

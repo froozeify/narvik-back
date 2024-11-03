@@ -38,9 +38,9 @@ class ClubVoter extends Voter {
     }
 
     // Super admin have full right
-//    if ($this->security->isGranted(UserRole::super_admin->value)) {
-//      return true;
-//    }
+    if ($this->security->isGranted(UserRole::super_admin->value)) {
+      return true;
+    }
 
     /** @var Club|null $targetedClub */
     $targetedClub = null;

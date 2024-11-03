@@ -55,6 +55,7 @@
         "zenstruck/foundry": "^2.2"
     },
     "require-dev": {
+        "dama/doctrine-test-bundle": "^8.2",
         "doctrine/doctrine-fixtures-bundle": "^3.4",
         "justinrainbow/json-schema": "^6.0",
         "phpstan/phpstan-doctrine": "^1.4",

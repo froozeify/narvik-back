@@ -38,7 +38,7 @@ final class InitStory extends Story {
       'smtpEnabled' => false,
     ]), 'clubs');
 
-    $this->addToPool('clubs', ClubFactory::createMany(faker()->numberBetween(2, 5)));
+    $this->addToPool('clubs', ClubFactory::createMany(3));
 
     // We create a one club admin and supervisor for each
     $this->addState('admin_club_1', UserFactory::createOne([
@@ -110,10 +110,10 @@ final class InitStory extends Story {
       'role' => ClubRole::member,
     ]);
 
-    $users = UserFactory::createMany(faker()->numberBetween(5, 10));
+    $users = UserFactory::createMany(5);
 
     // We create some member
-    $members = MemberFactory::createMany(faker()->numberBetween(30, 40), [
+    $members = MemberFactory::createMany(40, [
       'memberSeasons' => MemberSeasonFactory::new()->many(0, 4),
     ]);
 

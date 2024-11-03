@@ -7,6 +7,7 @@ use App\Enum\UserRole;
 use App\Tests\AbstractTestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 abstract class AbstractEntityClubLinkedTestCase extends AbstractEntityTestCase {
 
@@ -20,11 +21,5 @@ abstract class AbstractEntityClubLinkedTestCase extends AbstractEntityTestCase {
     $access[ClubRole::admin->value] = true;
     $access[ClubRole::supervisor->value] = true;
     return $access;
-  }
-
-  public function testGetCollectionAsClub1Admin(): void {
-//    $this->loggedAsSuperAdmin();
-//    $this->testGetCollectionAs(UserRole::super_admin);
-    return;
   }
 }

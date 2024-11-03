@@ -14,6 +14,8 @@ abstract class AbstractTestCase extends ApiTestCase {
   use ResetDatabase;
   use Factories;
 
+  use CustomApiTestAssertionsTrait;
+
   private ?string $accessToken = null;
   private ?string $refreshToken = null;
 

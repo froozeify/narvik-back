@@ -1,5 +1,8 @@
 name: CI
 
+env:
+  IGNORE_MIGRATION: true
+
 on:
   push:
     branches:

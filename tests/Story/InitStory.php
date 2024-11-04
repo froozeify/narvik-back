@@ -36,6 +36,7 @@ final class InitStory extends Story {
       'name' => 'Club 2',
       'salesEnabled' => false,
       'smtpEnabled' => false,
+      'badgerToken' => 'club2longbadgertoken',
     ]), 'clubs');
 
     $this->addToPool('clubs', ClubFactory::createMany(3));

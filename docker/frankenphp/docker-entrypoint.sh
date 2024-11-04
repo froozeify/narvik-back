@@ -28,9 +28,16 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 			echo "The database is now ready and reachable"
 		fi
 
-		if [ "$( find ./migrations -iname '*.php' -print -quit )" ]; then
-			php bin/console doctrine:migrations:migrate --no-interaction --all-or-nothing
+
+		if [[ -z "${IGNORE_MIGRATION}" ]]; then
+			echo "Executing doctrine migration"
+			if [ "$( find ./migrations -iname '*.php' -print -quit )" ]; then
+				php bin/console doctrine:migrations:migrate --no-interaction --all-or-nothing
+			fi
+		else
+			echo "Doctrine migration has been ignored because IGNORE_MIGRATION env var is present"
 		fi
+
 	fi
 
 	setfacl -R -m u:www-data:rwX -m u:"$(whoami)":rwX var

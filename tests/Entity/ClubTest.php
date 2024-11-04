@@ -34,19 +34,34 @@ class ClubTest extends AbstractEntityTestCase {
     $club1 = InitStory::club_1();
     $iri = $this->getIriFromResource($club1);
 
+    // Super admin
     $this->loggedAsSuperAdmin();
     $this->makeGetRequest($iri);
-
     self::assertResponseIsSuccessful();
     self::assertJsonContains([
       '@id' => $iri,
       'badgerToken' => $club1->getBadgerToken(),
     ]);
 
-//    FIXME: Get an item for admin should work, for now return a 403, probably to fix in security.yaml
-//    $this->loggedAsAdminClub1();
-//    $this->makeGetRequest($iri);
-//    self::assertResponseIsSuccessful();
-//    self::assertJsonNotHasKey('badgerToken');
+    // Admin club 1
+    $this->loggedAsAdminClub1();
+    $this->makeGetRequest($iri);
+    self::assertResponseIsSuccessful();
+    self::assertJsonContains([
+      '@id' => $iri,
+      'badgerToken' => $club1->getBadgerToken(),
+    ]);
+
+    // Supervisor club 1
+    $this->loggedAsSupervisorClub1();
+    $response = $this->makeGetRequest($iri);
+    self::assertResponseIsSuccessful();
+    self::assertJsonNotHasKey('badgerToken', $response);
+
+    // Member
+    $this->loggedAsMemberClub1();
+    $response = $this->makeGetRequest($iri);
+    self::assertResponseIsSuccessful();
+    self::assertJsonNotHasKey('badgerToken', $response);
   }
 }

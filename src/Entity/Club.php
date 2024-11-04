@@ -23,10 +23,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ClubRepository::class)]
 #[ApiResource(operations: [
-  new GetCollection(security: "is_granted('ROLE_SUPER_ADMIN')"),
+  new GetCollection(security: "is_granted('ROLE_SUPER_ADMIN')"), // Collection only to super admin, other should get them through /self
   new Get(),
   new Post(security: "is_granted('ROLE_SUPER_ADMIN')"),
-  new Patch(security: "is_granted('ROLE_ADMIN')",),
+  new Patch(security: "is_granted('ROLE_SUPER_ADMIN')",),
   new Delete(security: "is_granted('ROLE_SUPER_ADMIN')",),
 ], normalizationContext: [
   'groups' => ['club', 'club-read'],

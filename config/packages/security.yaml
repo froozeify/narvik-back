@@ -46,8 +46,7 @@ security:
 
     role_hierarchy:
         ROLE_SUPER_ADMIN: [ ROLE_ADMIN ]
-        ROLE_ADMIN: [ ROLE_SUPERVISOR ]
-        ROLE_SUPERVISOR: [ ROLE_USER, ROLE_BADGER ]
+        ROLE_ADMIN: [ ROLE_USER ]
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
@@ -60,29 +59,31 @@ security:
         - { path: ^/members/-/initiate-reset-password, roles: PUBLIC_ACCESS }
         - { path: ^/members/-/reset-password, roles: PUBLIC_ACCESS }
 
-        - { path: ^/images, roles: [ROLE_ADMIN, ROLE_BADGER]}
+        - { path: ^/images, roles: [ROLE_USER, ROLE_BADGER]}
 
-        - {path: ^/self, roles: [ ROLE_MEMBER, ROLE_BADGER ]}
+        - {path: ^/self, roles: [ ROLE_USER, ROLE_BADGER ]}
 
-        - { path: ^/activities, roles: [ROLE_SUPERVISOR, ROLE_BADGER]}
+        - { path: ^/activities, roles: [ROLE_USER, ROLE_BADGER]}
 
-        - { path: ^/external-presences, roles: [ROLE_SUPERVISOR, ROLE_BADGER]}
+        - { path: ^/clubs, roles: [ROLE_USER]}
+
+        - { path: ^/external-presences, roles: [ROLE_USER, ROLE_BADGER]}
         - { path: ^/global-settings, roles: [ROLE_SUPER_ADMIN]}
             
-        - { path: ^/inventory-categories, roles: [ROLE_SUPERVISOR]}
-        - { path: ^/inventory-items, roles: [ROLE_SUPERVISOR]}
-        - { path: ^/inventory-item-histories, roles: [ROLE_SUPERVISOR]}
+        - { path: ^/inventory-categories, roles: [ROLE_USER]}
+        - { path: ^/inventory-items, roles: [ROLE_USER]}
+        - { path: ^/inventory-item-histories, roles: [ROLE_USER]}
 
         - { path: ^/members/-/from-itac, roles: [ROLE_ADMIN]}
-        - { path: ^/members, roles: [ROLE_SUPERVISOR, ROLE_BADGER]}
+        - { path: ^/members, roles: [ROLE_USER, ROLE_BADGER]}
 
         - { path: ^/member-presences/-/from-cerbere, roles: [ROLE_ADMIN]}
-        - { path: ^/member-presences, roles: [ROLE_SUPERVISOR, ROLE_BADGER]}
-        - { path: ^/metrics, roles: [ROLE_SUPERVISOR]}
+        - { path: ^/member-presences, roles: [ROLE_USER, ROLE_BADGER]}
+        - { path: ^/metrics, roles: [ROLE_USER]}
 
-        - { path: ^/sales, roles: [ROLE_SUPERVISOR]}
-        - { path: ^/sale-payment-modes, roles: [ROLE_SUPERVISOR]}
-        # - { path: ^/sale-purchased-items, roles: [ROLE_SUPERVISOR]} # Not available in the API
+        - { path: ^/sales, roles: [ROLE_USER]}
+        - { path: ^/sale-payment-modes, roles: [ROLE_USER]}
+        # - { path: ^/sale-purchased-items, roles: [ROLE_USER]} # Not available in the API
             
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
@@ -90,7 +91,7 @@ security:
         # - { route: 'presence_list', roles: ROLE_BADGER } # route will also include presence_list_* it's like path, it's regex 
 
         # Always at the end, in case we forgot to protect a route, only admin will be able to access it
-        - { path: ^/, roles: ROLE_ADMIN }
+        - { path: ^/, roles: ROLE_SUPER_ADMIN }
 
 when@test:
     security:

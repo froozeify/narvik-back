@@ -43,8 +43,8 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 	setfacl -R -m u:www-data:rwX -m u:"$(whoami)":rwX var
 	setfacl -dR -m u:www-data:rwX -m u:"$(whoami)":rwX var
 
-	echo "Updating default global settings"
-	php bin/console install:default-settings
+#	echo "Updating default global settings"
+#	php bin/console install:default-settings
 
 	echo "Starting supervisord with messenger-worker conf file"
 	/usr/bin/supervisord -c /etc/supervisor/conf.d/messenger-worker.ini

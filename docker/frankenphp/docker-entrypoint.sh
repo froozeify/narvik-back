@@ -1,6 +1,8 @@
 #!/bin/sh
 set -e
 
+IGNORE_MIGRATION=${IGNORE_MIGRATION:-false}
+
 if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 	if [ -z "$(ls -A 'vendor/' 2>/dev/null)" ]; then
 		composer install --prefer-dist --no-progress --no-interaction
@@ -29,7 +31,7 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 		fi
 
 
-		if [[ -z "${IGNORE_MIGRATION}" ]]; then
+		if [ $IGNORE_MIGRATION == "false" ]; then
 			echo "Executing doctrine migration"
 			if [ "$( find ./migrations -iname '*.php' -print -quit )" ]; then
 				php bin/console doctrine:migrations:migrate --no-interaction --all-or-nothing

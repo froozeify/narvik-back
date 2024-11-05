@@ -31,13 +31,14 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 		fi
 
 
-		if [ $IGNORE_MIGRATION == "false" ]; then
+		if [ $IGNORE_MIGRATION == "true" ]; then
+			echo "Doctrine migration has been ignored because 'IGNORE_MIGRATION' env var is set to 'true'."
+			echo "Setting it to anything else will make the doctrine migration to be executed."
+		else
 			echo "Executing doctrine migration"
 			if [ "$( find ./migrations -iname '*.php' -print -quit )" ]; then
 				php bin/console doctrine:migrations:migrate --no-interaction --all-or-nothing
 			fi
-		else
-			echo "Doctrine migration has been ignored because IGNORE_MIGRATION env var is present"
 		fi
 
 	fi

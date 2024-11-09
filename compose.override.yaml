@@ -15,7 +15,7 @@ services:
       MERCURE_EXTRA_DIRECTIVES: demo
       # See https://xdebug.org/docs/all_settings#mode
       XDEBUG_MODE: "${XDEBUG_MODE:-off}"
-      IGNORE_MIGRATION: true # Comment this line if you want to play the migration (not needed on local dev env with the fixture loading)
+      IGNORE_MIGRATION: true # Comment this line, or false if you want to play the migration (not needed on local dev env with the fixture loading)
     extra_hosts:
       # Ensure that host.docker.internal is correctly defined on Linux
       - host.docker.internal:host-gateway

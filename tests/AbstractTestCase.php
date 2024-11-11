@@ -124,8 +124,8 @@ abstract class AbstractTestCase extends ApiTestCase {
     return $response;
   }
 
-  public function makeLoggedRequest(string $method, string $url, ?array $data = null, array $uriParameters = []): ResponseInterface {
-    $options = $this->prepareRequestOptions($data, $uriParameters);
+  public function makeLoggedRequest(string $method, string $url, ?array $data = null, array $uriParameters = [], array $queryOptions = []): ResponseInterface {
+    $options = array_merge($queryOptions, $this->prepareRequestOptions($data, $uriParameters));
     $response = static::createClientWithCredentials()->request($method, $url, $options);
     return $response;
   }
@@ -145,7 +145,7 @@ abstract class AbstractTestCase extends ApiTestCase {
   }
 
   public function makePatchRequest(string $url, array $data = null, array $uriParameters = []): ResponseInterface {
-    return $this->makeLoggedRequest(Request::METHOD_PATCH, $url, $data, $uriParameters);
+    return $this->makeLoggedRequest(Request::METHOD_PATCH, $url, $data, $uriParameters, ['headers' => ['Content-Type' => 'application/merge-patch+json']]);
   }
 
   public function makeDeleteRequest(string $url, array $data = null, array $uriParameters = []): ResponseInterface {

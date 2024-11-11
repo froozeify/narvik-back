@@ -17,12 +17,12 @@ class UserMember {
   private ?int $id = null;
 
   #[ORM\ManyToOne(inversedBy: 'memberships')]
-  #[ORM\JoinColumn(nullable: false)]
+  #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
   #[Groups(['member-read', 'admin-write'])]
   private ?User $user = null;
 
-  #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-  #[ORM\JoinColumn(nullable: false)]
+  #[ORM\OneToOne()]
+  #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
   #[Groups(['member-read', 'admin-write'])]
   private ?Member $member = null;
 

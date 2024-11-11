@@ -4,6 +4,8 @@ namespace App\Tests;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Symfony\Bundle\Test\Client;
+use App\Enum\ClubRole;
+use App\Enum\UserRole;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -57,6 +59,31 @@ abstract class AbstractTestCase extends ApiTestCase {
     $this->accessToken = $data['token'];
     $this->refreshToken = $data['refresh_token'];
     return true;
+  }
+
+  public function makeAllLoggedRequests(\Closure $requestFunction, bool $excludeClub2 = false): void {
+    // Super admin
+    $this->loggedAsSuperAdmin();
+    $requestFunction(UserRole::super_admin->value, null);
+
+    // Admin club 1
+    $this->loggedAsAdminClub1();
+    $requestFunction(ClubRole::admin->value, 1);
+
+    // Supervisor club 1
+    $this->loggedAsSupervisorClub1();
+    $requestFunction(ClubRole::supervisor->value, 1);
+
+    // member club 1
+    $this->loggedAsMemberClub1();
+    $requestFunction(ClubRole::member->value, 1);
+
+    // Club 2
+    if (!$excludeClub2) {
+      // Admin club 2
+      $this->loggedAsAdminClub2();
+      $requestFunction(ClubRole::admin->value, 2);
+    }
   }
 
   public function loggedAsSuperAdmin(): bool {

@@ -3,7 +3,10 @@
 namespace App\Tests\Entity;
 
 use App\Entity\Club;
+use App\Enum\ClubRole;
+use App\Enum\UserRole;
 use App\Tests\Story\InitStory;
+use Symfony\Component\HttpFoundation\Response;
 
 class ClubTest extends AbstractEntityTestCase {
   protected int $TOTAL_SUPER_ADMIN = 5;
@@ -16,10 +19,23 @@ class ClubTest extends AbstractEntityTestCase {
     return '/clubs';
   }
 
-  // TODO: Create test to check only superadmin and club_admin can see the `badgerToken` field
-
   public function testCreate(): void {
-    self::markTestSkipped('to implement');
+    $payload = [
+      "name" => 'Club de test',
+    ];
+
+    // Only super admin can create
+    $this->makeAllLoggedRequests(function (string $level, ?int $id) use ($payload) {
+      $this->makePostRequest($this->getRootUri(), $payload);
+
+      if ($level === UserRole::super_admin->value) {
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains($payload);
+      } else {
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+      }
+    });
+
   }
 
   public function testPatch(): void {
@@ -34,34 +50,18 @@ class ClubTest extends AbstractEntityTestCase {
     $club1 = InitStory::club_1();
     $iri = $this->getIriFromResource($club1);
 
-    // Super admin
-    $this->loggedAsSuperAdmin();
-    $this->makeGetRequest($iri);
-    self::assertResponseIsSuccessful();
-    self::assertJsonContains([
-      '@id' => $iri,
-      'badgerToken' => $club1->getBadgerToken(),
-    ]);
+    $this->makeAllLoggedRequests(function (string $level, ?int $id) use ($iri, $club1) {
+      $response = $this->makeGetRequest($iri);
+      $this->assertResponseIsSuccessful();
 
-    // Admin club 1
-    $this->loggedAsAdminClub1();
-    $this->makeGetRequest($iri);
-    self::assertResponseIsSuccessful();
-    self::assertJsonContains([
-      '@id' => $iri,
-      'badgerToken' => $club1->getBadgerToken(),
-    ]);
-
-    // Supervisor club 1
-    $this->loggedAsSupervisorClub1();
-    $response = $this->makeGetRequest($iri);
-    self::assertResponseIsSuccessful();
-    self::assertJsonNotHasKey('badgerToken', $response);
-
-    // Member
-    $this->loggedAsMemberClub1();
-    $response = $this->makeGetRequest($iri);
-    self::assertResponseIsSuccessful();
-    self::assertJsonNotHasKey('badgerToken', $response);
+      if (in_array($level, [UserRole::super_admin->value, ClubRole::admin->value])) {
+        $this->assertJsonContains([
+          '@id' => $iri,
+          'badgerToken' => $club1->getBadgerToken(),
+        ]);
+      } else {
+        $this->assertJsonNotHasKey('badgerToken', $response);
+      }
+    }, true);
   }
 }

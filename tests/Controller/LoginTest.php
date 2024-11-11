@@ -3,28 +3,25 @@
 namespace App\Tests\Controller;
 
 use App\Tests\AbstractTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class LoginTest extends AbstractTestCase {
-  public function testLoginAsSuperAdmin(): void {
-    $this->loggedAsSuperAdmin(); // We log as super admin
-    $this->assertResponseIsSuccessful();
+  public function testSuccessful(): void {
+    $this->makeAllLoggedRequests(function () {
+      $this->assertResponseIsSuccessful();
+    });
   }
 
-//  public function testLoginAsClubAdmin(): void { }
-//
-//  public function testLoginAsClubSupervisor(): void { }
-//
-//  public function testLoginAsClubMember(): void { }
-//
+//  TODO: Add login test as a not activated account, should fail
 //  public function testLoginAsNotActivated(): void { }
 
   public function testLoginWithWrongPassword(): void {
     $this->loggedAs("admin@admin.com", "wrong");
-    $this->assertResponseStatusCodeSame(401);
+    $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
 
     // We request a PRIVATE resource
     $this->makeGetRequest('/activities');
-    $this->assertResponseStatusCodeSame(401);
+    $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
   }
 
   /**
@@ -34,6 +31,6 @@ class LoginTest extends AbstractTestCase {
    */
   public function testLoginAsUnknown(): void {
     $this->loggedAs("notexisting@test.fr", "test");
-    $this->assertResponseStatusCodeSame(401);
+    $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
   }
 }

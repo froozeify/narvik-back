@@ -2,8 +2,8 @@
 
 namespace App\Controller\Abstract;
 
+use App\Entity\ClubDependent\Member;
 use App\Entity\Interface\SortableEntityInterface;
-use App\Entity\Member;
 use App\Repository\Interface\SortableRepositoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

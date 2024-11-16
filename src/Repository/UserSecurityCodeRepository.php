@@ -2,7 +2,6 @@
 
 namespace App\Repository;
 
-use App\Entity\Member;
 use App\Entity\User;
 use App\Entity\UserSecurityCode;
 use App\Enum\UserSecurityCodeTrigger;

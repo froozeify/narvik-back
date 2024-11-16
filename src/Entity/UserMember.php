@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\ClubDependent\Member;
 use App\Enum\ClubRole;
 use App\Repository\UserMemberRepository;
 use Doctrine\ORM\Mapping as ORM;

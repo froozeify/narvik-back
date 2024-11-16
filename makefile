@@ -14,6 +14,9 @@ SYMFONY  = $(PHP) bin/console
 .DEFAULT_GOAL = help
 .PHONY        : help build up start down logs sh composer vendor sf cc
 
+# Capture the first argument as `file`
+file=$(word 2,$(MAKECMDGOALS))
+
 ## —— 🎵 🐳 The Symfony Docker Makefile 🐳 🎵 ——————————————————————————————————
 help: ## Outputs this help screen
 	@grep -E '(^[a-zA-Z0-9\./_-]+:.*?##.*$$)|(^##)' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}{printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m##/[33m/'
@@ -74,8 +77,13 @@ cc: sf
 reload-fixture: ## Reload the database based on the default fixtures
 	@$(COMPOSER) reload-fixture
 
-test: ## Run the test suit on the app
-	@$(COMPOSER) test
+test: ## Run the test suit on the app, add f=<filepath> to run the tests only in that specific file
+	@$(eval f ?=)
+	@if [ -z "$(f)" ]; then\
+		echo "Running test globally";\
+	fi
+
+	@$(COMPOSER) test $(f)
 
 test-with-coverage: ## Run the test suit on the app with coverage report
 	@$(COMPOSER) test-with-coverage

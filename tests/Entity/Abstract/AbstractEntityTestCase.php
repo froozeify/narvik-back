@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Tests\Entity;
+namespace App\Tests\Entity\Abstract;
 
 use App\Enum\ClubRole;
 use App\Enum\UserRole;
 use App\Tests\AbstractTestCase;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
@@ -21,7 +20,7 @@ abstract class AbstractEntityTestCase extends AbstractTestCase {
   protected int $TOTAL_MEMBER_CLUB_1 = 0;
 
   abstract protected function getClassname() : string;
-  abstract protected function getRootUri() : string;
+  abstract protected function getRootUrl() : string;
 
   abstract public function testCreate(): void;
   abstract public function testPatch(): void;
@@ -44,9 +43,12 @@ abstract class AbstractEntityTestCase extends AbstractTestCase {
     ];
   }
 
-  protected function testGetCollectionAs(UserRole|ClubRole $role): ResponseInterface {
-    $response = $this->makeGetRequest($this->getRootUri());
+  protected function testGetCollectionAs(UserRole|ClubRole $role, int $total): ResponseInterface {
+    $response = $this->makeGetRequest($this->getRootUrl());
+    return $this->validateGetCollectionResponse($response, $role, $total);
+  }
 
+  protected function validateGetCollectionResponse(ResponseInterface $response, UserRole|ClubRole $role, int $total): ResponseInterface {
     if (!$this->getCollectionGrantedAccess()[$role->value]) {
       self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
       return $response;
@@ -54,51 +56,32 @@ abstract class AbstractEntityTestCase extends AbstractTestCase {
 
     self::assertResponseIsSuccessful();
     self::assertMatchesResourceCollectionJsonSchema($this->getClassname());
+    $this->assertCount($total, $response->toArray()['member']);
     return $response;
   }
 
   public function testGetCollectionAsSuperAdmin(): ResponseInterface {
     $this->loggedAsSuperAdmin();
-    $response = $this->testGetCollectionAs(UserRole::super_admin);
-    if ($this->getCollectionGrantedAccess()[UserRole::super_admin->value]) {
-      $this->assertCount($this->TOTAL_SUPER_ADMIN, $response->toArray()['member']);
-    }
-    return $response;
+    return $this->testGetCollectionAs(UserRole::super_admin, $this->TOTAL_SUPER_ADMIN);
   }
 
   public function testGetCollectionAsAdminClub1(): ResponseInterface {
     $this->loggedAsAdminClub1();
-    $response = $this->testGetCollectionAs(ClubRole::admin);
-    if ($this->getCollectionGrantedAccess()[ClubRole::admin->value]) {
-      $this->assertCount($this->TOTAL_ADMIN_CLUB_1, $response->toArray()['member']);
-    }
-    return $response;
+    return $this->testGetCollectionAs(ClubRole::admin, $this->TOTAL_ADMIN_CLUB_1);
   }
 
   public function testGetCollectionAsAdminClub2(): ResponseInterface {
     $this->loggedAsAdminClub2();
-    $response = $this->testGetCollectionAs(ClubRole::admin);
-    if ($this->getCollectionGrantedAccess()[ClubRole::admin->value]) {
-      $this->assertCount($this->TOTAL_ADMIN_CLUB_2, $response->toArray()['member']);
-    }
-    return $response;
+    return $this->testGetCollectionAs(ClubRole::admin, $this->TOTAL_ADMIN_CLUB_2);
   }
 
   public function testGetCollectionAsSupervisorClub1(): ResponseInterface {
     $this->loggedAsSupervisorClub1();
-    $response = $this->testGetCollectionAs(ClubRole::supervisor);
-    if ($this->getCollectionGrantedAccess()[ClubRole::supervisor->value]) {
-      $this->assertCount($this->TOTAL_SUPERVISOR_CLUB_1, $response->toArray()['member']);
-    }
-    return $response;
+    return $this->testGetCollectionAs(ClubRole::supervisor, $this->TOTAL_SUPERVISOR_CLUB_1);
   }
 
   public function testGetCollectionAsMemberClub1(): ResponseInterface {
     $this->loggedAsMemberClub1();
-    $response = $this->testGetCollectionAs(ClubRole::member);
-    if ($this->getCollectionGrantedAccess()[ClubRole::member->value]) {
-      $this->assertCount($this->TOTAL_MEMBER_CLUB_1, $response->toArray()['member']);
-    }
-    return $response;
+    return $this->testGetCollectionAs(ClubRole::member, $this->TOTAL_MEMBER_CLUB_1);
   }
 }

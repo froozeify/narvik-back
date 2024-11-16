@@ -2,7 +2,7 @@
 
 namespace App\Repository\Trait;
 
-use App\Entity\Activity;
+use App\Entity\ClubDependent\Activity;
 use App\Enum\GlobalSetting;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;

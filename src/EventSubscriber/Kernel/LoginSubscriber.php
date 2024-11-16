@@ -2,7 +2,7 @@
 
 namespace App\EventSubscriber\Kernel;
 
-use App\Entity\Member;
+use App\Entity\ClubDependent\Member;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationSuccessEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Events;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;

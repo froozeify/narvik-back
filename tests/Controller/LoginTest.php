@@ -20,7 +20,7 @@ class LoginTest extends AbstractTestCase {
     $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
 
     // We request a PRIVATE resource
-    $this->makeGetRequest('/activities');
+    $this->makeGetRequest('/clubs');
     $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
   }
 

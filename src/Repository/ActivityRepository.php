@@ -2,8 +2,7 @@
 
 namespace App\Repository;
 
-use App\Controller\ActivityMergeTo;
-use App\Entity\Activity;
+use App\Entity\ClubDependent\Activity;
 use App\Entity\ExternalPresence;
 use App\Entity\MemberPresence;
 use App\Repository\Trait\UuidEntityRepositoryTrait;

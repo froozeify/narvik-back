@@ -2,7 +2,7 @@
 
 namespace App\EventSubscriber\Doctrine;
 
-use App\Entity\Member;
+use App\Entity\ClubDependent\Member;
 use App\Service\MemberService;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\Event\PostLoadEventArgs;

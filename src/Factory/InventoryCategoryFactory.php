@@ -2,7 +2,7 @@
 
 namespace App\Factory;
 
-use App\Entity\InventoryCategory;
+use App\Entity\ClubDependent\InventoryCategory;
 use App\Repository\InventoryCategoryRepository;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
@@ -29,22 +29,22 @@ use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
  * @method FactoryCollection<InventoryCategory|Proxy> sequence(iterable|callable $sequence)
  * @method static ProxyRepositoryDecorator<InventoryCategory, InventoryCategoryRepository> repository()
  *
- * @phpstan-method \App\Entity\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\InventoryCategory> create(array|callable $attributes = [])
- * @phpstan-method static \App\Entity\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\InventoryCategory> createOne(array $attributes = [])
- * @phpstan-method static \App\Entity\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\InventoryCategory> find(object|array|mixed $criteria)
- * @phpstan-method static \App\Entity\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\InventoryCategory> findOrCreate(array $attributes)
- * @phpstan-method static \App\Entity\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\InventoryCategory> first(string $sortedField = 'id')
- * @phpstan-method static \App\Entity\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\InventoryCategory> last(string $sortedField = 'id')
- * @phpstan-method static \App\Entity\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\InventoryCategory> random(array $attributes = [])
- * @phpstan-method static \App\Entity\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\InventoryCategory> randomOrCreate(array $attributes = [])
- * @phpstan-method static list<\App\Entity\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\InventoryCategory>> all()
- * @phpstan-method static list<\App\Entity\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\InventoryCategory>> createMany(int $number, array|callable $attributes = [])
- * @phpstan-method static list<\App\Entity\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\InventoryCategory>> createSequence(iterable|callable $sequence)
- * @phpstan-method static list<\App\Entity\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\InventoryCategory>> findBy(array $attributes)
- * @phpstan-method static list<\App\Entity\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\InventoryCategory>> randomRange(int $min, int $max, array $attributes = [])
- * @phpstan-method static list<\App\Entity\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\InventoryCategory>> randomSet(int $number, array $attributes = [])
- * @phpstan-method \Zenstruck\Foundry\FactoryCollection<\App\Entity\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\InventoryCategory>> many(int $min, int|null $max = null)
- * @phpstan-method \Zenstruck\Foundry\FactoryCollection<\App\Entity\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\InventoryCategory>> sequence(iterable|callable $sequence)
+ * @phpstan-method \App\Entity\ClubDependent\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\InventoryCategory> create(array|callable $attributes = [])
+ * @phpstan-method static \App\Entity\ClubDependent\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\InventoryCategory> createOne(array $attributes = [])
+ * @phpstan-method static \App\Entity\ClubDependent\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\InventoryCategory> find(object|array|mixed $criteria)
+ * @phpstan-method static \App\Entity\ClubDependent\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\InventoryCategory> findOrCreate(array $attributes)
+ * @phpstan-method static \App\Entity\ClubDependent\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\InventoryCategory> first(string $sortedField = 'id')
+ * @phpstan-method static \App\Entity\ClubDependent\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\InventoryCategory> last(string $sortedField = 'id')
+ * @phpstan-method static \App\Entity\ClubDependent\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\InventoryCategory> random(array $attributes = [])
+ * @phpstan-method static \App\Entity\ClubDependent\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\InventoryCategory> randomOrCreate(array $attributes = [])
+ * @phpstan-method static list<\App\Entity\ClubDependent\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\InventoryCategory>> all()
+ * @phpstan-method static list<\App\Entity\ClubDependent\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\InventoryCategory>> createMany(int $number, array|callable $attributes = [])
+ * @phpstan-method static list<\App\Entity\ClubDependent\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\InventoryCategory>> createSequence(iterable|callable $sequence)
+ * @phpstan-method static list<\App\Entity\ClubDependent\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\InventoryCategory>> findBy(array $attributes)
+ * @phpstan-method static list<\App\Entity\ClubDependent\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\InventoryCategory>> randomRange(int $min, int $max, array $attributes = [])
+ * @phpstan-method static list<\App\Entity\ClubDependent\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\InventoryCategory>> randomSet(int $number, array $attributes = [])
+ * @phpstan-method \Zenstruck\Foundry\FactoryCollection<\App\Entity\ClubDependent\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\InventoryCategory>> many(int $min, int|null $max = null)
+ * @phpstan-method \Zenstruck\Foundry\FactoryCollection<\App\Entity\ClubDependent\InventoryCategory&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\InventoryCategory>> sequence(iterable|callable $sequence)
  * @extends PersistentProxyObjectFactory<InventoryCategory>
  */
 final class InventoryCategoryFactory extends PersistentProxyObjectFactory {

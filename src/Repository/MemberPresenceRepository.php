@@ -2,8 +2,8 @@
 
 namespace App\Repository;
 
-use App\Entity\Activity;
-use App\Entity\Member;
+use App\Entity\ClubDependent\Activity;
+use App\Entity\ClubDependent\Member;
 use App\Entity\MemberPresence;
 use App\Repository\Interface\PresenceRepositoryInterface;
 use App\Repository\Trait\PresenceRepositoryTrait;

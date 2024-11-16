@@ -6,6 +6,7 @@ use App\Entity\Club;
 use App\Enum\ClubRole;
 use App\Enum\UserRole;
 use App\Factory\ClubFactory;
+use App\Tests\Entity\Abstract\AbstractEntityTestCase;
 use App\Tests\Story\InitStory;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -16,7 +17,7 @@ class ClubTest extends AbstractEntityTestCase {
     return Club::class;
   }
 
-  protected function getRootUri(): string {
+  protected function getRootUrl(): string {
     return '/clubs';
   }
 
@@ -27,7 +28,7 @@ class ClubTest extends AbstractEntityTestCase {
 
     // Only super admin can create
     $this->makeAllLoggedRequests(function (string $level, ?int $id) use ($payload) {
-      $this->makePostRequest($this->getRootUri(), $payload);
+      $this->makePostRequest($this->getRootUrl(), $payload);
 
       if ($level === UserRole::super_admin->value) {
         $this->assertResponseIsSuccessful();
@@ -107,10 +108,6 @@ class ClubTest extends AbstractEntityTestCase {
 
     $this->makeGetRequest($userMemberIri);
     $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
-  }
-
-  public function testFail(): void {
-    self::fail("Add more check in testCascadeDelete");
   }
 
   public function testBadgerTokenFieldVisibility(): void {

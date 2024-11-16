@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Activity;
+use App\Entity\ClubDependent\Activity;
 use App\Repository\ActivityRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;

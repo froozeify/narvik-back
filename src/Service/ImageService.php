@@ -2,20 +2,11 @@
 
 namespace App\Service;
 
-use App\Entity\AgeCategory;
 use App\Entity\Image;
-use App\Entity\Member;
-use App\Entity\Season;
-use App\Enum\ItacCsvHeaderMapping;
-use App\Enum\ClubRole;
-use Doctrine\ORM\EntityManagerInterface;
-use League\Csv\Reader;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Mime\Part\File;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ImageService {
 

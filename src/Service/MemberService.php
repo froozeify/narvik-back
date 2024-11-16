@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Entity\Member;
+use App\Entity\ClubDependent\Member;
 use App\Enum\GlobalSetting;
 use App\Repository\ActivityRepository;
 use App\Repository\MemberPresenceRepository;

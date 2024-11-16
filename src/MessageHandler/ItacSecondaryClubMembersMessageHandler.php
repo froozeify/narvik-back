@@ -3,11 +3,11 @@
 namespace App\MessageHandler;
 
 use App\Entity\AgeCategory;
-use App\Entity\Member;
+use App\Entity\ClubDependent\Member;
 use App\Entity\MemberSeason;
 use App\Entity\Season;
-use App\Enum\ItacSecondaryClubCsvHeaderMapping;
 use App\Enum\ClubRole;
+use App\Enum\ItacSecondaryClubCsvHeaderMapping;
 use App\Message\ItacSecondaryClubMembersMessage;
 use App\Repository\AgeCategoryRepository;
 use App\Repository\MemberRepository;

@@ -2,22 +2,13 @@
 
 namespace App\Service;
 
-use App\Entity\AgeCategory;
-use App\Entity\Member;
-use App\Entity\MemberSeason;
-use App\Entity\Season;
 use App\Enum\GlobalSetting;
-use App\Enum\ItacCsvHeaderMapping;
-use App\Enum\ClubRole;
 use App\Message\ItacMembersMessage;
 use App\Message\ItacSecondaryClubMembersMessage;
-use Doctrine\ORM\EntityManagerInterface;
-use League\Csv\CharsetConverter;
 use League\Csv\Reader;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ImportItacCsvService {
 

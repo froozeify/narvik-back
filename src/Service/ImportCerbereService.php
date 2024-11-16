@@ -2,12 +2,11 @@
 
 namespace App\Service;
 
-use App\Entity\Activity;
+use App\Entity\ClubDependent\Activity;
 use App\Message\CerberePresencesDateMessage;
 use App\Repository\ActivityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\Reader\Xls;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class ImportCerbereService {

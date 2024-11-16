@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Member;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;

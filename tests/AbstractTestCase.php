@@ -6,6 +6,7 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Symfony\Bundle\Test\Client;
 use App\Enum\ClubRole;
 use App\Enum\UserRole;
+use JetBrains\PhpStorm\NoReturn;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -24,6 +25,15 @@ abstract class AbstractTestCase extends ApiTestCase {
   public function setUp(): void {
     parent::setUp();
     self::bootKernel();
+    $this->initDefaultFixtures();
+  }
+
+  public function initDefaultFixtures(): void {}
+
+  #[NoReturn]
+  public function debugTestDatabase(): void {
+    \DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver::commit();
+    die; // The DB changes are actually persisted
   }
 
   protected function createClientWithCredentials(string $token = null): Client {

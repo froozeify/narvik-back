@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Entity\Member;
+use App\Entity\ClubDependent\Member;
 use App\Enum\ClubRole;
 use App\Repository\MemberRepository;
 use Doctrine\ORM\EntityManagerInterface;

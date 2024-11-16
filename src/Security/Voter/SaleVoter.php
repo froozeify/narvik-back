@@ -2,7 +2,7 @@
 
 namespace App\Security\Voter;
 
-use App\Entity\Member;
+use App\Entity\ClubDependent\Member;
 use App\Entity\Sale;
 use App\Enum\ClubRole;
 use Symfony\Bundle\SecurityBundle\Security;

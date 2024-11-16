@@ -6,8 +6,7 @@ If a test fail and you want to check the database status at this moment you can 
 public function testMyTestCaseThatINeedToDebug()
 {
     // ... something thats changes the DB state
-    \DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver::commit();
-    die;
+    $this->debugTestDatabase();
     // now the DB changes are actually persisted and you can debug them
 }
 ```

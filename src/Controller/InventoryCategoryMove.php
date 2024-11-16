@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Controller\Abstract\SortableController;
 use App\Entity\Club;
-use App\Entity\InventoryCategory;
+use App\Entity\ClubDependent\InventoryCategory;
 use App\Repository\InventoryCategoryRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

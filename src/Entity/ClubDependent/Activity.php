@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\ClubDependent;
 
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiFilter;
@@ -8,12 +8,18 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\ActivityMergeTo;
+use App\Controller\InventoryCategoryMove;
 use App\Entity\Abstract\UuidEntity;
+use App\Entity\Club;
+use App\Entity\ExternalPresence;
 use App\Entity\Interface\ClubLinkedEntityInterface;
+use App\Entity\MemberPresence;
 use App\Entity\Trait\SelfClubLinkedEntityTrait;
 use App\Repository\ActivityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -26,7 +32,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: ActivityRepository::class)]
 #[ApiResource(
   operations: [
-    new GetCollection(),
     new Get(),
     new Post(
       security: "is_granted('CLUB_ADMIN', object)"
@@ -61,7 +66,19 @@ use Symfony\Component\Validator\Constraints as Assert;
     'groups' => ['club-admin-write']
   ],
   order: ['name' => 'asc'],
-  paginationEnabled: false
+)]
+#[ApiResource(
+  uriTemplate: '/clubs/{clubUuid}/activities.{_format}',
+  operations: [
+    new GetCollection(),
+  ],
+  uriVariables: [
+    'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+  ],
+  normalizationContext: [
+    'groups' => ['activity', 'activity-read']
+  ],
+  order: ['name' => 'asc'],
 )]
 #[ApiFilter(OrderFilter::class, properties: ['name' => 'ASC', 'isEnabled' => 'ASC'])]
 class Activity extends UuidEntity implements ClubLinkedEntityInterface {

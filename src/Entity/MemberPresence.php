@@ -19,6 +19,8 @@ use App\Controller\MemberPresencesFromItac;
 use App\Controller\MemberPresencesImportFromExternal;
 use App\Controller\MemberPresenceToday;
 use App\Entity\Abstract\UuidEntity;
+use App\Entity\ClubDependent\Activity;
+use App\Entity\ClubDependent\Member;
 use App\Entity\Interface\TimestampEntityInterface;
 use App\Entity\Trait\TimestampTrait;
 use App\Filter\MultipleFilter;

@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\ExternalPresenceToday;
 use App\Entity\Abstract\UuidEntity;
+use App\Entity\ClubDependent\Activity;
 use App\Entity\Interface\TimestampEntityInterface;
 use App\Entity\Trait\TimestampTrait;
 use App\Filter\MultipleFilter;

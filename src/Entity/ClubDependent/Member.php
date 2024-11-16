@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\ClubDependent;
 
 use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
@@ -18,6 +18,9 @@ use App\Controller\MemberPhotosImportFromItac;
 use App\Controller\MemberSearchByLicenceOrName;
 use App\Entity\Abstract\UuidEntity;
 use App\Entity\Interface\ClubLinkedEntityInterface;
+use App\Entity\MemberPresence;
+use App\Entity\MemberSeason;
+use App\Entity\Sale;
 use App\Entity\Trait\SelfClubLinkedEntityTrait;
 use App\Filter\CurrentSeasonFilter;
 use App\Filter\MultipleFilter;

@@ -2,19 +2,12 @@
 
 namespace App\Security\Voter;
 
-use ApiPlatform\Metadata\GetCollection;
 use App\Entity\Club;
 use App\Entity\Interface\ClubLinkedEntityInterface;
-use App\Entity\Member;
-use App\Entity\Sale;
 use App\Entity\User;
-use App\Entity\UserMember;
 use App\Enum\ClubRole;
 use App\Enum\UserRole;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 

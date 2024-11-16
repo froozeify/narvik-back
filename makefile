@@ -71,6 +71,9 @@ sf: ## List all Symfony commands or pass the parameter "c=" to run a given comma
 cc: c=c:c ## Clear the cache
 cc: sf
 
+reload-fixture: ## Reload the database based on the default fixtures
+	@$(COMPOSER) reload-fixture
+
 test: ## Run the test suit on the app
 	@$(COMPOSER) test
 

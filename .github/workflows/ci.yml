@@ -1,7 +1,7 @@
 name: CI
 
 env:
-  IGNORE_MIGRATION: true
+  IGNORE_MIGRATION: false
 
 on:
   push:

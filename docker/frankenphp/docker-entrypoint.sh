@@ -31,6 +31,7 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 		fi
 
 
+		# TODO: Add a paramg like this one but to migrate to v3 (some stuff must be done before migrate)
 		if [ $IGNORE_MIGRATION == "true" ]; then
 			echo "Doctrine migration has been ignored because 'IGNORE_MIGRATION' env var is set to 'true'."
 			echo "Setting it to anything else will make the doctrine migration to be executed."

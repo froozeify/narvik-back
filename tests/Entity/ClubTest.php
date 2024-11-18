@@ -5,8 +5,8 @@ namespace App\Tests\Entity;
 use App\Entity\Club;
 use App\Enum\ClubRole;
 use App\Enum\UserRole;
-use App\Factory\ClubFactory;
 use App\Tests\Entity\Abstract\AbstractEntityTestCase;
+use App\Tests\Factory\ClubFactory;
 use App\Tests\Story\InitStory;
 use Symfony\Component\HttpFoundation\Response;
 

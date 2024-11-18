@@ -2,7 +2,7 @@
 
 namespace App\Tests\Story;
 
-use App\Factory\SalePaymentModeFactory;
+use App\Tests\Factory\SalePaymentModeFactory;
 use Zenstruck\Foundry\Story;
 
 final class SalePaymentModeStory extends Story {

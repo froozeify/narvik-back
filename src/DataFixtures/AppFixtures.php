@@ -2,24 +2,17 @@
 
 namespace App\DataFixtures;
 
-use App\Factory\ClubFactory;
-use App\Factory\ExternalPresenceFactory;
-use App\Factory\InventoryItemFactory;
-use App\Factory\InventoryItemHistoryFactory;
-use App\Factory\MemberFactory;
-use App\Factory\MemberPresenceFactory;
-use App\Factory\MemberSeasonFactory;
-use App\Factory\UserFactory;
-use App\Factory\UserMemberFactory;
+use App\Tests\Factory\ExternalPresenceFactory;
+use App\Tests\Factory\InventoryItemFactory;
+use App\Tests\Factory\InventoryItemHistoryFactory;
 use App\Tests\Story\ActivityStory;
 use App\Tests\Story\GlobalSettingStory;
+use App\Tests\Story\InitStory;
 use App\Tests\Story\InventoryCategoryStory;
 use App\Tests\Story\SalePaymentModeStory;
 use App\Tests\Story\SeasonStory;
-use App\Tests\Story\InitStory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use function Zenstruck\Foundry\faker;
 
 class AppFixtures extends Fixture {
   public function load(ObjectManager $manager): void {

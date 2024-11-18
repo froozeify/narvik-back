@@ -2,8 +2,8 @@
 
 namespace App\Tests\Story;
 
-use App\Factory\ClubFactory;
-use App\Factory\InventoryCategoryFactory;
+use App\Tests\Factory\ClubFactory;
+use App\Tests\Factory\InventoryCategoryFactory;
 use Zenstruck\Foundry\Story;
 
 final class InventoryCategoryStory extends Story {

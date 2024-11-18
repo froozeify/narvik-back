@@ -2,7 +2,7 @@
 
 namespace App\Tests\Story;
 
-use App\Factory\SeasonFactory;
+use App\Tests\Factory\SeasonFactory;
 use Zenstruck\Foundry\Story;
 
 final class SeasonStory extends Story {

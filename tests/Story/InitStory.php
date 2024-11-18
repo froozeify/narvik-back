@@ -5,11 +5,11 @@ namespace App\Tests\Story;
 use App\Entity\Club;
 use App\Entity\User;
 use App\Enum\ClubRole;
-use App\Factory\ClubFactory;
-use App\Factory\MemberFactory;
-use App\Factory\MemberSeasonFactory;
-use App\Factory\UserFactory;
-use App\Factory\UserMemberFactory;
+use App\Tests\Factory\ClubFactory;
+use App\Tests\Factory\MemberFactory;
+use App\Tests\Factory\MemberSeasonFactory;
+use App\Tests\Factory\UserFactory;
+use App\Tests\Factory\UserMemberFactory;
 use Zenstruck\Foundry\Story;
 use function Zenstruck\Foundry\faker;
 

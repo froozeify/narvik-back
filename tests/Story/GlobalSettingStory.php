@@ -3,7 +3,7 @@
 namespace App\Tests\Story;
 
 use App\Enum\GlobalSetting;
-use App\Factory\GlobalSettingFactory;
+use App\Tests\Factory\GlobalSettingFactory;
 use Zenstruck\Foundry\Story;
 use function Zenstruck\Foundry\faker;
 

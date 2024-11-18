@@ -2,9 +2,8 @@
 
 namespace App\Tests\Controller;
 
-use App\Factory\UserFactory;
 use App\Tests\AbstractTestCase;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Tests\Factory\UserFactory;
 use Symfony\Component\HttpFoundation\Response;
 
 class LoginTest extends AbstractTestCase {

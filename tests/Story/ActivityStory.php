@@ -2,7 +2,7 @@
 
 namespace App\Tests\Story;
 
-use App\Factory\ActivityFactory;
+use App\Tests\Factory\ActivityFactory;
 use Zenstruck\Foundry\Story;
 
 final class ActivityStory extends Story {

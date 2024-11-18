@@ -2,7 +2,9 @@
 
 namespace App\Tests\Controller;
 
+use App\Factory\UserFactory;
 use App\Tests\AbstractTestCase;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 class LoginTest extends AbstractTestCase {
@@ -12,8 +14,25 @@ class LoginTest extends AbstractTestCase {
     });
   }
 
-//  TODO: Add login test as a not activated account, should fail
-//  public function testLoginAsNotActivated(): void { }
+  public function testLoginAsNotActivated(): void {
+    // We create a not activated account
+    $notActivated = UserFactory::createOne([
+      'email' => 'notactivated@user.fr',
+      'plainPassword' => 'testuser123',
+      'accountActivated' => false,
+    ]);
+    $notActivated->_enableAutoRefresh();
+
+    $this->loggedAs("notactivated@user.fr", "testuser123");
+    $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+
+    // We update the user
+    $notActivated->setAccountActivated(true);
+    $notActivated->_save();
+
+    $this->loggedAs("notactivated@user.fr", "testuser123");
+    $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+  }
 
   public function testLoginWithWrongPassword(): void {
     $this->loggedAs("admin@admin.com", "wrong");

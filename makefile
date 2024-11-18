@@ -80,7 +80,7 @@ reload-fixture: ## Reload the database based on the default fixtures
 test: ## Run the test suit on the app, add f=<filepath> to run the tests only in that specific file
 	@$(eval f ?=)
 	@if [ -z "$(f)" ]; then\
-		echo "Running test globally";\
+		echo "\033[42m    Running test globally    \033[m";\
 	fi
 
 	@$(COMPOSER) test $(f)

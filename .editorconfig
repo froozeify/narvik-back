@@ -31,7 +31,7 @@ indent_size = 2
 [*.sh]
 indent_style = tab
 
-[*.xml{,.dist}]
+[*.xml.dist]
 indent_style = space
 indent_size = 4
 
@@ -44,19 +44,18 @@ indent_size = 2
 [.gitmodules]
 indent_style = tab
 
-[.php_cs{,.dist}]
+[.php_cs.dist]
 indent_style = space
 indent_size = 4
 
 [composer.json]
 indent_size = 4
 
-[{,docker-}compose{,.*}.{yaml,yml}]
-indent_style = space
+[{compose,docker-compose}.*.{yaml,yml}]
 indent_size = 2
 
-[{,*.*}Dockerfile]
+[*.*Dockerfile]
 indent_style = tab
 
-[{,*.*}Caddyfile]
+[*.*Caddyfile]
 indent_style = tab

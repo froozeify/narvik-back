@@ -1,7 +1,7 @@
-#syntax=docker/dockerfile:1.4
+#syntax=docker/dockerfile:1
 
-# Version
-FROM dunglas/frankenphp:1-alpine AS frankenphp_upstream
+# Versions
+FROM dunglas/frankenphp:1.3.1-php8.3-alpine AS frankenphp_upstream
 
 # The different stages of this Dockerfile are meant to be built into separate images
 # https://docs.docker.com/develop/develop-images/multistage-build/#stop-at-a-specific-build-stage
@@ -12,6 +12,8 @@ FROM dunglas/frankenphp:1-alpine AS frankenphp_upstream
 FROM frankenphp_upstream AS frankenphp_base
 
 WORKDIR /app
+
+VOLUME /app/var/
 
 # persistent / runtime deps
 # hadolint ignore=DL3018
@@ -36,6 +38,8 @@ RUN set -eux; \
 # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
+ENV PHP_INI_SCAN_DIR=":$PHP_INI_DIR/app.conf.d"
+
 ###> recipes ###
 ###> doctrine/doctrine-bundle ###
 RUN apk add --no-cache --virtual .pgsql-deps postgresql-dev; \
@@ -45,7 +49,7 @@ RUN apk add --no-cache --virtual .pgsql-deps postgresql-dev; \
 ###< doctrine/doctrine-bundle ###
 ###< recipes ###
 
-COPY --link docker/frankenphp/conf.d/app.ini $PHP_INI_DIR/conf.d/
+COPY --link docker/frankenphp/conf.d/10-app.ini $PHP_INI_DIR/app.conf.d/
 COPY --link --chmod=755 docker/frankenphp/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 COPY --link docker/frankenphp/Caddyfile /etc/caddy/Caddyfile
 
@@ -65,7 +69,6 @@ CMD [ "frankenphp", "run", "--config", "/etc/caddy/Caddyfile" ]
 FROM frankenphp_base AS frankenphp_dev
 
 ENV APP_ENV=dev XDEBUG_MODE=off
-VOLUME /app/var/
 
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
@@ -74,7 +77,7 @@ RUN set -eux; \
 		xdebug \
 	;
 
-COPY --link docker/frankenphp/conf.d/app.dev.ini $PHP_INI_DIR/conf.d/
+COPY --link docker/frankenphp/conf.d/20-app.dev.ini $PHP_INI_DIR/app.conf.d/
 
 CMD [ "frankenphp", "run", "--config", "/etc/caddy/Caddyfile", "--watch" ]
 
@@ -89,7 +92,7 @@ ENV FRANKENPHP_CONFIG="import worker.Caddyfile"
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
-COPY --link docker/frankenphp/conf.d/app.prod.ini $PHP_INI_DIR/conf.d/
+COPY --link docker/frankenphp/conf.d/20-app.prod.ini $PHP_INI_DIR/app.conf.d/
 COPY --link docker/frankenphp/worker.Caddyfile /etc/caddy/worker.Caddyfile
 
 # prevent the reinstallation of vendors at every changes in the source code
@@ -104,5 +107,6 @@ RUN rm -Rf docker/frankenphp/
 RUN set -eux; \
 	mkdir -p var/cache var/log; \
 	composer dump-autoload --classmap-authoritative --no-dev; \
+	composer dump-env prod; \
 	composer run-script --no-dev post-install-cmd; \
 	chmod +x bin/console; sync;

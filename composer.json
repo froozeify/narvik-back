@@ -7,7 +7,7 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
-        "php": ">=8.2.11",
+        "php": ">=8.3",
         "ext-ctype": "*",
         "ext-iconv": "*",
         "api-platform/doctrine-orm": "^4.0",
@@ -22,7 +22,7 @@
         "lexik/jwt-authentication-bundle": "^3.1",
         "nelmio/cors-bundle": "^2.4",
         "phpdocumentor/reflection-docblock": "^5.3",
-        "phpoffice/phpspreadsheet": "^3.3",
+        "phpoffice/phpspreadsheet": "^3.4",
         "phpstan/phpdoc-parser": "^1.29",
         "ramsey/uuid-doctrine": "^2.1",
         "runtime/frankenphp-symfony": "dev-main",
@@ -51,7 +51,7 @@
         "symfony/yaml": "7.1.*",
         "twig/cssinliner-extra": "^3.11",
         "twig/extra-bundle": "^3.11",
-        "twig/twig": "^3.10",
+        "twig/twig": "^3.15",
         "zenstruck/foundry": "^2.2"
     },
     "require-dev": {

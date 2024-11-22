@@ -23,7 +23,7 @@ abstract class AbstractEntityClubLinkedTestCase extends AbstractEntityTestCase {
   }
 
   protected function getRootWClubUrl(Club $club) : string {
-    return "/clubs/{$club->getUuid()}{$this->getRootUrl()}";
+    return $this->getIriFromResource($club) . $this->getRootUrl();
   }
 
   protected function testGetCollectionWClubAs(UserRole|ClubRole $role, Club $club, int $total): ResponseInterface {

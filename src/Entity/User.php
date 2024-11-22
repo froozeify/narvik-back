@@ -177,11 +177,11 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
   private ?string $email = null;
 
   #[ORM\Column(length: 255)]
-  #[Groups(['autocomplete', 'user-read', 'admin-write'])]
+  #[Groups(['autocomplete', 'user-read', 'super-admin-write'])]
   private ?string $firstname = null;
 
   #[ORM\Column(length: 255)]
-  #[Groups(['autocomplete', 'user-read', 'admin-write'])]
+  #[Groups(['autocomplete', 'user-read', 'super-admin-write'])]
   private ?string $lastname = null;
 
   /**

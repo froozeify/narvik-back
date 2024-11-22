@@ -13,7 +13,7 @@ trait SelfClubLinkedEntityTrait {
 
   #[ORM\ManyToOne(targetEntity: Club::class)]
   #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-  #[Groups(['common-read'])]
+  #[Groups(['common-read', 'club-admin-write'])]
   private ?Club $club = null;
 
   public function getClub(): ?Club {

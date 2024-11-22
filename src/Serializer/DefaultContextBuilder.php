@@ -33,7 +33,7 @@ final readonly class DefaultContextBuilder implements SerializerContextBuilderIn
       $context['groups'][] = 'common-read';
       $context['groups'][] = 'timestamp';
       if ($this->authorizationChecker->isGranted(ClubRole::admin->value)) {
-        $context['groups'][] = 'admin-read';
+        $context['groups'][] = 'club-admin-read';
       }
       if ($this->authorizationChecker->isGranted(UserRole::super_admin->value)) {
         $context['groups'][] = 'super-admin-read';
@@ -41,7 +41,7 @@ final readonly class DefaultContextBuilder implements SerializerContextBuilderIn
     } else {
       $context['groups'][] = 'common-write';
       if ($this->authorizationChecker->isGranted(ClubRole::admin->value)) {
-        $context['groups'][] = 'admin-write';
+        $context['groups'][] = 'club-admin-write';
       }
       if ($this->authorizationChecker->isGranted(UserRole::super_admin->value)) {
         $context['groups'][] = 'super-admin-write';

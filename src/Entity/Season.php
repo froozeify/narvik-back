@@ -27,7 +27,7 @@ class Season {
   private ?int $id = null;
 
   #[ORM\Column(length: 255)]
-  #[Groups(['season-read', 'admin-write', 'member-season-read', 'member-presence-read'])]
+  #[Groups(['season-read', 'club-admin-write', 'member-season-read', 'member-presence-read'])]
   private ?string $name = null;
 
   #[ORM\OneToMany(mappedBy: 'season', targetEntity: MemberSeason::class)]

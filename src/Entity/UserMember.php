@@ -19,16 +19,16 @@ class UserMember {
 
   #[ORM\ManyToOne(inversedBy: 'memberships')]
   #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-  #[Groups(['member-read', 'admin-write'])]
+  #[Groups(['member-read', 'club-admin-write'])]
   private ?User $user = null;
 
   #[ORM\OneToOne()]
   #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-  #[Groups(['member-read', 'admin-write'])]
+  #[Groups(['member-read', 'club-admin-write'])]
   private ?Member $member = null;
 
   #[ORM\Column(type: "string", enumType: ClubRole::class)]
-  #[Groups(['member-read', 'admin-write'])]
+  #[Groups(['member-read', 'club-admin-write'])]
   private ClubRole $role = ClubRole::member;
 
   public function getId(): ?int {

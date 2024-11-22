@@ -43,15 +43,15 @@ class Club extends UuidEntity implements TimestampEntityInterface {
   private ?string $name = null;
 
   #[ORM\Column(options: ['default' => false])]
-  #[Groups(['club-read', 'admin-write'])]
+  #[Groups(['club-read', 'club-admin-write'])]
   private bool $smtpEnabled = false;
 
   #[ORM\Column(options: ['default' => false])]
-  #[Groups(['club-read', 'admin-write'])]
+  #[Groups(['club-read', 'club-admin-write'])]
   private bool $salesEnabled = false;
 
   #[ORM\Column(length: 255, nullable: true)]
-  #[Groups(['club-read', 'admin-write'])]
+  #[Groups(['club-read', 'club-admin-write'])]
   #[ApiProperty(security: "is_granted('CLUB_ADMIN', object)")] // Property only viewable & writable by the club admin
   private ?string $badgerToken = null;
 

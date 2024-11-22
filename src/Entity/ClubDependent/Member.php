@@ -196,20 +196,20 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
 
 
   #[ORM\Column(length: 180, nullable: true)]
-  #[Groups(['member-read', 'admin-write'])]
+  #[Groups(['member-read', 'club-admin-write'])]
   private ?string $email = null;
 
   #[ORM\Column(length: 10, unique: true, nullable: true)]
   #[Assert\Regex(pattern: '/\d{8,10}/')]
-  #[Groups(['autocomplete', 'member-read', 'admin-write', 'member-presence-read'])]
+  #[Groups(['autocomplete', 'member-read', 'club-admin-write', 'member-presence-read'])]
   private ?string $licence = null;
 
   #[ORM\Column(length: 255)]
-  #[Groups(['autocomplete', 'member-read', 'admin-write'])]
+  #[Groups(['autocomplete', 'member-read', 'club-admin-write'])]
   private ?string $firstname = null;
 
   #[ORM\Column(length: 255)]
-  #[Groups(['autocomplete', 'member-read', 'admin-write'])]
+  #[Groups(['autocomplete', 'member-read', 'club-admin-write'])]
   private ?string $lastname = null;
 
   #[ORM\Column(length: 1)]
@@ -217,7 +217,7 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
   private string $gender = "M";
 
   #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-  #[Groups(['member-read', 'admin-write'])]
+  #[Groups(['member-read', 'club-admin-write'])]
   private ?\DateTimeInterface $birthday = null;
 
   #[ORM\Column]
@@ -261,11 +261,11 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
   private ?string $mobilePhone = null;
 
   #[ORM\Column]
-  #[Groups(['admin-read'])]
+  #[Groups(['club-admin-read'])]
   private bool $blacklisted = false;
 
   #[ORM\Column(length: 255, nullable: true)]
-  #[Groups(['admin-read'])]
+  #[Groups(['club-admin-read'])]
   private ?string $licenceState = null;
 
   #[ORM\Column(length: 1)]

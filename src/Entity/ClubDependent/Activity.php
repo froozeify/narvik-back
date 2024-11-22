@@ -34,7 +34,7 @@ use Symfony\Component\Validator\Constraints as Assert;
   operations: [
     new Get(),
     new Post(
-      security: "is_granted('CLUB_ADMIN', object)"
+      securityPostDenormalize: "is_granted('CLUB_ADMIN', object)"
     ),
     new Patch(
       security: "is_granted('CLUB_ADMIN', object)"
@@ -54,7 +54,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         requestBody: new Model\RequestBody('Must be an empty json body')
       ),
 
-      security: "is_granted('ROLE_ADMIN')",
+      security: "is_granted('CLUB_ADMIN')",
       read: false,
       write: false,
     )
@@ -85,12 +85,12 @@ class Activity extends UuidEntity implements ClubLinkedEntityInterface {
   use SelfClubLinkedEntityTrait;
 
   #[ORM\Column(length: 255)]
-  #[Groups(['admin-write', 'activity-read','member-read', 'member-presence', 'external-presence'])]
+  #[Groups(['club-admin-write', 'activity-read','member-read', 'member-presence', 'external-presence'])]
   #[Assert\NotBlank()]
   private string $name;
 
   #[ORM\Column(type: 'boolean')]
-  #[Groups(['admin-write', 'activity-read','member-read', 'member-presence', 'external-presence'])]
+  #[Groups(['club-admin-write', 'activity-read','member-read', 'member-presence', 'external-presence'])]
   private ?bool $isEnabled = true;
 
   #[ORM\ManyToMany(targetEntity: MemberPresence::class, mappedBy: 'activities')]

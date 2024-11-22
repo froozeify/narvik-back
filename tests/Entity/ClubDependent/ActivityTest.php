@@ -4,14 +4,14 @@ namespace App\Tests\Entity\ClubDependent;
 
 use App\Entity\ClubDependent\Activity;
 use App\Enum\ClubRole;
-use App\Enum\UserRole;
 use App\Tests\Entity\Abstract\AbstractEntityClubLinkedTestCase;
+use App\Tests\Enum\ResponseCodeEnum;
+use App\Tests\Factory\ActivityFactory;
 use App\Tests\Story\ActivityStory;
 use App\Tests\Story\InitStory;
-use Symfony\Component\HttpFoundation\Response;
 
 class ActivityTest extends AbstractEntityClubLinkedTestCase {
-  protected int $TOTAL_SUPER_ADMIN = 9;
+  protected int $TOTAL_SUPER_ADMIN = 9; // 9 = count ActivityStory::activities_club1
   protected int $TOTAL_ADMIN_CLUB_1 = 9;
   protected int $TOTAL_ADMIN_CLUB_2 = 1;
   protected int $TOTAL_SUPERVISOR_CLUB_1 = 9;
@@ -45,22 +45,22 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
       "club" => $iri,
     ];
 
-    // Only super admin and Club Admin can make the request
-    $this->makeAllLoggedRequests(function (string $level, ?int $id) use ($payload) {
-      $this->makePostRequest($this->getRootUrl(), $payload);
+    $payloadCheck = $payload;
+    // For the check we update the payload value
+    $payloadCheck["club"] = [
+      '@id' => $payload["club"],
+    ];
 
-      // For the check we update the payload value
-      $payload["club"] = [
-        '@id' => $payload["club"],
-      ];
-
-      if (in_array($level, [UserRole::super_admin->value, ClubRole::admin->value])) {
-        $this->assertResponseIsSuccessful();
-        $this->assertJsonContains($payload);
-      } else {
-        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+    $this->makeAllLoggedRequests(
+      $payloadCheck,
+      supervisorClub1Code: ResponseCodeEnum::forbidden,
+      adminClub1Code: ResponseCodeEnum::created,
+      adminClub2Code: ResponseCodeEnum::bad_request,
+      superAdminCode: ResponseCodeEnum::created,
+      requestFunction: function (string $level, ?int $id) use ($payload) {
+        $this->makePostRequest($this->getRootUrl(), $payload);
       }
-    }, true);
+    );
   }
 
   public function testPatch(): void {
@@ -71,40 +71,32 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
       "name" => 'Update activity'
     ];
 
-    // Only super admin and Club Admin can make the request
-    $this->makeAllLoggedRequests(function (string $level, ?int $id) use ($iri, $payload) {
-      $payload["name"] .= $id;
-      $this->makePatchRequest($iri, $payload);
-
-      if (in_array($level, [UserRole::super_admin->value, ClubRole::admin->value])) {
-        $this->assertResponseIsSuccessful();
-        $this->assertJsonContains($payload);
-      } else {
-        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+    $this->makeAllLoggedRequests(
+      $payload,
+      supervisorClub1Code: ResponseCodeEnum::forbidden,
+      requestFunction: function (string $level, ?int $id) use ($iri, &$payload) {
+        $this->makePatchRequest($iri, $payload);
       }
-    }, true);
+    );
   }
 
   public function testDelete(): void {
-    $activity = ActivityStory::getRandom("activities_club1");
-    $iri = $this->getIriFromResource($activity);
+    $this->makeAllLoggedRequests(
+      null,
+      supervisorClub1Code: ResponseCodeEnum::forbidden,
+      adminClub1Code: ResponseCodeEnum::no_content,
+      superAdminCode: ResponseCodeEnum::no_content,
+      requestFunction: function (string $level, ?int $id)  {
+        $activity = ActivityFactory::createOne([
+          'name' => 'Test activity to remove',
+          'club' => InitStory::club_1()
+        ]);
+        $iri = $this->getIriFromResource($activity);
 
-    // Admin club 2 can't delete
-    $this->loggedAsAdminClub2();
-    $this->makeDeleteRequest($iri);
-    $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
-
-    // Supervisor club 1 can't
-    $this->loggedAsSupervisorClub1();
-    $this->makeDeleteRequest($iri);
-    $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
-
-    // Admin club 1 can
-    $this->loggedAsAdminClub1();
-    $this->makeDeleteRequest($iri);
-    $this->assertResponseIsSuccessful();
+        $this->makeDeleteRequest($iri);
+      }
+    );
   }
 
   // TODO: Add activity merge test
-
 }

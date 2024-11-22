@@ -3,9 +3,8 @@
 namespace App\Tests\Entity;
 
 use App\Entity\Club;
-use App\Enum\ClubRole;
-use App\Enum\UserRole;
 use App\Tests\Entity\Abstract\AbstractEntityTestCase;
+use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Factory\ClubFactory;
 use App\Tests\Story\InitStory;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,16 +26,17 @@ class ClubTest extends AbstractEntityTestCase {
     ];
 
     // Only super admin can create
-    $this->makeAllLoggedRequests(function (string $level, ?int $id) use ($payload) {
-      $this->makePostRequest($this->getRootUrl(), $payload);
-
-      if ($level === UserRole::super_admin->value) {
-        $this->assertResponseIsSuccessful();
-        $this->assertJsonContains($payload);
-      } else {
-        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+    $this->makeAllLoggedRequests(
+      $payload,
+      ResponseCodeEnum::forbidden,
+      ResponseCodeEnum::forbidden,
+      ResponseCodeEnum::forbidden,
+      ResponseCodeEnum::forbidden,
+      ResponseCodeEnum::created,
+      requestFunction: function (string $level, ?int $id) use ($payload) {
+        $this->makePostRequest($this->getRootUrl(), $payload);
       }
-    });
+    );
 
   }
 
@@ -49,41 +49,35 @@ class ClubTest extends AbstractEntityTestCase {
     ];
 
     // Only super admin can update
-    $this->makeAllLoggedRequests(function (string $level, ?int $club) use ($iri, $payload) {
-      $this->makePatchRequest($iri, $payload);
-
-      if ($level === UserRole::super_admin->value) {
-        $this->assertResponseIsSuccessful();
-        $this->assertJsonContains($payload);
-      } else {
-        if ($club === 1) {
-          $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
-        } else {
-          $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
-        }
+    $this->makeAllLoggedRequests(
+      $payload,
+      supervisorClub1Code: ResponseCodeEnum::forbidden,
+      adminClub1Code: ResponseCodeEnum::forbidden,
+      requestFunction: function (string $level, ?int $id) use ($iri, $payload) {
+        $this->makePatchRequest($iri, $payload);
       }
-    });
+    );
   }
 
   public function testDelete(): void {
-    $club = ClubFactory::createOne([
-      'name' => 'Club to delete',
-      'salesEnabled' => true,
-      'smtpEnabled' => true,
-      'badgerToken' => 'clubbadger',
-    ]);
-    $iri = $this->getIriFromResource($club);
-
     // Only super admin can delete
-    $this->makeAllLoggedRequests(function (string $level, ?int $club) use ($iri) {
-      $this->makeDeleteRequest($iri);
-
-      if ($level === UserRole::super_admin->value) {
-        $this->assertResponseIsSuccessful();
-      } else {
-        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
+    $this->makeAllLoggedRequests(
+      null,
+      ResponseCodeEnum::not_found,
+      ResponseCodeEnum::not_found,
+      ResponseCodeEnum::not_found,
+      superAdminCode: ResponseCodeEnum::no_content,
+      requestFunction: function (string $level, ?int $id) {
+        $club = ClubFactory::createOne([
+          'name' => 'Club to delete',
+          'salesEnabled' => true,
+          'smtpEnabled' => true,
+          'badgerToken' => 'clubbadger',
+        ]);
+        $iri = $this->getIriFromResource($club);
+        $this->makeDeleteRequest($iri);
       }
-    });
+    );
   }
 
   public function testCascadeDelete(): void {
@@ -114,18 +108,29 @@ class ClubTest extends AbstractEntityTestCase {
     $club1 = InitStory::club_1();
     $iri = $this->getIriFromResource($club1);
 
-    $this->makeAllLoggedRequests(function (string $level, ?int $id) use ($iri, $club1) {
-      $response = $this->makeGetRequest($iri);
-      $this->assertResponseIsSuccessful();
+    $payloadMatch = [
+      '@id' => $iri,
+      'badgerToken' => $club1->getBadgerToken(),
+    ];
 
-      if (in_array($level, [UserRole::super_admin->value, ClubRole::admin->value])) {
-        $this->assertJsonContains([
-          '@id' => $iri,
-          'badgerToken' => $club1->getBadgerToken(),
-        ]);
-      } else {
-        $this->assertJsonNotHasKey('badgerToken', $response);
-      }
-    }, true);
+    $success = [
+      'loggedAsSuperAdmin',
+      'loggedAsAdminClub1',
+    ];
+    foreach ($success as $function) {
+      $this->$function();
+      $this->makeGetRequest($iri);
+      $this->assertJsonContains($payloadMatch);
+    }
+
+    $denied = [
+      'loggedAsSupervisorClub1',
+      'loggedAsMemberClub1',
+    ];
+    foreach ($denied as $function) {
+      $this->$function();
+      $response = $this->makeGetRequest($iri);
+      $this->assertJsonNotHasKey('badgerToken', $response);
+    }
   }
 }

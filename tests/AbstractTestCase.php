@@ -6,6 +6,7 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Symfony\Bundle\Test\Client;
 use App\Enum\ClubRole;
 use App\Enum\UserRole;
+use App\Tests\Enum\ResponseCodeEnum;
 use JetBrains\PhpStorm\NoReturn;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -71,28 +72,51 @@ abstract class AbstractTestCase extends ApiTestCase {
     return true;
   }
 
-  public function makeAllLoggedRequests(\Closure $requestFunction, bool $excludeClub2 = false): void {
+  private function checkRequestResponse(ResponseCodeEnum $responseCode, ?array $payloadToValidate): void {
+    $this->assertResponseStatusCodeSame($responseCode->value);
+
+    if ($responseCode->isSuccess()) {
+      if ($payloadToValidate) {
+        $this->assertJsonContains($payloadToValidate);
+      }
+    }
+  }
+
+  public function makeAllLoggedRequests(
+    ?array $payloadToValidate = null,
+    ResponseCodeEnum $memberClub1Code = ResponseCodeEnum::forbidden,
+    ResponseCodeEnum $supervisorClub1Code = ResponseCodeEnum::ok,
+    ResponseCodeEnum $adminClub1Code  = ResponseCodeEnum::ok,
+    ?ResponseCodeEnum $adminClub2Code = ResponseCodeEnum::not_found,
+    ResponseCodeEnum $superAdminCode = ResponseCodeEnum::ok,
+    ?\Closure $requestFunction = null
+  ): void {
     // Super admin
     $this->loggedAsSuperAdmin();
-    $requestFunction(UserRole::super_admin->value, null);
+    if ($requestFunction) $requestFunction(UserRole::super_admin->value, null);
+    $this->checkRequestResponse($superAdminCode, $payloadToValidate);
 
     // Admin club 1
     $this->loggedAsAdminClub1();
-    $requestFunction(ClubRole::admin->value, 1);
+    if ($requestFunction) $requestFunction(ClubRole::admin->value, 1);
+    $this->checkRequestResponse($adminClub1Code, $payloadToValidate);
 
     // Supervisor club 1
     $this->loggedAsSupervisorClub1();
-    $requestFunction(ClubRole::supervisor->value, 1);
+    if ($requestFunction) $requestFunction(ClubRole::supervisor->value, 1);
+    $this->checkRequestResponse($supervisorClub1Code, $payloadToValidate);
 
     // member club 1
     $this->loggedAsMemberClub1();
-    $requestFunction(ClubRole::member->value, 1);
+    if ($requestFunction) $requestFunction(ClubRole::member->value, 1);
+    $this->checkRequestResponse($memberClub1Code, $payloadToValidate);
 
     // Club 2
-    if (!$excludeClub2) {
+    if ($adminClub2Code) {
       // Admin club 2
       $this->loggedAsAdminClub2();
-      $requestFunction(ClubRole::admin->value, 2);
+      if ($requestFunction) $requestFunction(ClubRole::admin->value, 2);
+      $this->checkRequestResponse($adminClub2Code, $payloadToValidate);
     }
   }
 

@@ -3,14 +3,20 @@
 namespace App\Tests\Controller;
 
 use App\Tests\AbstractTestCase;
+use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Factory\UserFactory;
 use Symfony\Component\HttpFoundation\Response;
 
 class LoginTest extends AbstractTestCase {
   public function testSuccessful(): void {
-    $this->makeAllLoggedRequests(function () {
-      $this->assertResponseIsSuccessful();
-    });
+    $this->makeAllLoggedRequests(
+      null,
+      ResponseCodeEnum::ok,
+      ResponseCodeEnum::ok,
+      ResponseCodeEnum::ok,
+      ResponseCodeEnum::ok,
+      ResponseCodeEnum::ok
+    );
   }
 
   public function testLoginAsNotActivated(): void {

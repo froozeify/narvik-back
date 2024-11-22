@@ -6,6 +6,7 @@ services:
       target: frankenphp_dev
     volumes:
       - ./:/app
+      - app_var:/app/var
       - ./docker/frankenphp/Caddyfile:/etc/caddy/Caddyfile:ro
       - ./docker/frankenphp/conf.d/20-app.dev.ini:/usr/local/etc/php/app.conf.d/20-app.dev.ini:ro
       # If you develop on Mac or Windows you can remove the vendor/ directory
@@ -40,3 +41,6 @@ services:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
 ###< symfony/mailer ###
+
+volumes:
+  app_var:

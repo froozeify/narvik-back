@@ -74,6 +74,9 @@ sf: ## List all Symfony commands or pass the parameter "c=" to run a given comma
 cc: c=c:c ## Clear the cache
 cc: sf
 
+cc-test: ## Clear the test cache
+	@$(MAKE) --no-print-directory sf c='c:c --env=test'
+
 reload-fixture: ## Reload the database based on the default fixtures
 	@$(COMPOSER) reload-fixture
 

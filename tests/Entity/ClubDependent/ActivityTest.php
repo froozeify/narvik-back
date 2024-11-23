@@ -9,6 +9,7 @@ use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Factory\ActivityFactory;
 use App\Tests\Story\ActivityStory;
 use App\Tests\Story\InitStory;
+use Zenstruck\Foundry\Persistence\Proxy;
 
 class ActivityTest extends AbstractEntityClubLinkedTestCase {
   protected int $TOTAL_SUPER_ADMIN = 9; // 9 = count ActivityStory::activities_club1
@@ -59,7 +60,7 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
       superAdminCode: ResponseCodeEnum::created,
       requestFunction: function (string $level, ?int $id) use ($payload) {
         $this->makePostRequest($this->getRootUrl(), $payload);
-      }
+      },
     );
   }
 
@@ -68,7 +69,7 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
     $iri = $this->getIriFromResource($activity);
 
     $payload = [
-      "name" => 'Update activity'
+      "name" => 'Update activity',
     ];
 
     $this->makeAllLoggedRequests(
@@ -76,7 +77,7 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
       supervisorClub1Code: ResponseCodeEnum::forbidden,
       requestFunction: function (string $level, ?int $id) use ($iri, &$payload) {
         $this->makePatchRequest($iri, $payload);
-      }
+      },
     );
   }
 
@@ -86,17 +87,76 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
       supervisorClub1Code: ResponseCodeEnum::forbidden,
       adminClub1Code: ResponseCodeEnum::no_content,
       superAdminCode: ResponseCodeEnum::no_content,
-      requestFunction: function (string $level, ?int $id)  {
+      requestFunction: function (string $level, ?int $id) {
         $activity = ActivityFactory::createOne([
           'name' => 'Test activity to remove',
-          'club' => InitStory::club_1()
+          'club' => InitStory::club_1(),
         ]);
         $iri = $this->getIriFromResource($activity);
 
         $this->makeDeleteRequest($iri);
-      }
+      },
     );
   }
 
-  // TODO: Add activity merge test
+  public function testActivityMergeWithNotExisting(): void {
+    /** @var Proxy $activity */
+    $activity = ActivityStory::getRandom("activities_club1");
+    $activityUUid = $activity->_real()->getUuid();
+
+    $this->loggedAsSuperAdmin();
+    $this->makePostRequest("{$this->getRootUrl()}/{$activityUUid}/merge-to/{$activityUUid}-notexisting", []);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+    $this::assertJsonContains([
+      "detail" => "Target activity not found"
+    ]);
+  }
+
+  public function testActivityMergeToSelf() {
+    /** @var Proxy $activity */
+    $activity = ActivityStory::getRandom("activities_club1");
+    $activityUUid = $activity->_real()->getUuid();
+
+    $this->loggedAsSuperAdmin();
+    $this->makePostRequest("{$this->getRootUrl()}/{$activityUUid}/merge-to/{$activityUUid}", []);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+    $this::assertJsonContains([
+      "detail" => "Can't migrate to self activity"
+    ]);
+  }
+
+  public function testActivityMergeWithOtherClub(): void {
+    /** @var Proxy $activity */
+    $activity = ActivityStory::getRandom("activities_club1");
+    $activityUUid = $activity->_real()->getUuid();
+    /** @var Proxy $activityOtherClub */
+    $activityOtherClub = ActivityStory::getRandom("activities_club2");
+    $activityUuidOtherClub = $activityOtherClub->_real()->getUuid();
+
+    $this->loggedAsSuperAdmin();
+    $this->makePostRequest("{$this->getRootUrl()}/{$activityUUid}/merge-to/{$activityUuidOtherClub}", []);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+    $this::assertJsonContains([
+      "detail" => "Activity club does not match target activity club"
+    ]);
+  }
+
+  public function testActivityMergeSuccess(): void {
+    $this->makeAllLoggedRequests(
+      null,
+      supervisorClub1Code: ResponseCodeEnum::forbidden,
+      adminClub2Code: ResponseCodeEnum::forbidden,
+      requestFunction: function () {
+        $activity = ActivityFactory::createOne([
+          'name' => 'activity to receive',
+          'club' => InitStory::club_1()
+        ]);
+        $activity2 = ActivityFactory::createOne([
+          'name' => 'activity to migrate',
+          'club' => InitStory::club_1()
+        ]);
+        $this->makePostRequest("{$this->getRootUrl()}/{$activity->getUuid()}/merge-to/{$activity2->getUuid()}", []);
+      },
+    );
+  }
 }

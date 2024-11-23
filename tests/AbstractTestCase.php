@@ -146,7 +146,7 @@ abstract class AbstractTestCase extends ApiTestCase {
       $options['extra']['parameters'] = $uriParameters;
     }
 
-    if (!empty($data)) {
+    if (!is_null($data)) {
       $options['json'] = $data;
     }
     return $options;

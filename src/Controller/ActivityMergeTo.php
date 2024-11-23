@@ -2,22 +2,19 @@
 
 namespace App\Controller;
 
+use App\Controller\Abstract\AbstractController;
 use App\Entity\ClubDependent\Activity;
-use App\Enum\ClubRole;
 use App\Repository\ActivityRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ActivityMergeTo extends AbstractController {
 
-  public function __invoke(Activity $activity, string $targetUuid, ActivityRepository $activityRepository): Response {
-    // We verify the user has the permission
-    // $activity is always loaded here (UserClubExtension is only called on GET query)
-    $this->denyAccessUnlessGranted(ClubRole::admin->value, $activity);
+  public function __invoke(Request $request, Activity $activity, ActivityRepository $activityRepository): Response {
+    $json = $this->checkAndGetJsonValues($request, ['target']);
 
-    $targetActivity = $activityRepository->findOneByUuid($targetUuid);
+    $targetActivity = $activityRepository->findOneByUuid($json['target']);
     if (!$targetActivity) {
       throw new HttpException(Response::HTTP_BAD_REQUEST, "Target activity not found");
     }

@@ -105,7 +105,7 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
     $activityUUid = $activity->_real()->getUuid();
 
     $this->loggedAsSuperAdmin();
-    $this->makePostRequest("{$this->getRootUrl()}/{$activityUUid}/merge-to/{$activityUUid}-notexisting", []);
+    $this->makePatchRequest("{$this->getRootUrl()}/{$activityUUid}/merge-to", ["target" => "{$activityUUid}-notexisting"]);
     $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
     $this::assertJsonContains([
       "detail" => "Target activity not found"
@@ -118,7 +118,7 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
     $activityUUid = $activity->_real()->getUuid();
 
     $this->loggedAsSuperAdmin();
-    $this->makePostRequest("{$this->getRootUrl()}/{$activityUUid}/merge-to/{$activityUUid}", []);
+    $this->makePatchRequest("{$this->getRootUrl()}/{$activityUUid}/merge-to", ["target" => $activityUUid]);
     $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
     $this::assertJsonContains([
       "detail" => "Can't migrate to self activity"
@@ -134,18 +134,17 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
     $activityUuidOtherClub = $activityOtherClub->_real()->getUuid();
 
     $this->loggedAsSuperAdmin();
-    $this->makePostRequest("{$this->getRootUrl()}/{$activityUUid}/merge-to/{$activityUuidOtherClub}", []);
+    $this->makePatchRequest("{$this->getRootUrl()}/{$activityUUid}/merge-to", ["target" => $activityUuidOtherClub]);
     $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
     $this::assertJsonContains([
       "detail" => "Activity club does not match target activity club"
     ]);
   }
 
-  public function testActivityMergeSuccess(): void {
+  public function testActivityMerge(): void {
     $this->makeAllLoggedRequests(
       null,
       supervisorClub1Code: ResponseCodeEnum::forbidden,
-      adminClub2Code: ResponseCodeEnum::forbidden,
       requestFunction: function () {
         $activity = ActivityFactory::createOne([
           'name' => 'activity to receive',
@@ -155,7 +154,7 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
           'name' => 'activity to migrate',
           'club' => InitStory::club_1()
         ]);
-        $this->makePostRequest("{$this->getRootUrl()}/{$activity->getUuid()}/merge-to/{$activity2->getUuid()}", []);
+        $this->makePatchRequest("{$this->getRootUrl()}/{$activity->getUuid()}/merge-to", ["target" => $activity2->getUuid()]);
       },
     );
   }

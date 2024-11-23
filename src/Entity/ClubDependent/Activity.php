@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\OpenApi\Model;
+use ApiPlatform\Symfony\Action\PlaceholderAction;
 use App\Controller\ActivityMergeTo;
 use App\Controller\InventoryCategoryMove;
 use App\Entity\Abstract\UuidEntity;
@@ -43,19 +44,26 @@ use Symfony\Component\Validator\Constraints as Assert;
       security: "is_granted('CLUB_ADMIN', object)"
     ),
 
-    new Post(
-      uriTemplate: '/activities/{uuid}/merge-to/{targetUuid}',
+    new Patch(
+      uriTemplate: '/activities/{uuid}/merge-to',
       controller: ActivityMergeTo::class,
       openapi: new Model\Operation(
         summary: 'Merge (and then delete) with another activity',
-        parameters: [
-          new Model\Parameter('targetActivity', 'path', 'Activity to be merged into', true)
-        ],
-        requestBody: new Model\RequestBody('Must be an empty json body')
+        requestBody: new Model\RequestBody(
+          content: new \ArrayObject([
+            'application/json' => [
+              'schema' => [
+                'type'       => 'object',
+                'properties' => [
+                  'target' => ['type' => 'string', 'description' => 'Activity uuid target', 'required' => true],
+                ],
+              ],
+            ],
+          ]),
+        ),
       ),
-
-      security: "is_granted('CLUB_ADMIN')",
-      read: false,
+      security: "is_granted('CLUB_ADMIN', object)",
+      read: true,
       write: false,
     )
   ],

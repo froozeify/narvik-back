@@ -15,7 +15,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-final readonly class UserClubExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface {
+final class UserClubExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface {
   private QueryNameGeneratorInterface $queryNameGenerator;
   private QueryBuilder $queryBuilder;
   private string $rootAlias;

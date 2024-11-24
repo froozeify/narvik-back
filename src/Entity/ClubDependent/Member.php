@@ -7,8 +7,10 @@ use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
@@ -17,15 +19,14 @@ use App\Controller\MemberImportSecondaryClubFromItac;
 use App\Controller\MemberPhotosImportFromItac;
 use App\Controller\MemberSearchByLicenceOrName;
 use App\Entity\Abstract\UuidEntity;
+use App\Entity\Club;
 use App\Entity\Interface\ClubLinkedEntityInterface;
-use App\Entity\MemberPresence;
-use App\Entity\MemberSeason;
 use App\Entity\Sale;
 use App\Entity\Trait\SelfClubLinkedEntityTrait;
 use App\Filter\CurrentSeasonFilter;
 use App\Filter\MultipleFilter;
 use App\Repository\MemberRepository;
-use App\State\MemberProcessor;
+use App\State\UserMemberProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -39,13 +40,21 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[UniqueEntity(fields: ['email'], ignoreNull: true)]
 #[ApiResource(
   operations: [
-    new GetCollection(),
     new Get(),
     new Patch(),
-    // No POST/DELETE since we import them
-
+    new Delete(),
+  ], normalizationContext: [
+    'groups' => ['member', 'member-read']
+  ], denormalizationContext: [
+    'groups' => ['member', 'member-write']
+  ],
+)]
+#[ApiResource(
+  uriTemplate: '/clubs/{clubUuid}/members.{_format}',
+  operations: [
+    new GetCollection(),
     new Post(
-      uriTemplate: '/members/-/search',
+      uriTemplate: '/clubs/{clubUuid}/members/-/search',
       controller: MemberSearchByLicenceOrName::class,
       openapi: new Model\Operation(
         summary: 'Search members matching the query (by licence or fullName)',
@@ -65,13 +74,14 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
       ),
       normalizationContext: ['groups' => 'autocomplete'],
+      security: "is_granted('CLUB_ADMIN', request)", // We past the request due to being a ClubDependent custom query
       read: false,
       deserialize: false,
       write: false,
       serialize: false,
     ),
     new Post(
-      uriTemplate: '/members/-/from-itac',
+      uriTemplate: '/clubs/{clubUuid}/members/-/from-itac',
       controller: MemberImportFromItac::class,
       openapi: new Model\Operation(
         requestBody: new Model\RequestBody(
@@ -90,11 +100,11 @@ use Symfony\Component\Validator\Constraints as Assert;
           ])
         )
       ),
-      security: "is_granted('ROLE_ADMIN')",
+      securityPostDenormalize: "is_granted('CLUB_ADMIN', object)",
       deserialize: false,
     ),
     new Post(
-      uriTemplate: '/members/-/secondary-from-itac',
+      uriTemplate: '/clubs/{clubUuid}/members/-/secondary-from-itac',
       controller: MemberImportSecondaryClubFromItac::class,
       openapi: new Model\Operation(
         requestBody: new Model\RequestBody(
@@ -113,11 +123,11 @@ use Symfony\Component\Validator\Constraints as Assert;
           ])
         )
       ),
-      security: "is_granted('ROLE_ADMIN')",
+      securityPostDenormalize: "is_granted('CLUB_ADMIN', object)",
       deserialize: false,
     ),
     new Post(
-      uriTemplate: '/members/-/photos-from-itac',
+      uriTemplate: '/clubs/{clubUuid}/members/-/photos-from-itac',
       controller: MemberPhotosImportFromItac::class,
       openapi: new Model\Operation(
         requestBody: new Model\RequestBody(
@@ -136,15 +146,17 @@ use Symfony\Component\Validator\Constraints as Assert;
           ])
         )
       ),
-      security: "is_granted('ROLE_ADMIN')",
+      securityPostDenormalize: "is_granted('CLUB_ADMIN', object)",
       deserialize: false,
     )
-  ], normalizationContext: [
-    'groups' => ['member', 'member-read']
-  ], denormalizationContext: [
-    'groups' => ['member', 'member-write']
   ],
-  processor: MemberProcessor::class,
+  uriVariables: [
+    'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+  ],
+  normalizationContext: [
+    'groups' => ['member', 'member-read']
+  ],
+  order: ['name' => 'asc'],
 )]
 #[ApiFilter(ExistsFilter::class, properties: ['licence'])]
 #[ApiFilter(SearchFilter::class, properties: ['role' => 'exact'])]
@@ -153,15 +165,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(CurrentSeasonFilter::class, properties: ['memberSeasons.season'])]
 class Member extends UuidEntity implements ClubLinkedEntityInterface {
   use SelfClubLinkedEntityTrait;
-
-//  public static function getClubSqlPath(): string {
-//    return 'club';
-//  }
-
-//  #[ORM\ManyToOne(inversedBy: 'members')]
-//  #[ORM\JoinColumn(nullable: false)]
-//  #[Groups(['common-read'])]
-//  private ?Club $club = null;
 
   /**
    * @var Collection<int, Sale>

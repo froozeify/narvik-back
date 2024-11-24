@@ -3,8 +3,10 @@
 namespace App\Repository;
 
 use App\DQL\CustomExpr;
+use App\Entity\Club;
 use App\Entity\ClubDependent\Member;
-use App\Entity\MemberPresence;
+use App\Entity\ClubDependent\MemberPresence;
+use App\Repository\Trait\UuidEntityRepositoryTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
@@ -20,18 +22,23 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
  * @method Member[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class MemberRepository extends ServiceEntityRepository {
+  use UuidEntityRepositoryTrait;
+
   public function __construct(ManagerRegistry $registry) {
     parent::__construct($registry, Member::class);
   }
+
 
   /**
    * Will return matching member based on the input string
    * Will be excluded user that don't have a licence number set (i.e: badger, default admin)
    *
+   * @param Club   $club
    * @param string $string
+   *
    * @return array
    */
-  public function findByLicenceOrName(string $string): array {
+  public function findByLicenceOrName(Club $club, string $string): array {
     $string = trim($string);
 
     $qb = $this->createQueryBuilder("m");
@@ -48,6 +55,7 @@ class MemberRepository extends ServiceEntityRepository {
     $qb->andWhere(
       $qb->expr()->isNotNull('m.licence'),
     );
+    $qb->andWhere('m.club = :club');
 
     $matches = [];
     preg_match("/^(\d{8,})/m", $string, $matches);
@@ -60,6 +68,7 @@ class MemberRepository extends ServiceEntityRepository {
 
     $qb
       ->setParameter('name', '%' . str_replace(' ', '%', $string) . '%')
+      ->setParameter('club', $club)
       ->setMaxResults(10);
 
     return $qb->getQuery()->getResult();

@@ -6,14 +6,12 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\AgeCategoryRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AgeCategoryRepository::class)]
 #[ApiResource(
   normalizationContext: [
     'groups' => ['age-category', 'age-category-read']
-  ],
-  denormalizationContext: [
-    'groups' => []
   ]
 )]
 class AgeCategory {
@@ -24,11 +22,13 @@ class AgeCategory {
   private ?int $id = null;
 
   #[ORM\Column(length: 255)]
-  #[Groups(['age-category-read', 'member-read', 'member-presence-read'])]
+  #[Groups(['super-admin-write', 'age-category-read', 'member-read', 'member-presence-read'])]
+  #[Assert\NotBlank]
   private ?string $code = null;
 
   #[ORM\Column(length: 255)]
-  #[Groups(['age-category-read', 'member-read', 'member-presence-read'])]
+  #[Groups(['super-admin-write', 'age-category-read', 'member-read', 'member-presence-read'])]
+  #[Assert\NotBlank]
   private ?string $name = null;
 
   public function getId(): ?int {

@@ -63,6 +63,7 @@ security:
         - {path: ^/self, roles: [ ROLE_USER, ROLE_BADGER ]}
 
         - { path: ^/activities, roles: [ROLE_USER, ROLE_BADGER]}
+        - { path: ^/age-categories, roles: [ROLE_SUPER_ADMIN]}
 
         - { path: ^/clubs, roles: [ROLE_USER]}
 

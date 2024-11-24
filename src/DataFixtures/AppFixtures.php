@@ -6,6 +6,7 @@ use App\Tests\Factory\ExternalPresenceFactory;
 use App\Tests\Factory\InventoryItemFactory;
 use App\Tests\Factory\InventoryItemHistoryFactory;
 use App\Tests\Story\ActivityStory;
+use App\Tests\Story\AgeCategoryStory;
 use App\Tests\Story\GlobalSettingStory;
 use App\Tests\Story\InitStory;
 use App\Tests\Story\InventoryCategoryStory;
@@ -25,11 +26,10 @@ class AppFixtures extends Fixture {
     // We create the default global settings
     GlobalSettingStory::load();
 
-
-
-
     // We generate the activities
     ActivityStory::load();
+
+    AgeCategoryStory::load();
 
     // We record some external presence
     ExternalPresenceFactory::new()->many(20, 40)->create();

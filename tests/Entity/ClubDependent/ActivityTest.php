@@ -7,8 +7,8 @@ use App\Enum\ClubRole;
 use App\Tests\Entity\Abstract\AbstractEntityClubLinkedTestCase;
 use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Factory\ActivityFactory;
-use App\Tests\Story\ActivityStory;
 use App\Tests\Story\_InitStory;
+use App\Tests\Story\ActivityStory;
 use Zenstruck\Foundry\Persistence\Proxy;
 
 class ActivityTest extends AbstractEntityClubLinkedTestCase {
@@ -108,7 +108,7 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
     $this->makePatchRequest("{$this->getRootUrl()}/{$activityUUid}/merge-to", ["target" => "{$activityUUid}-notexisting"]);
     $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
     $this::assertJsonContains([
-      "detail" => "Target activity not found"
+      "detail" => "Target activity not found",
     ]);
   }
 
@@ -121,7 +121,7 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
     $this->makePatchRequest("{$this->getRootUrl()}/{$activityUUid}/merge-to", ["target" => $activityUUid]);
     $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
     $this::assertJsonContains([
-      "detail" => "Can't migrate to self activity"
+      "detail" => "Can't migrate to self activity",
     ]);
   }
 
@@ -137,7 +137,7 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
     $this->makePatchRequest("{$this->getRootUrl()}/{$activityUUid}/merge-to", ["target" => $activityUuidOtherClub]);
     $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
     $this::assertJsonContains([
-      "detail" => "Activity club does not match target activity club"
+      "detail" => "Activity club does not match target activity club",
     ]);
   }
 
@@ -148,11 +148,11 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
       requestFunction: function () {
         $activity = ActivityFactory::createOne([
           'name' => 'activity to receive',
-          'club' => _InitStory::club_1()
+          'club' => _InitStory::club_1(),
         ]);
         $activity2 = ActivityFactory::createOne([
           'name' => 'activity to migrate',
-          'club' => _InitStory::club_1()
+          'club' => _InitStory::club_1(),
         ]);
         $this->makePatchRequest("{$this->getRootUrl()}/{$activity->getUuid()}/merge-to", ["target" => $activity2->getUuid()]);
       },

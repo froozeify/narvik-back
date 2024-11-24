@@ -7,7 +7,8 @@ use App\Tests\Entity\Abstract\AbstractEntityTestCase;
 use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Factory\ClubFactory;
 use App\Tests\Story\_InitStory;
-use Symfony\Component\HttpFoundation\Response;
+use App\Tests\Story\ActivityStory;
+use Zenstruck\Foundry\Persistence\Proxy;
 
 class ClubTest extends AbstractEntityTestCase {
   protected int $TOTAL_SUPER_ADMIN = 5;
@@ -80,28 +81,44 @@ class ClubTest extends AbstractEntityTestCase {
     );
   }
 
-  public function testCascadeDelete(): void {
-    //TODO: Fix the deletion (cascade not removing all linked entities)
-    // Also check that the related entities are well removed
-    $club1 = _InitStory::club_1();
-    $iri = $this->getIriFromResource($club1);
+  public function testCascadeDeletion(): void {
     $this->loggedAsSuperAdmin();
+
+    // Activity entity is part use ClubLinkedEntityInterface with SelfClubLinkedEntityTrait
+    // All entity using SelfClubLinkedEntityTrait will have the same result (cascade delete is set in the trait)
+    /** @var Proxy[] $activitiesPool */
+    $activitiesPool = ActivityStory::getPool("activities_club1");
+    $activityIris = [];
+    foreach ($activitiesPool as $activityClub) {
+      $activityIris[] = $this->getIriFromResource($activityClub->_real());
+    }
+
+    $club1 = _InitStory::club_1();
+    $clubIri = $this->getIriFromResource($club1);
 
     // We check user exist before
     $user = _InitStory::member_club_1();
     $userMembership = $user->getMemberships()->get(0);
     $userMemberIri = $this->getIriFromResource($userMembership->getMember());
-
-    // TODO: Add get member presences (and check well removed after)
-
     $this->makeGetRequest($userMemberIri);
     $this->assertResponseIsSuccessful();
+    // Activity exist
+    foreach ($activityIris as $activityIri) {
+      $this->makeGetRequest($activityIri);
+      $this->assertResponseIsSuccessful();
+    }
 
-    $this->makeDeleteRequest($iri);
+    // We make the deletion
+    $this->makeDeleteRequest($clubIri);
     $this->assertResponseIsSuccessful();
 
+    // We verify all are well removed
     $this->makeGetRequest($userMemberIri);
-    $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::not_found->value);
+    foreach ($activityIris as $activityIri) {
+      $this->makeGetRequest($activityIri);
+      $this->assertResponseStatusCodeSame(ResponseCodeEnum::not_found->value);
+    }
   }
 
   public function testBadgerTokenFieldVisibility(): void {

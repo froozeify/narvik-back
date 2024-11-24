@@ -11,13 +11,13 @@ final class ActivityStory extends Story {
     foreach (ActivityFactory::ACTIVITIES as $activity) {
       $this->addToPool('activities_club1', ActivityFactory::createOne([
         'name' => $activity,
-        'club' => InitStory::club_1()
+        'club' => _InitStory::club_1()
       ]));
     }
 
     $this->addToPool('activities_club2', ActivityFactory::createOne([
       'name' => ActivityFactory::ACTIVITIES[0],
-      'club' => InitStory::club_2()
+      'club' => _InitStory::club_2()
     ]));
   }
 }

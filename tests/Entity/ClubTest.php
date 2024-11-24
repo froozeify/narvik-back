@@ -6,7 +6,7 @@ use App\Entity\Club;
 use App\Tests\Entity\Abstract\AbstractEntityTestCase;
 use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Factory\ClubFactory;
-use App\Tests\Story\InitStory;
+use App\Tests\Story\_InitStory;
 use Symfony\Component\HttpFoundation\Response;
 
 class ClubTest extends AbstractEntityTestCase {
@@ -41,7 +41,7 @@ class ClubTest extends AbstractEntityTestCase {
   }
 
   public function testPatch(): void {
-    $club1 = InitStory::club_1();
+    $club1 = _InitStory::club_1();
     $iri = $this->getIriFromResource($club1);
 
     $payload = [
@@ -83,12 +83,12 @@ class ClubTest extends AbstractEntityTestCase {
   public function testCascadeDelete(): void {
     //TODO: Fix the deletion (cascade not removing all linked entities)
     // Also check that the related entities are well removed
-    $club1 = InitStory::club_1();
+    $club1 = _InitStory::club_1();
     $iri = $this->getIriFromResource($club1);
     $this->loggedAsSuperAdmin();
 
     // We check user exist before
-    $user = InitStory::member_club_1();
+    $user = _InitStory::member_club_1();
     $userMembership = $user->getMemberships()->get(0);
     $userMemberIri = $this->getIriFromResource($userMembership->getMember());
 
@@ -105,7 +105,7 @@ class ClubTest extends AbstractEntityTestCase {
   }
 
   public function testBadgerTokenFieldVisibility(): void {
-    $club1 = InitStory::club_1();
+    $club1 = _InitStory::club_1();
     $iri = $this->getIriFromResource($club1);
 
     $payloadMatch = [

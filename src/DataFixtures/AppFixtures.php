@@ -5,10 +5,10 @@ namespace App\DataFixtures;
 use App\Tests\Factory\ExternalPresenceFactory;
 use App\Tests\Factory\InventoryItemFactory;
 use App\Tests\Factory\InventoryItemHistoryFactory;
+use App\Tests\Story\_InitStory;
 use App\Tests\Story\ActivityStory;
 use App\Tests\Story\AgeCategoryStory;
 use App\Tests\Story\GlobalSettingStory;
-use App\Tests\Story\InitStory;
 use App\Tests\Story\InventoryCategoryStory;
 use App\Tests\Story\SalePaymentModeStory;
 use App\Tests\Story\SeasonStory;
@@ -18,7 +18,7 @@ use Doctrine\Persistence\ObjectManager;
 class AppFixtures extends Fixture {
   public function load(ObjectManager $manager): void {
     // We create the bare minium required (some users and clubs)
-    InitStory::load();
+    _InitStory::load();
 
     // We create the default season
     SeasonStory::load();

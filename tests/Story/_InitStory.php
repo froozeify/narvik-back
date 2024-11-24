@@ -22,7 +22,7 @@ use function Zenstruck\Foundry\faker;
  * @method static Club club_1()
  * @method static Club club_2()
  */
-final class InitStory extends Story {
+final class _InitStory extends Story {
   public function build(): void {
     $this->addState('super_admin', UserFactory::new()->superAdmin("admin@admin.com")->create(), 'super_admin');
 

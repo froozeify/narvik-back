@@ -8,7 +8,7 @@ use App\Tests\Entity\Abstract\AbstractEntityClubLinkedTestCase;
 use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Factory\ActivityFactory;
 use App\Tests\Story\ActivityStory;
-use App\Tests\Story\InitStory;
+use App\Tests\Story\_InitStory;
 use Zenstruck\Foundry\Persistence\Proxy;
 
 class ActivityTest extends AbstractEntityClubLinkedTestCase {
@@ -38,7 +38,7 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
   }
 
   public function testCreate(): void {
-    $club1 = InitStory::club_1();
+    $club1 = _InitStory::club_1();
     $iri = $this->getIriFromResource($club1);
 
     $payload = [
@@ -90,7 +90,7 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
       requestFunction: function (string $level, ?int $id) {
         $activity = ActivityFactory::createOne([
           'name' => 'Test activity to remove',
-          'club' => InitStory::club_1(),
+          'club' => _InitStory::club_1(),
         ]);
         $iri = $this->getIriFromResource($activity);
 
@@ -148,11 +148,11 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
       requestFunction: function () {
         $activity = ActivityFactory::createOne([
           'name' => 'activity to receive',
-          'club' => InitStory::club_1()
+          'club' => _InitStory::club_1()
         ]);
         $activity2 = ActivityFactory::createOne([
           'name' => 'activity to migrate',
-          'club' => InitStory::club_1()
+          'club' => _InitStory::club_1()
         ]);
         $this->makePatchRequest("{$this->getRootUrl()}/{$activity->getUuid()}/merge-to", ["target" => $activity2->getUuid()]);
       },

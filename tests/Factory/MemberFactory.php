@@ -60,7 +60,7 @@ final class MemberFactory extends PersistentProxyObjectFactory {
    */
   protected function defaults(): array {
     return [
-      'club'      => ClubFactory::random(),
+      'club'      => ClubFactory::first(),
       'firstname' => self::faker()->firstName(),
       'lastname'  => self::faker()->lastName(),
       'email'     => self::faker()->unique()->safeEmail(),

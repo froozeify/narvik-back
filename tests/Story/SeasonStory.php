@@ -17,7 +17,7 @@ final class SeasonStory extends Story {
 
   public function build(): void {
     foreach (self::SEASONS as $season) {
-      $this->addToPool('default_seasons', SeasonFactory::createOne([
+      $this->addToPool('seasons', SeasonFactory::createOne([
         'name' => $season
       ]));
     }

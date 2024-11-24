@@ -84,10 +84,8 @@ security:
         - { path: ^/sales, roles: [ROLE_USER]}
         - { path: ^/sale-payment-modes, roles: [ROLE_USER]}
         # - { path: ^/sale-purchased-items, roles: [ROLE_USER]} # Not available in the API
+        - { path: ^/seasons, roles: [ROLE_SUPER_ADMIN]}
             
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
-        # - { path: ^/imports, roles: ROLE_ADMIN }
         # - { route: 'presence_list', roles: ROLE_BADGER } # route will also include presence_list_* it's like path, it's regex 
 
         # Always at the end, in case we forgot to protect a route, only admin will be able to access it

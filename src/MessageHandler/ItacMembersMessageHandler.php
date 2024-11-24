@@ -4,7 +4,7 @@ namespace App\MessageHandler;
 
 use App\Entity\AgeCategory;
 use App\Entity\ClubDependent\Member;
-use App\Entity\MemberSeason;
+use App\Entity\ClubDependent\MemberSeason;
 use App\Entity\Season;
 use App\Enum\ClubRole;
 use App\Enum\ItacCsvHeaderMapping;

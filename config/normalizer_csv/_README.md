@@ -9,7 +9,7 @@ Watch out of the `@Groups` annotation or even `@ApiProperty(security="is_granted
 
 Typical structure
 ```yaml
-App\Entity\MemberPresence:
+App\Entity\ClubDependent\MemberPresence:
     id: ~
     date: ~
     createdAt: creation

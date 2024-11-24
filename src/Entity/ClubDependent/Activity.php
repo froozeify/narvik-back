@@ -17,7 +17,6 @@ use App\Entity\Abstract\UuidEntity;
 use App\Entity\Club;
 use App\Entity\ExternalPresence;
 use App\Entity\Interface\ClubLinkedEntityInterface;
-use App\Entity\MemberPresence;
 use App\Entity\Trait\SelfClubLinkedEntityTrait;
 use App\Repository\ActivityRepository;
 use Doctrine\Common\Collections\ArrayCollection;

@@ -4,7 +4,7 @@ namespace App\Repository;
 
 use App\Entity\ClubDependent\Activity;
 use App\Entity\ClubDependent\Member;
-use App\Entity\MemberPresence;
+use App\Entity\ClubDependent\MemberPresence;
 use App\Repository\Interface\PresenceRepositoryInterface;
 use App\Repository\Trait\PresenceRepositoryTrait;
 use App\Service\GlobalSettingService;

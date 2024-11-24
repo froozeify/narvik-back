@@ -4,8 +4,8 @@ namespace App\MessageHandler;
 
 use App\Entity\ClubDependent\Activity;
 use App\Entity\ClubDependent\Member;
+use App\Entity\ClubDependent\MemberPresence;
 use App\Entity\ExternalPresence;
-use App\Entity\MemberPresence;
 use App\Message\CerberePresencesDateMessage;
 use App\Repository\ActivityRepository;
 use App\Repository\ExternalPresenceRepository;

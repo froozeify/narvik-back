@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\MemberSeason;
+use App\Entity\ClubDependent\MemberSeason;
 use App\Entity\Season;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;

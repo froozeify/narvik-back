@@ -2,7 +2,7 @@
 
 namespace App\Tests\Factory;
 
-use App\Entity\MemberSeason;
+use App\Entity\ClubDependent\MemberSeason;
 use App\Repository\MemberSeasonRepository;
 use App\Tests\Story\SeasonStory;
 use Zenstruck\Foundry\FactoryCollection;
@@ -30,22 +30,22 @@ use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
  * @method FactoryCollection<MemberSeason|Proxy> sequence(iterable|callable $sequence)
  * @method static ProxyRepositoryDecorator<MemberSeason, MemberSeasonRepository> repository()
  *
- * @phpstan-method \App\Entity\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\MemberSeason> create(array|callable $attributes = [])
- * @phpstan-method static \App\Entity\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\MemberSeason> createOne(array $attributes = [])
- * @phpstan-method static \App\Entity\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\MemberSeason> find(object|array|mixed $criteria)
- * @phpstan-method static \App\Entity\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\MemberSeason> findOrCreate(array $attributes)
- * @phpstan-method static \App\Entity\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\MemberSeason> first(string $sortedField = 'id')
- * @phpstan-method static \App\Entity\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\MemberSeason> last(string $sortedField = 'id')
- * @phpstan-method static \App\Entity\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\MemberSeason> random(array $attributes = [])
- * @phpstan-method static \App\Entity\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\MemberSeason> randomOrCreate(array $attributes = [])
- * @phpstan-method static list<\App\Entity\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\MemberSeason>> all()
- * @phpstan-method static list<\App\Entity\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\MemberSeason>> createMany(int $number, array|callable $attributes = [])
- * @phpstan-method static list<\App\Entity\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\MemberSeason>> createSequence(iterable|callable $sequence)
- * @phpstan-method static list<\App\Entity\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\MemberSeason>> findBy(array $attributes)
- * @phpstan-method static list<\App\Entity\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\MemberSeason>> randomRange(int $min, int $max, array $attributes = [])
- * @phpstan-method static list<\App\Entity\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\MemberSeason>> randomSet(int $number, array $attributes = [])
- * @phpstan-method \Zenstruck\Foundry\FactoryCollection<\App\Entity\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\MemberSeason>> many(int $min, int|null $max = null)
- * @phpstan-method \Zenstruck\Foundry\FactoryCollection<\App\Entity\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\MemberSeason>> sequence(iterable|callable $sequence)
+ * @phpstan-method \App\Entity\ClubDependent\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\MemberSeason> create(array|callable $attributes = [])
+ * @phpstan-method static \App\Entity\ClubDependent\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\MemberSeason> createOne(array $attributes = [])
+ * @phpstan-method static \App\Entity\ClubDependent\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\MemberSeason> find(object|array|mixed $criteria)
+ * @phpstan-method static \App\Entity\ClubDependent\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\MemberSeason> findOrCreate(array $attributes)
+ * @phpstan-method static \App\Entity\ClubDependent\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\MemberSeason> first(string $sortedField = 'id')
+ * @phpstan-method static \App\Entity\ClubDependent\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\MemberSeason> last(string $sortedField = 'id')
+ * @phpstan-method static \App\Entity\ClubDependent\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\MemberSeason> random(array $attributes = [])
+ * @phpstan-method static \App\Entity\ClubDependent\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\MemberSeason> randomOrCreate(array $attributes = [])
+ * @phpstan-method static list<\App\Entity\ClubDependent\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\MemberSeason>> all()
+ * @phpstan-method static list<\App\Entity\ClubDependent\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\MemberSeason>> createMany(int $number, array|callable $attributes = [])
+ * @phpstan-method static list<\App\Entity\ClubDependent\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\MemberSeason>> createSequence(iterable|callable $sequence)
+ * @phpstan-method static list<\App\Entity\ClubDependent\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\MemberSeason>> findBy(array $attributes)
+ * @phpstan-method static list<\App\Entity\ClubDependent\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\MemberSeason>> randomRange(int $min, int $max, array $attributes = [])
+ * @phpstan-method static list<\App\Entity\ClubDependent\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\MemberSeason>> randomSet(int $number, array $attributes = [])
+ * @phpstan-method \Zenstruck\Foundry\FactoryCollection<\App\Entity\ClubDependent\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\MemberSeason>> many(int $min, int|null $max = null)
+ * @phpstan-method \Zenstruck\Foundry\FactoryCollection<\App\Entity\ClubDependent\MemberSeason&\Zenstruck\Foundry\Persistence\Proxy<\App\Entity\ClubDependent\MemberSeason>> sequence(iterable|callable $sequence)
  * @extends PersistentProxyObjectFactory<MemberSeason>
  */
 final class MemberSeasonFactory extends PersistentProxyObjectFactory {

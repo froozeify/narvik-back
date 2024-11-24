@@ -2,15 +2,32 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Patch;
 use App\Entity\ClubDependent\Member;
 use App\Enum\ClubRole;
 use App\Repository\UserMemberRepository;
+use App\State\UserMemberProcessor;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: UserMemberRepository::class)]
 #[UniqueEntity(fields: ['member', 'user'], message: 'Member already linked')]
+#[ApiResource(
+  operations: [
+    new Get(),
+    new Patch(),
+    new Delete(),
+  ], normalizationContext: [
+    'groups' => ['user-member', 'user-member-read']
+  ], denormalizationContext: [
+    'groups' => ['user-member', 'user-member-write']
+  ],
+  processor: UserMemberProcessor::class,
+)]
 class UserMember {
   #[ORM\Id]
   #[ORM\GeneratedValue]

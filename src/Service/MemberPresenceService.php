@@ -2,8 +2,8 @@
 
 namespace App\Service;
 
+use App\Entity\ClubDependent\MemberPresence;
 use App\Entity\ExternalPresence;
-use App\Entity\MemberPresence;
 use App\Repository\ExternalPresenceRepository;
 use App\Repository\MemberPresenceRepository;
 use App\Repository\MemberRepository;

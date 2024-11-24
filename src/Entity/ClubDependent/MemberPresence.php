@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\ClubDependent;
 
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
@@ -19,8 +19,6 @@ use App\Controller\MemberPresencesFromItac;
 use App\Controller\MemberPresencesImportFromExternal;
 use App\Controller\MemberPresenceToday;
 use App\Entity\Abstract\UuidEntity;
-use App\Entity\ClubDependent\Activity;
-use App\Entity\ClubDependent\Member;
 use App\Entity\Interface\TimestampEntityInterface;
 use App\Entity\Trait\TimestampTrait;
 use App\Filter\MultipleFilter;

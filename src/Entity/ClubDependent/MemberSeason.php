@@ -37,14 +37,17 @@ use Symfony\Component\Serializer\Attribute\Groups;
 class MemberSeason extends UuidEntity {
 
   #[ORM\ManyToOne(targetEntity: Member::class, inversedBy: 'memberSeasons')]
+  #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
   #[Groups(['member-season-read'])]
   private ?Member $member = null;
 
   #[ORM\ManyToOne(targetEntity: Season::class, inversedBy: 'memberSeasons')]
+  #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
   #[Groups(['member-season-read'])]
   private ?Season $season = null;
 
   #[ORM\ManyToOne(targetEntity: AgeCategory::class)]
+  #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
   #[Groups(['member-season-read', 'member-read', 'member-presence-read'])]
   private ?AgeCategory $ageCategory = null;
 

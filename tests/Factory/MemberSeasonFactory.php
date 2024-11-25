@@ -4,6 +4,7 @@ namespace App\Tests\Factory;
 
 use App\Entity\ClubDependent\MemberSeason;
 use App\Repository\MemberSeasonRepository;
+use App\Tests\Story\AgeCategoryStory;
 use App\Tests\Story\SeasonStory;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
@@ -62,8 +63,8 @@ final class MemberSeasonFactory extends PersistentProxyObjectFactory {
   protected function defaults(): array {
 
     return [
-      'member'          => MemberFactory::randomOrCreate(),
-      'ageCategory'     => AgeCategoryFactory::randomOrCreate(),
+      'member'          => MemberFactory::random(),
+      'ageCategory'     => AgeCategoryStory::getRandom("age_categories"),
       'isSecondaryClub' => self::faker()->boolean(25),
       //      'season'      => $season->object(), // Done in self::initialize()
     ];

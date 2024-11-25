@@ -14,10 +14,10 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
+use App\Controller\ClubDependent\MemberSearchByLicenceOrName;
 use App\Controller\MemberImportFromItac;
 use App\Controller\MemberImportSecondaryClubFromItac;
 use App\Controller\MemberPhotosImportFromItac;
-use App\Controller\MemberSearchByLicenceOrName;
 use App\Entity\Abstract\UuidEntity;
 use App\Entity\Club;
 use App\Entity\Interface\ClubLinkedEntityInterface;
@@ -26,7 +26,6 @@ use App\Entity\Trait\SelfClubLinkedEntityTrait;
 use App\Filter\CurrentSeasonFilter;
 use App\Filter\MultipleFilter;
 use App\Repository\MemberRepository;
-use App\State\UserMemberProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -41,8 +40,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
   operations: [
     new Get(),
-    new Patch(),
-    new Delete(),
   ], normalizationContext: [
     'groups' => ['member', 'member-read']
   ], denormalizationContext: [
@@ -52,7 +49,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
   uriTemplate: '/clubs/{clubUuid}/members.{_format}',
   operations: [
-    new GetCollection(),
+    new GetCollection(
+      security: "is_granted('CLUB_SUPERVISOR', request)"
+    ),
     new Post(
       uriTemplate: '/clubs/{clubUuid}/members/-/search',
       controller: MemberSearchByLicenceOrName::class,
@@ -74,11 +73,6 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
       ),
       normalizationContext: ['groups' => 'autocomplete'],
-      security: "is_granted('CLUB_ADMIN', request)", // We past the request due to being a ClubDependent custom query
-      read: false,
-      deserialize: false,
-      write: false,
-      serialize: false,
     ),
     new Post(
       uriTemplate: '/clubs/{clubUuid}/members/-/from-itac',
@@ -156,7 +150,6 @@ use Symfony\Component\Validator\Constraints as Assert;
   normalizationContext: [
     'groups' => ['member', 'member-read']
   ],
-  order: ['name' => 'asc'],
 )]
 #[ApiFilter(ExistsFilter::class, properties: ['licence'])]
 #[ApiFilter(SearchFilter::class, properties: ['role' => 'exact'])]
@@ -199,76 +192,76 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
 
 
   #[ORM\Column(length: 180, nullable: true)]
-  #[Groups(['member-read', 'club-admin-write'])]
+  #[Groups(['member-read', 'club-supervisor-write'])]
   private ?string $email = null;
 
   #[ORM\Column(length: 10, unique: true, nullable: true)]
   #[Assert\Regex(pattern: '/\d{8,10}/')]
-  #[Groups(['autocomplete', 'member-read', 'club-admin-write', 'member-presence-read'])]
+  #[Groups(['autocomplete', 'member-read', 'club-supervisor-write', 'member-presence-read'])]
   private ?string $licence = null;
 
   #[ORM\Column(length: 255)]
-  #[Groups(['autocomplete', 'member-read', 'club-admin-write'])]
+  #[Groups(['autocomplete', 'member-read', 'club-supervisor-write'])]
   private ?string $firstname = null;
 
   #[ORM\Column(length: 255)]
-  #[Groups(['autocomplete', 'member-read', 'club-admin-write'])]
+  #[Groups(['autocomplete', 'member-read', 'club-supervisor-write'])]
   private ?string $lastname = null;
 
   #[ORM\Column(length: 1)]
-  #[Groups(['member-read'])]
+  #[Groups(['member-read', 'club-supervisor-write'])]
   private string $gender = "M";
 
   #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-  #[Groups(['member-read', 'club-admin-write'])]
+  #[Groups(['member-read', 'club-supervisor-write'])]
   private ?\DateTimeInterface $birthday = null;
 
   #[ORM\Column]
-  #[Groups(['member-read'])]
+  #[Groups(['member-read', 'club-admin-write'])]
   private bool $handisport = false;
 
   #[ORM\Column]
-  #[Groups(['member-read'])]
+  #[Groups(['member-read', 'club-admin-write'])]
   private bool $deceased = false;
 
   #[ORM\Column(length: 255, nullable: true)]
-  #[Groups(['member-read'])]
+  #[Groups(['member-read', 'club-supervisor-write'])]
   private ?string $postal1 = null;
 
   #[ORM\Column(length: 255, nullable: true)]
-  #[Groups(['member-read'])]
+  #[Groups(['member-read', 'club-supervisor-write'])]
   private ?string $postal2 = null;
 
   #[ORM\Column(length: 255, nullable: true)]
-  #[Groups(['member-read'])]
+  #[Groups(['member-read', 'club-supervisor-write'])]
   private ?string $postal3 = null;
 
   #[ORM\Column(nullable: true)]
-  #[Groups(['member-read'])]
+  #[Groups(['member-read', 'club-supervisor-write'])]
   private ?int $zipCode = null;
 
   #[ORM\Column(length: 255, nullable: true)]
-  #[Groups(['member-read'])]
+  #[Groups(['member-read', 'club-supervisor-write'])]
   private ?string $city = null;
 
   #[ORM\Column(length: 255, nullable: true)]
-  #[Groups(['member-read'])]
+  #[Groups(['member-read', 'club-supervisor-write'])]
   private ?string $country = null;
 
   #[ORM\Column(length: 14, nullable: true)]
-  #[Groups(['member-read'])]
+  #[Groups(['member-read', 'club-supervisor-write'])]
   private ?string $phone = null;
 
   #[ORM\Column(length: 14, nullable: true)]
-  #[Groups(['member-read'])]
+  #[Groups(['member-read', 'club-supervisor-write'])]
   private ?string $mobilePhone = null;
 
   #[ORM\Column]
-  #[Groups(['club-admin-read'])]
+  #[Groups(['club-admin-read', 'club-admin-write'])]
   private bool $blacklisted = false;
 
   #[ORM\Column(length: 255, nullable: true)]
-  #[Groups(['club-admin-read'])]
+  #[Groups(['club-admin-read', 'club-admin-write'])]
   private ?string $licenceState = null;
 
   #[ORM\Column(length: 1)]

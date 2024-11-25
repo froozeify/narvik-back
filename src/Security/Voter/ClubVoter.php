@@ -28,7 +28,7 @@ class ClubVoter extends Voter {
     }
 
     if ($subject instanceof Request) {
-      $subject = $this->requestService->getClubFromRequest($subject);
+      $subject = $this->requestService->getClubFromRequest($subject, false);
     }
 
     return ($subject instanceof ClubLinkedEntityInterface || $subject instanceof Club) && in_array($attribute, $roles);

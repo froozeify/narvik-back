@@ -56,7 +56,7 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
       $payloadCheck,
       supervisorClub1Code: ResponseCodeEnum::forbidden,
       adminClub1Code: ResponseCodeEnum::created,
-      adminClub2Code: ResponseCodeEnum::bad_request,
+      adminClub2Code: ResponseCodeEnum::forbidden,
       superAdminCode: ResponseCodeEnum::created,
       requestFunction: function (string $level, ?int $id) use ($payload) {
         $this->makePostRequest($this->getRootUrl(), $payload);

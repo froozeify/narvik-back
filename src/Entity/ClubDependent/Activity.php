@@ -29,15 +29,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: ActivityRepository::class)]
 #[ApiResource(
   operations: [
-    new Get(),
     new Post(
       securityPostDenormalize: "is_granted('CLUB_ADMIN', object)"
-    ),
-    new Patch(
-      security: "is_granted('CLUB_ADMIN', object)"
-    ),
-    new Delete(
-      security: "is_granted('CLUB_ADMIN', object)"
     ),
 
     new Patch(
@@ -67,20 +60,37 @@ use Symfony\Component\Validator\Constraints as Assert;
     'groups' => ['activity', 'activity-read']
   ],
   denormalizationContext: [
-    'groups' => ['club-admin-write']
+    'groups' => ['activity', 'activity-write']
   ],
   order: ['name' => 'asc'],
 )]
 #[ApiResource(
-  uriTemplate: '/clubs/{clubUuid}/activities.{_format}',
+  uriTemplate: '/clubs/{clubUuid}/activities/{uuid}.{_format}',
   operations: [
-    new GetCollection(),
+    new Get(),
+    new GetCollection(
+      uriTemplate: '/clubs/{clubUuid}/activities.{_format}',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ]
+    ),
+
+    new Patch(
+      security: "is_granted('CLUB_ADMIN', object)",
+    ),
+    new Delete(
+      security: "is_granted('CLUB_ADMIN', object)"
+    ),
   ],
   uriVariables: [
     'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+    'uuid' => new Link(fromClass: Activity::class),
   ],
   normalizationContext: [
     'groups' => ['activity', 'activity-read']
+  ],
+  denormalizationContext: [
+    'groups' => ['activity', 'activity-write']
   ],
   order: ['name' => 'asc'],
 )]

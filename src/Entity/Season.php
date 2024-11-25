@@ -29,7 +29,6 @@ class Season {
   private ?string $name = null;
 
   #[ORM\OneToMany(mappedBy: 'season', targetEntity: MemberSeason::class)]
-  #[Groups(['season-read'])]
   private Collection $memberSeasons;
 
   public function __construct() {

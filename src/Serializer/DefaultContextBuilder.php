@@ -32,18 +32,26 @@ final readonly class DefaultContextBuilder implements SerializerContextBuilderIn
     if ($normalization) {
       $context['groups'][] = 'common-read';
       $context['groups'][] = 'timestamp';
-      if ($this->authorizationChecker->isGranted(ClubRole::admin->value)) {
+      if ($this->authorizationChecker->isGranted(ClubRole::supervisor->value, $request)) {
+        $context['groups'][] = 'club-supervisor-read';
+      }
+      if ($this->authorizationChecker->isGranted(ClubRole::admin->value, $request)) {
         $context['groups'][] = 'club-admin-read';
       }
-      if ($this->authorizationChecker->isGranted(UserRole::super_admin->value)) {
+      if ($this->authorizationChecker->isGranted(UserRole::super_admin->value, $request)) {
         $context['groups'][] = 'super-admin-read';
       }
     } else {
+      // FIXME: Context are not well applied
+      // i.e: When POST /activities $request do not contain the club ref
       $context['groups'][] = 'common-write';
-      if ($this->authorizationChecker->isGranted(ClubRole::admin->value)) {
+      if ($this->authorizationChecker->isGranted(ClubRole::supervisor->value, $request)) {
+        $context['groups'][] = 'club-supervisor-write';
+      }
+      if ($this->authorizationChecker->isGranted(ClubRole::admin->value, $request)) {
         $context['groups'][] = 'club-admin-write';
       }
-      if ($this->authorizationChecker->isGranted(UserRole::super_admin->value)) {
+      if ($this->authorizationChecker->isGranted(UserRole::super_admin->value, $request)) {
         $context['groups'][] = 'super-admin-write';
       }
     }

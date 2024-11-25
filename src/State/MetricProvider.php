@@ -61,7 +61,7 @@ class MetricProvider implements ProviderInterface {
   }
 
   protected function getMembers(string $identifier): Metric {
-    $total = $this->memberRepository->countTotalMembers();
+    $total = $this->memberRepository->countTotalClubMembers();
     $previousSeason = $this->memberSeasonRepository->countTotalMembersForPreviousSeason();
     $currentSeason = $this->memberSeasonRepository->countTotalMembersForThisSeason();
 

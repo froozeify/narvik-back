@@ -74,7 +74,7 @@ class MemberRepository extends ServiceEntityRepository {
     return $qb->getQuery()->getResult();
   }
 
-  public function findOneByLicence(string $licence): ?Member {
+  public function findOneByLicence(Club $club, string $licence): ?Member {
     return $this->createQueryBuilder('m')
       ->andWhere('m.licence = :licence')
       ->setParameter('licence', $licence)
@@ -83,7 +83,7 @@ class MemberRepository extends ServiceEntityRepository {
       ->getOneOrNullResult();
   }
 
-  public function findOneByEmail(string $email): ?Member {
+  public function findOneByEmail(Club $club, string $email): ?Member {
     return $this->createQueryBuilder('m')
       ->andWhere('m.email = :email')
       ->setParameter('email', $email)
@@ -92,7 +92,7 @@ class MemberRepository extends ServiceEntityRepository {
       ->getOneOrNullResult();
   }
 
-  public function findAllNotPresentToday(): array {
+  public function findAllNotPresentToday(Club $club): array {
     $qb = $this->createQueryBuilder('u');
 
     $memberAlreadyPresents = [];
@@ -115,7 +115,7 @@ class MemberRepository extends ServiceEntityRepository {
     return $qb->getQuery()->getResult();
   }
 
-  public function countTotalMembers(): int {
+  public function countTotalClubMembers(Club $club): int {
     $qb = $this->createQueryBuilder("m");
     return $qb
       ->select($qb->expr()->count("m.id"))

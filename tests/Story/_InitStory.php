@@ -3,6 +3,7 @@
 namespace App\Tests\Story;
 
 use App\Entity\Club;
+use App\Entity\ClubDependent\Member;
 use App\Entity\User;
 use App\Enum\ClubRole;
 use App\Tests\Factory\ClubFactory;
@@ -14,17 +15,23 @@ use Zenstruck\Foundry\Story;
 use function Zenstruck\Foundry\faker;
 
 /**
- * @method static User super_admin()
- * @method static User admin_club_1() This user is also a member of club 2 with just member role
- * @method static User admin_club_2()
- * @method static User supervisor_club_1()
- * @method static User member_club_1()
+ * @method static User USER_super_admin()
+ * @method static User USER_admin_club_1() This user is also a member of club 2 with just member role
+ * @method static User USER_admin_club_2()
+ * @method static User USER_supervisor_club_1()
+ * @method static User USER_member_club_1()
+ * @method static User USER_member_club_2()
  * @method static Club club_1()
  * @method static Club club_2()
+ * @method static Member MEMBER_admin_club_1()
+ * @method static Member MEMBER_admin_club_2()
+ * @method static Member MEMBER_supervisor_club_1()
+ * @method static Member MEMBER_member_club_1()
+ * @method static Member MEMBER_member_club_2()
  */
 final class _InitStory extends Story {
   public function build(): void {
-    $this->addState('super_admin', UserFactory::new()->superAdmin("admin@admin.com")->create(), 'super_admin');
+    $this->addState('USER_super_admin', UserFactory::new()->superAdmin("admin@admin.com")->create(), 'super_admin');
 
     $this->addState('club_1', ClubFactory::createOne([
         'name' => 'Club 1',
@@ -42,88 +49,94 @@ final class _InitStory extends Story {
     $this->addToPool('clubs', ClubFactory::createMany(3));
 
     // We create a one club admin and supervisor for each
-    $this->addState('admin_club_1', UserFactory::createOne([
+    $this->addState('USER_admin_club_1', UserFactory::createOne([
       'email' => 'admin@club1.fr',
       'plainPassword' => 'admin123',
       'accountActivated' => true,
     ]), 'users');
-    $this->addState('admin_club_2', UserFactory::createOne([
+    $this->addState('USER_admin_club_2', UserFactory::createOne([
       'email' => 'admin@club2.fr',
       'plainPassword' => 'admin123',
       'accountActivated' => true,
     ]), 'users');
-    $this->addState('supervisor_club_1', UserFactory::createOne([
+    $this->addState('USER_supervisor_club_1', UserFactory::createOne([
       'email' => 'supervisor@club1.fr',
       'plainPassword' => 'admin123',
       'accountActivated' => true,
     ]), 'users');
-    $this->addState('member_club_1', UserFactory::createOne([
+    $this->addState('USER_member_club_1', UserFactory::createOne([
       'email' => 'member@club1.fr',
+      'plainPassword' => 'member123',
+      'accountActivated' => true,
+    ]), 'users');
+    $this->addState('USER_member_club_2', UserFactory::createOne([
+      'email' => 'member@club2.fr',
       'plainPassword' => 'member123',
       'accountActivated' => true,
     ]), 'users');
 
     // We create the association club <-> Member <-> User
-    $adminMember = MemberFactory::createOne([
+    $this->addState('MEMBER_admin_club_1', MemberFactory::createOne([
       'club' => self::club_1(),
       'email' => 'admin@club1.fr',
-    ]);
-    $adminMember2 = MemberFactory::createOne([
+    ]));
+    $this->addState('MEMBER_admin_club_2', MemberFactory::createOne([
       'club' => self::club_2(),
       'email' => 'admin@club2.fr',
-    ]);
-    $supervisorMember = MemberFactory::createOne([
+    ]));
+    $this->addState('MEMBER_supervisor_club_1', MemberFactory::createOne([
       'club' => self::club_1(),
       'email' => 'supervisor@club1.fr',
-    ]);
-    $memberUser = MemberFactory::createOne([
+    ]));
+    $this->addState('MEMBER_member_club_1', MemberFactory::createOne([
       'club' => self::club_1(),
       'email' => 'member@club1.fr',
-    ]);
-    $memberUser2 = MemberFactory::createOne([
+    ]));
+    $this->addState('MEMBER_member_club_2', MemberFactory::createOne([
       'club' => self::club_2(),
       'email' => 'admin@club1.fr',
-    ]);
+    ]));
 
     UserMemberFactory::createOne([
-      'member' => $adminMember,
-      'user' => self::admin_club_1(),
+      'member' => self::MEMBER_admin_club_1(),
+      'user' => self::USER_admin_club_1(),
       'role' => ClubRole::admin,
     ]);
     UserMemberFactory::createOne([
-      'member' => $adminMember2,
-      'user' => self::admin_club_2(),
+      'member' => self::MEMBER_admin_club_2(),
+      'user' => self::USER_admin_club_2(),
       'role' => ClubRole::admin,
     ]);
     UserMemberFactory::createOne([
-      'member' => $supervisorMember,
-      'user' => self::supervisor_club_1(),
+      'member' => self::MEMBER_supervisor_club_1(),
+      'user' => self::USER_supervisor_club_1(),
       'role' => ClubRole::supervisor,
     ]);
     UserMemberFactory::createOne([
-      'member' => $memberUser,
-      'user' => self::member_club_1(),
+      'member' => self::MEMBER_member_club_1(),
+      'user' => self::USER_member_club_1(),
       'role' => ClubRole::member,
     ]);
     UserMemberFactory::createOne([
-      'member' => $memberUser2,
-      'user' => self::admin_club_1(),
+      'member' => self::MEMBER_member_club_2(),
+      'user' => self::USER_member_club_2(),
       'role' => ClubRole::member,
     ]);
 
-    $users = UserFactory::createMany(5);
+    // Some users linked with no club
+     $users = UserFactory::createMany(5);
 
     // We create some member
-    $members = MemberFactory::createMany(40, [
-      'memberSeasons' => MemberSeasonFactory::new()->many(0, 4),
-    ]);
-
-    // We link the member with user
-    foreach ($members as $member) {
-      UserMemberFactory::createOne([
-        'user' => faker()->randomElement($users),
-        'member' => $member,
-      ]);
-    }
+//    $members = MemberFactory::createMany(10, [
+//      'memberSeasons' => MemberSeasonFactory::new()->many(0, 4),
+//    ]);
+//
+//    // We link the member with user
+//    foreach ($members as $member) {
+//      UserMemberFactory::createOne([
+//        'user' => faker()->randomElement($users),
+//        'member' => $member,
+//      ]);
+//    }
   }
 }

@@ -60,11 +60,12 @@ final class MemberFactory extends PersistentProxyObjectFactory {
    */
   protected function defaults(): array {
     return [
-      'club'      => ClubFactory::first(),
-      'firstname' => self::faker()->firstName(),
-      'lastname'  => self::faker()->lastName(),
-      'email'     => self::faker()->unique()->safeEmail(),
-      'licence'   => str_pad(self::faker()->numberBetween(1000000, 99999999), 8, "0", STR_PAD_LEFT),
+      'club'          => ClubFactory::first(),
+      'firstname'     => self::faker()->firstName(),
+      'lastname'      => self::faker()->lastName(),
+      'email'         => self::faker()->unique()->safeEmail(),
+      'licence'       => str_pad(self::faker()->numberBetween(1000000, 99999999), 8, "0", STR_PAD_LEFT),
+      'memberSeasons' => MemberSeasonFactory::new()->many(1),
     ];
   }
 

@@ -97,7 +97,7 @@ class ClubTest extends AbstractEntityTestCase {
     $clubIri = $this->getIriFromResource($club1);
 
     // We check user exist before
-    $user = _InitStory::member_club_1();
+    $user = _InitStory::USER_member_club_1();
     $userMembership = $user->getMemberships()->get(0);
     $userMemberIri = $this->getIriFromResource($userMembership->getMember());
     $this->makeGetRequest($userMemberIri);

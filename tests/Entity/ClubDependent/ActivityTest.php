@@ -63,6 +63,21 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
     );
   }
 
+  public function testCreateToAnotherClub(): void {
+    $club1 = _InitStory::club_1();
+    $club2 = _InitStory::club_2();
+    $iriClub2 = $this->getIriFromResource($club2);
+
+    $payload = [
+      "name" => 'Test activity',
+      "club" => $iriClub2
+    ];
+
+    $this->loggedAsAdminClub1();
+    $this->makePostRequest($this->getRootWClubUrl($club1), $payload);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+  }
+
   public function testPatch(): void {
     $activity = ActivityStory::getRandom("activities_club1");
     $iri = $this->getIriFromResource($activity);

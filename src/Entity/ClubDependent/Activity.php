@@ -11,8 +11,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\OpenApi\Model;
-use App\Controller\ActivityMergeTo;
+use App\Controller\ActivityMerge;
 use App\Entity\Abstract\UuidEntity;
 use App\Entity\Club;
 use App\Entity\ExternalPresence;
@@ -24,18 +23,39 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\OpenApi\Model;
 
 
 #[ORM\Entity(repositoryClass: ActivityRepository::class)]
 #[ApiResource(
+  uriTemplate: '/clubs/{clubUuid}/activities/{uuid}.{_format}',
   operations: [
+    new GetCollection(
+      uriTemplate: '/clubs/{clubUuid}/activities.{_format}',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ]
+    ),
     new Post(
-      securityPostDenormalize: "is_granted('CLUB_ADMIN', object)"
+      uriTemplate: '/clubs/{clubUuid}/activities.{_format}',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
+      securityPostDenormalize: "is_granted('CLUB_ADMIN', request)",
+      read: false,
+    ),
+
+    new Get(),
+    new Patch(
+      security: "is_granted('CLUB_ADMIN', object)",
+    ),
+    new Delete(
+      security: "is_granted('CLUB_ADMIN', object)"
     ),
 
     new Patch(
-      uriTemplate: '/activities/{uuid}/merge-to',
-      controller: ActivityMergeTo::class,
+      uriTemplate: '/clubs/{clubUuid}/activities/{uuid}/merge',
+      controller: ActivityMerge::class,
       openapi: new Model\Operation(
         summary: 'Merge (and then delete) with another activity',
         requestBody: new Model\RequestBody(
@@ -55,32 +75,6 @@ use Symfony\Component\Validator\Constraints as Assert;
       read: true,
       write: false,
     )
-  ],
-  normalizationContext: [
-    'groups' => ['activity', 'activity-read']
-  ],
-  denormalizationContext: [
-    'groups' => ['activity', 'activity-write']
-  ],
-  order: ['name' => 'asc'],
-)]
-#[ApiResource(
-  uriTemplate: '/clubs/{clubUuid}/activities/{uuid}.{_format}',
-  operations: [
-    new Get(),
-    new GetCollection(
-      uriTemplate: '/clubs/{clubUuid}/activities.{_format}',
-      uriVariables: [
-        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
-      ]
-    ),
-
-    new Patch(
-      security: "is_granted('CLUB_ADMIN', object)",
-    ),
-    new Delete(
-      security: "is_granted('CLUB_ADMIN', object)"
-    ),
   ],
   uriVariables: [
     'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),

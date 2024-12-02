@@ -43,13 +43,12 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
 
     $payload = [
       "name" => 'Test activity',
-      "club" => $iri,
     ];
 
     $payloadCheck = $payload;
     // For the check we update the payload value
     $payloadCheck["club"] = [
-      '@id' => $payload["club"],
+      '@id' => $iri,
     ];
 
     $this->makeAllLoggedRequests(
@@ -58,8 +57,8 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
       adminClub1Code: ResponseCodeEnum::created,
       adminClub2Code: ResponseCodeEnum::forbidden,
       superAdminCode: ResponseCodeEnum::created,
-      requestFunction: function (string $level, ?int $id) use ($payload) {
-        $this->makePostRequest($this->getRootUrl(), $payload);
+      requestFunction: function (string $level, ?int $id) use ($club1, $payload) {
+        $this->makePostRequest($this->getRootWClubUrl($club1), $payload);
       },
     );
   }
@@ -102,10 +101,11 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
   public function testActivityMergeWithNotExisting(): void {
     /** @var Proxy $activity */
     $activity = ActivityStory::getRandom("activities_club1");
+    $iri = $this->getIriFromResource($activity->_real());
     $activityUUid = $activity->_real()->getUuid();
 
     $this->loggedAsSuperAdmin();
-    $this->makePatchRequest("{$this->getRootUrl()}/{$activityUUid}/merge-to", ["target" => "{$activityUUid}-notexisting"]);
+    $this->makePatchRequest("$iri/merge", ["target" => "{$activityUUid}-notexisting"]);
     $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
     $this::assertJsonContains([
       "detail" => "Target activity not found",
@@ -115,10 +115,11 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
   public function testActivityMergeToSelf() {
     /** @var Proxy $activity */
     $activity = ActivityStory::getRandom("activities_club1");
+    $iri = $this->getIriFromResource($activity->_real());
     $activityUUid = $activity->_real()->getUuid();
 
     $this->loggedAsSuperAdmin();
-    $this->makePatchRequest("{$this->getRootUrl()}/{$activityUUid}/merge-to", ["target" => $activityUUid]);
+    $this->makePatchRequest("$iri/merge", ["target" => $activityUUid]);
     $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
     $this::assertJsonContains([
       "detail" => "Can't migrate to self activity",
@@ -128,13 +129,14 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
   public function testActivityMergeWithOtherClub(): void {
     /** @var Proxy $activity */
     $activity = ActivityStory::getRandom("activities_club1");
+    $iri = $this->getIriFromResource($activity->_real());
     $activityUUid = $activity->_real()->getUuid();
     /** @var Proxy $activityOtherClub */
     $activityOtherClub = ActivityStory::getRandom("activities_club2");
     $activityUuidOtherClub = $activityOtherClub->_real()->getUuid();
 
     $this->loggedAsSuperAdmin();
-    $this->makePatchRequest("{$this->getRootUrl()}/{$activityUUid}/merge-to", ["target" => $activityUuidOtherClub]);
+    $this->makePatchRequest("$iri/merge", ["target" => $activityUuidOtherClub]);
     $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
     $this::assertJsonContains([
       "detail" => "Activity club does not match target activity club",
@@ -154,7 +156,8 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
           'name' => 'activity to migrate',
           'club' => _InitStory::club_1(),
         ]);
-        $this->makePatchRequest("{$this->getRootUrl()}/{$activity->getUuid()}/merge-to", ["target" => $activity2->getUuid()]);
+        $iri = $this->getIriFromResource($activity);
+        $this->makePatchRequest("$iri/merge", ["target" => $activity2->getUuid()]);
       },
     );
   }

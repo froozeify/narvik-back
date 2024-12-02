@@ -5,6 +5,7 @@ namespace App\Tests\Entity\Abstract;
 use App\Entity\Club;
 use App\Enum\ClubRole;
 use App\Enum\UserRole;
+use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Story\_InitStory;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -39,21 +40,41 @@ abstract class AbstractEntityClubLinkedTestCase extends AbstractEntityTestCase {
 
   public function testGetCollectionAsAdminClub1(): ResponseInterface {
     $this->loggedAsAdminClub1();
+
+    // We don't get any from club 2
+    $this->makeGetRequest($this->getRootWClubUrl(_InitStory::club_2()));
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::forbidden->value);
+
     return $this->testGetCollectionWClubAs(ClubRole::admin, _InitStory::club_1(), $this->TOTAL_ADMIN_CLUB_1);
   }
 
   public function testGetCollectionAsAdminClub2(): ResponseInterface {
     $this->loggedAsAdminClub2();
+
+    // We don't get any from club 1
+    $this->makeGetRequest($this->getRootWClubUrl(_InitStory::club_1()));
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::forbidden->value);
+
     return $this->testGetCollectionWClubAs(ClubRole::admin, _InitStory::club_2(), $this->TOTAL_ADMIN_CLUB_2);
   }
 
   public function testGetCollectionAsSupervisorClub1(): ResponseInterface {
     $this->loggedAsSupervisorClub1();
+
+    // We don't get any from club 2
+    $this->makeGetRequest($this->getRootWClubUrl(_InitStory::club_2()));
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::forbidden->value);
+
     return $this->testGetCollectionWClubAs(ClubRole::supervisor, _InitStory::club_1(),$this->TOTAL_SUPERVISOR_CLUB_1);
   }
 
   public function testGetCollectionAsMemberClub1(): ResponseInterface {
     $this->loggedAsMemberClub1();
+
+    // We don't get any from club 2
+    $this->makeGetRequest($this->getRootWClubUrl(_InitStory::club_2()));
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::forbidden->value);
+
     return $this->testGetCollectionWClubAs(ClubRole::member, _InitStory::club_1(), $this->TOTAL_MEMBER_CLUB_1);
   }
 }

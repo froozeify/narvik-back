@@ -10,12 +10,18 @@ enum ClubRole: string {
   case badger = 'CLUB_BADGER';
 
   public function hasRole(ClubRole $role): bool {
-    return match ($role->value) {
-      self::admin->value => $this->isAdmin(), // Admin have all role
-      self::supervisor->value => $this->hasSupervisorRole(),
-      // Member and badger only have their own level role
-      default => $role === $this,
-    };
+    // Admin have all role
+    if ($this->isAdmin()) {
+      return true;
+    }
+
+    // Supervisor have all role excepted admin
+    if ($this->hasSupervisorRole()) {
+      return !$role->isAdmin();
+    }
+
+    // Other role have no heritage, so must be the same
+    return $this === $role;
   }
 
   public function isAdmin(): bool {

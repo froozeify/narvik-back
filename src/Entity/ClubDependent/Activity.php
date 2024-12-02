@@ -34,7 +34,8 @@ use ApiPlatform\OpenApi\Model;
       uriTemplate: '/clubs/{clubUuid}/activities.{_format}',
       uriVariables: [
         'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
-      ]
+      ],
+      security: "is_granted('CLUB_MEMBER', request) || is_granted('CLUB_BADGER', request)",
     ),
     new Post(
       uriTemplate: '/clubs/{clubUuid}/activities.{_format}',

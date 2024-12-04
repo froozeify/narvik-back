@@ -15,28 +15,10 @@ abstract class AbstractClubDependentController extends AbstractController {
 
   public function __construct(
     RequestStack $requestStack,
-    private readonly Security $security,
     private readonly RequestService $requestService,
   ) {
     $this->club = $this->getClub($requestStack->getCurrentRequest());
-
-    $granted = false;
-    foreach (static::MINIMUM_ROLES() as $role) {
-      if ($this->security->isGranted($role->value, $this->club)) {
-        $granted = true;
-        break;
-      }
-    }
-
-    if (!$granted) {
-      throw $this->createAccessDeniedException();
-    }
   }
-
-  /**
-   * @return ClubRole[]|UserRole[]
-   */
-  abstract public static function MINIMUM_ROLES(): array;
 
   private function getClub(Request $request): Club {
     $club = $this->requestService->getClubFromRequest($request);

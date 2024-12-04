@@ -78,7 +78,7 @@ use ApiPlatform\OpenApi\Model;
   ],
   uriVariables: [
     'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
-    'uuid' => new Link(fromClass: Activity::class),
+    'uuid' => new Link(fromClass: self::class),
   ],
   normalizationContext: [
     'groups' => ['activity', 'activity-read']

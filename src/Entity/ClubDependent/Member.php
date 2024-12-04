@@ -24,7 +24,6 @@ use App\Entity\Interface\ClubLinkedEntityInterface;
 use App\Entity\Sale;
 use App\Entity\Trait\SelfClubLinkedEntityTrait;
 use App\Enum\ClubRole;
-use App\Enum\UserRole;
 use App\Filter\CurrentSeasonFilter;
 use App\Filter\MultipleFilter;
 use App\Repository\MemberRepository;
@@ -38,24 +37,41 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MemberRepository::class)]
 #[ORM\Table(name: 'member')]
-#[UniqueEntity(fields: ['email'], ignoreNull: true)]
+#[UniqueEntity(fields: ['email', 'club'], ignoreNull: true)]
 #[ApiResource(
-  operations: [
-    new Get(),
-  ], normalizationContext: [
-    'groups' => ['member', 'member-read']
-  ], denormalizationContext: [
-    'groups' => ['member', 'member-write']
-  ],
-)]
-#[ApiResource(
-  uriTemplate: '/clubs/{clubUuid}/members.{_format}',
+  uriTemplate: '/clubs/{clubUuid}/members/{uuid}.{_format}',
   operations: [
     new GetCollection(
+      uriTemplate: '/clubs/{clubUuid}/members.{_format}',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
       security: "is_granted('".ClubRole::supervisor->value."', request)"
     ),
     new Post(
+      uriTemplate: '/clubs/{clubUuid}/members.{_format}',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
+      securityPostDenormalize: "is_granted('".ClubRole::supervisor->value."', request)",
+      read: false
+    ),
+
+    new Get(
+      security: "is_granted('".ClubRole::supervisor->value."', object)",
+    ),
+    new Patch(
+      security: "is_granted('".ClubRole::supervisor->value."', object)",
+    ),
+    new Delete(
+      security: "is_granted('".ClubRole::admin->value."', object)"
+    ),
+
+    new Post(
       uriTemplate: '/clubs/{clubUuid}/members/-/search',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
       controller: MemberSearchByLicenceOrName::class,
       openapi: new Model\Operation(
         summary: 'Search members matching the query (by licence or fullName)',
@@ -75,11 +91,14 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
       ),
       normalizationContext: ['groups' => 'autocomplete'],
-      securityPostDenormalize: "is_granted('".ClubRole::admin->value."', request) || is_granted('".ClubRole::badger->value."', request)",
+      securityPostDenormalize: "is_granted('".ClubRole::supervisor->value."', request) || is_granted('".ClubRole::badger->value."', request)",
       read: false,
     ),
     new Post(
       uriTemplate: '/clubs/{clubUuid}/members/-/from-itac',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
       controller: MemberImportFromItac::class,
       openapi: new Model\Operation(
         requestBody: new Model\RequestBody(
@@ -103,6 +122,9 @@ use Symfony\Component\Validator\Constraints as Assert;
     ),
     new Post(
       uriTemplate: '/clubs/{clubUuid}/members/-/secondary-from-itac',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
       controller: MemberImportSecondaryClubFromItac::class,
       openapi: new Model\Operation(
         requestBody: new Model\RequestBody(
@@ -126,6 +148,9 @@ use Symfony\Component\Validator\Constraints as Assert;
     ),
     new Post(
       uriTemplate: '/clubs/{clubUuid}/members/-/photos-from-itac',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
       controller: MemberPhotosImportFromItac::class,
       openapi: new Model\Operation(
         requestBody: new Model\RequestBody(
@@ -148,11 +173,14 @@ use Symfony\Component\Validator\Constraints as Assert;
       deserialize: false,
     )
   ],
+
   uriVariables: [
     'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
-  ],
-  normalizationContext: [
+    'uuid' => new Link(fromClass: self::class),
+  ], normalizationContext: [
     'groups' => ['member', 'member-read']
+  ], denormalizationContext: [
+    'groups' => ['member', 'member-write']
   ],
 )]
 #[ApiFilter(ExistsFilter::class, properties: ['licence'])]

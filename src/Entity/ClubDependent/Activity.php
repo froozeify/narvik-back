@@ -17,6 +17,7 @@ use App\Entity\Club;
 use App\Entity\ExternalPresence;
 use App\Entity\Interface\ClubLinkedEntityInterface;
 use App\Entity\Trait\SelfClubLinkedEntityTrait;
+use App\Enum\ClubRole;
 use App\Repository\ActivityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -35,23 +36,23 @@ use ApiPlatform\OpenApi\Model;
       uriVariables: [
         'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
       ],
-      security: "is_granted('CLUB_MEMBER', request) || is_granted('CLUB_BADGER', request)",
+      security: "is_granted('".ClubRole::member->value."', request) || is_granted('".ClubRole::badger->value."', request)",
     ),
     new Post(
       uriTemplate: '/clubs/{clubUuid}/activities.{_format}',
       uriVariables: [
         'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
       ],
-      securityPostDenormalize: "is_granted('CLUB_ADMIN', request)",
+      securityPostDenormalize: "is_granted('".ClubRole::admin->value."', request)",
       read: false,
     ),
 
     new Get(),
     new Patch(
-      security: "is_granted('CLUB_ADMIN', object)",
+      security: "is_granted('".ClubRole::admin->value."', object)",
     ),
     new Delete(
-      security: "is_granted('CLUB_ADMIN', object)"
+      security: "is_granted('".ClubRole::admin->value."', object)"
     ),
 
     new Patch(
@@ -72,9 +73,7 @@ use ApiPlatform\OpenApi\Model;
           ]),
         ),
       ),
-      security: "is_granted('CLUB_ADMIN', object)",
-      read: true,
-      write: false,
+      security: "is_granted('".ClubRole::admin->value."', object)",
     )
   ],
   uriVariables: [

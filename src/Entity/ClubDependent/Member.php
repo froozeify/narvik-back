@@ -23,6 +23,8 @@ use App\Entity\Club;
 use App\Entity\Interface\ClubLinkedEntityInterface;
 use App\Entity\Sale;
 use App\Entity\Trait\SelfClubLinkedEntityTrait;
+use App\Enum\ClubRole;
+use App\Enum\UserRole;
 use App\Filter\CurrentSeasonFilter;
 use App\Filter\MultipleFilter;
 use App\Repository\MemberRepository;
@@ -50,7 +52,7 @@ use Symfony\Component\Validator\Constraints as Assert;
   uriTemplate: '/clubs/{clubUuid}/members.{_format}',
   operations: [
     new GetCollection(
-      security: "is_granted('CLUB_SUPERVISOR', request)"
+      security: "is_granted('".ClubRole::supervisor->value."', request)"
     ),
     new Post(
       uriTemplate: '/clubs/{clubUuid}/members/-/search',
@@ -73,6 +75,8 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
       ),
       normalizationContext: ['groups' => 'autocomplete'],
+      securityPostDenormalize: "is_granted('".ClubRole::admin->value."', request) || is_granted('".ClubRole::badger->value."', request)",
+      read: false,
     ),
     new Post(
       uriTemplate: '/clubs/{clubUuid}/members/-/from-itac',

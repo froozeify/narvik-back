@@ -14,20 +14,20 @@ use ApiPlatform\Metadata\Post;
 use App\Entity\Abstract\UuidEntity;
 use App\Entity\Interface\TimestampEntityInterface;
 use App\Entity\Trait\TimestampTrait;
+use App\Enum\ClubRole;
+use App\Enum\UserRole;
 use App\Repository\ClubRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ClubRepository::class)]
 #[ApiResource(operations: [
-  new GetCollection(security: "is_granted('ROLE_SUPER_ADMIN')"), // Collection only to super admin, other should get them through /self
+  new GetCollection(security: "is_granted('".UserRole::super_admin->value."')"), // Collection only to super admin, other should get them through /self
   new Get(),
-  new Post(security: "is_granted('ROLE_SUPER_ADMIN')"),
-  new Patch(security: "is_granted('ROLE_SUPER_ADMIN')",),
-  new Delete(security: "is_granted('ROLE_SUPER_ADMIN')",),
+  new Post(security: "is_granted('".UserRole::super_admin->value."')"),
+  new Patch(security: "is_granted('".UserRole::super_admin->value."')",),
+  new Delete(security: "is_granted('".UserRole::super_admin->value."')",),
 ], normalizationContext: [
   'groups' => ['club', 'club-read'],
 ], denormalizationContext: [
@@ -52,7 +52,7 @@ class Club extends UuidEntity implements TimestampEntityInterface {
 
   #[ORM\Column(length: 255, nullable: true)]
   #[Groups(['club-read', 'club-admin-write'])]
-  #[ApiProperty(security: "is_granted('CLUB_ADMIN', object)")] // Property only viewable & writable by the club admin
+  #[ApiProperty(security: "is_granted('".ClubRole::admin->value."', object)")] // Property only viewable & writable by the club admin
   private ?string $badgerToken = null;
 
   public function __construct() {

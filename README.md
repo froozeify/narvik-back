@@ -1,5 +1,8 @@
 # Narvik - Back
 
+# Prérequis
+- Base de données PostgreSQL avec l'extension `unaccent` activée.
+
 ## Fonctionnalités
 - Gestion de la présence des membres
 - Import manuel des membres depuis itac

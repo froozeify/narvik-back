@@ -91,16 +91,22 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
   }
 
   public function testSearchMember(): void {
-//    $club = _InitStory::club_1();
-//    $memberClub1 = _InitStory::MEMBER_member_club_1();
-//
-//    $this->loggedAsBadgerClub1();
-//    $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/search", [
-//      'query' => $memberClub1->getFirstname()
-//    ]);
-//    $this->assertResponseStatusCodeSame(ResponseCodeEnum::ok->value);
-//
-//    dump($response->toArray());
+    $club = _InitStory::club_1();
+    $memberClub1 = _InitStory::MEMBER_member_club_1();
+    $memberClub2 = _InitStory::MEMBER_member_club_2();
+
+    $this->loggedAsBadgerClub1();
+    $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/search", [
+      'query' => $memberClub1->getFullName()
+    ]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::ok->value);
+    $this->assertCount(1, $response->toArray());
+
+    $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/search", [
+      'query' => $memberClub2->getFullName()
+    ]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::ok->value);
+    $this->assertCount(0, $response->toArray());
   }
 
   // TODO: Add custom route tests

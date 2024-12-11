@@ -9,6 +9,7 @@ use App\Enum\ClubRole;
 use App\Enum\UserRole;
 use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Story\_InitStory;
+use Doctrine\DBAL\Connection;
 use JetBrains\PhpStorm\NoReturn;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,6 +29,11 @@ abstract class AbstractTestCase extends ApiTestCase {
   public function setUp(): void {
     parent::setUp();
     self::bootKernel();
+    $registry = self::$kernel->getContainer()->get('doctrine');
+    /** @var Connection $connection */
+    $connection = $registry->getConnection();
+    $connection->executeQuery('CREATE EXTENSION unaccent;');
+
     $this->initDefaultFixtures();
   }
 

@@ -17,6 +17,8 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
   protected int $TOTAL_ADMIN_CLUB_2 = 1;
   protected int $TOTAL_SUPERVISOR_CLUB_1 = 9;
   protected int $TOTAL_MEMBER_CLUB_1 = 9;
+  protected int $TOTAL_BADGER_CLUB_1 = 9;
+  protected int $TOTAL_BADGER_CLUB_2 = 1;
 
   protected function getClassname(): string {
     return Activity::class;
@@ -57,6 +59,7 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
       adminClub1Code: ResponseCodeEnum::created,
       adminClub2Code: ResponseCodeEnum::forbidden,
       superAdminCode: ResponseCodeEnum::created,
+      badgerClub2Code: ResponseCodeEnum::forbidden,
       requestFunction: function (string $level, ?int $id) use ($club1, $payload) {
         $this->makePostRequest($this->getRootWClubUrl($club1), $payload);
       },

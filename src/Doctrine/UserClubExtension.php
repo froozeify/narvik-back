@@ -52,7 +52,7 @@ final class UserClubExtension implements QueryCollectionExtensionInterface, Quer
   private function getUserClubs(): array {
     $user = $this->getUser();
     $userClubs = [];
-    foreach ($user->getClubs() as $club) {
+    foreach ($user->getLinkedClubs() as $club) {
       $userClubs[] = $club['club'];
     }
 

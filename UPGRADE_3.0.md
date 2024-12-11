@@ -11,6 +11,20 @@ Will return the list of activities related to that club only.
 
 The request to create them also depend on the clubUuid : `POST /clubs/{clubUuid}/activities`
 
+### Badger login
+Badger login route `POST /auth/bdg/{token}` change for
+
+```http
+POST /auth/bdg
+Content-Type: application/merge-patch+json
+
+{
+  "token": "{token}",
+  "club": "{clubUuid}"
+}
+
+```
+
 ### Activity entity
 Custom route `POST /activities/{uuid}/merge-to/{targetUuid}` change for
 

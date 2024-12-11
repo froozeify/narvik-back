@@ -38,6 +38,7 @@ class AgeCategoryTest extends AbstractEntityTestCase {
       ResponseCodeEnum::forbidden,
       ResponseCodeEnum::forbidden,
       ResponseCodeEnum::created,
+      badgerClub2Code: ResponseCodeEnum::forbidden,
       requestFunction: function (string $level, ?int $id) use ($payload) {
         $this->makePostRequest($this->getRootUrl(), $payload);
       }
@@ -60,6 +61,7 @@ class AgeCategoryTest extends AbstractEntityTestCase {
       ResponseCodeEnum::forbidden,
       ResponseCodeEnum::forbidden,
       ResponseCodeEnum::forbidden,
+      badgerClub2Code: ResponseCodeEnum::forbidden,
       requestFunction: function (string $level, ?int $id) use ($iri, $payload) {
         $this->makePatchRequest($iri, $payload);
       }
@@ -75,6 +77,7 @@ class AgeCategoryTest extends AbstractEntityTestCase {
       ResponseCodeEnum::forbidden,
       ResponseCodeEnum::forbidden,
       superAdminCode: ResponseCodeEnum::no_content,
+      badgerClub2Code: ResponseCodeEnum::forbidden,
       requestFunction: function (string $level, ?int $id) {
         $ageCategory = AgeCategoryFactory::createOne([
           "name" => 'Dame 1',

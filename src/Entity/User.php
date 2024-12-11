@@ -152,7 +152,7 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
   private UserRole $role = UserRole::user;
 
   #[Groups(['self-read'])]
-  private array $clubs = [];
+  private array $linkedClubs = [];
 
   /**
    * @var string The hashed password
@@ -197,10 +197,10 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
 
   // Custom calculated fields
 
-  public function getClubs(): array {
+  public function getLinkedClubs(): array {
     $userClubs = [];
     foreach ($this->getMemberships() as $membership) {
-      $club = $membership->getMember()?->getClub();
+      $club = $membership?->getMember()?->getClub() ?? $membership->getBadgerClub();
       if ($club) {
         $userClubs[] = [
           'club' => $club,
@@ -317,8 +317,9 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
     return $this->accountActivated;
   }
 
-  public function setAccountActivated(bool $accountActivated): void {
+  public function setAccountActivated(bool $accountActivated): static {
     $this->accountActivated = $accountActivated;
+    return $this;
   }
 
   /**

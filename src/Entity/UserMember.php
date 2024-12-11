@@ -40,9 +40,13 @@ class UserMember {
   private ?User $user = null;
 
   #[ORM\OneToOne()]
-  #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+  #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
   #[Groups(['member-read', 'club-admin-write'])]
   private ?Member $member = null;
+
+  #[ORM\ManyToOne(targetEntity: Club::class)]
+  #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
+  private ?Club $badgerClub = null;
 
   #[ORM\Column(type: "string", enumType: ClubRole::class)]
   #[Groups(['member-read', 'club-admin-write'])]
@@ -67,6 +71,15 @@ class UserMember {
 
   public function setMember(Member $member): static {
     $this->member = $member;
+    return $this;
+  }
+
+  public function getBadgerClub(): ?Club {
+    return $this->badgerClub;
+  }
+
+  public function setBadgerClub(?Club $club): static {
+    $this->badgerClub = $club;
     return $this;
   }
 

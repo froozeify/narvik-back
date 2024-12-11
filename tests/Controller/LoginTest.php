@@ -15,7 +15,9 @@ class LoginTest extends AbstractTestCase {
       ResponseCodeEnum::ok,
       ResponseCodeEnum::ok,
       ResponseCodeEnum::ok,
-      ResponseCodeEnum::ok
+      ResponseCodeEnum::ok,
+      ResponseCodeEnum::ok,
+      ResponseCodeEnum::ok,
     );
   }
 
@@ -26,15 +28,16 @@ class LoginTest extends AbstractTestCase {
       'plainPassword' => 'testuser123',
       'accountActivated' => false,
     ]);
-    $notActivated->_enableAutoRefresh();
 
     $this->loggedAs("notactivated@user.fr", "testuser123");
     $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
 
-    // We update the user
-    $notActivated->setAccountActivated(true);
-    $notActivated->_save();
+    // We enable the account
+    $this->loggedAsSuperAdmin();
+    $iri = $this->getIriFromResource($notActivated);
+    $this->makePatchRequest($iri, ['accountActivated' => true]);
 
+    // Account is now activated, the user can log in
     $this->loggedAs("notactivated@user.fr", "testuser123");
     $this->assertResponseStatusCodeSame(Response::HTTP_OK);
   }

@@ -34,6 +34,7 @@ class ClubTest extends AbstractEntityTestCase {
       ResponseCodeEnum::forbidden,
       ResponseCodeEnum::forbidden,
       ResponseCodeEnum::created,
+      badgerClub2Code: ResponseCodeEnum::forbidden,
       requestFunction: function (string $level, ?int $id) use ($payload) {
         $this->makePostRequest($this->getRootUrl(), $payload);
       }
@@ -68,6 +69,7 @@ class ClubTest extends AbstractEntityTestCase {
       ResponseCodeEnum::not_found,
       ResponseCodeEnum::not_found,
       superAdminCode: ResponseCodeEnum::no_content,
+      badgerClub1Code: ResponseCodeEnum::not_found,
       requestFunction: function (string $level, ?int $id) {
         $club = ClubFactory::createOne([
           'name' => 'Club to delete',

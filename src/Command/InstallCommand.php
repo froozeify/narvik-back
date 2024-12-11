@@ -44,7 +44,7 @@ class InstallCommand extends Command {
     $this->generateJwtKeys();
     $this->createAdminAccount();
     $this->createBadgerAccount();
-    $this->generateBadgerLoginToken();
+//    $this->generateBadgerLoginToken();
     $this->generateGlobalSettingsDefault();
 
     $this->io->success('Environnement configuré');
@@ -134,54 +134,44 @@ class InstallCommand extends Command {
     $this->getApplication()->doRun($command, $this->io);
   }
 
-  private function generateBadgerLoginToken(): void {
-    $this->io->section("Génération du token de connexion pour 'Badger'");
-
-    $existingToken = false;
-    if (!empty($this->globalSettingService->getSettingValue(GlobalSetting::BADGER_TOKEN))) {
-      $existingToken = true;
-    }
-
-    if ($existingToken) {
-      $question = new Question("Voulez-vous générer un nouveau token de connexion pour 'Badger' ? (oui/non)", "n");
-      $question->setValidator(function (?string $value): string {
-        if (empty($value)) {
-          $value = "o";
-        }
-        return strtolower($value);
-      });
-      $question = $this->io->askQuestion($question);
-      if ($question[0] !== "o") {
-        return;
-      }
-    }
-
-    $badgerToken = $this->randomToken(mt_rand(180, 200));
-    $this->globalSettingService->updateSettingValue(GlobalSetting::BADGER_TOKEN, $badgerToken);
-
-    $this->io->table([
-      'token',
-    ], [
-      [
-        $badgerToken,
-      ]
-    ]);
-  }
+//  private function generateBadgerLoginToken(): void {
+//    $this->io->section("Génération du token de connexion pour 'Badger'");
+//
+//    $existingToken = false;
+//    if (!empty($this->globalSettingService->getSettingValue(GlobalSetting::BADGER_TOKEN))) {
+//      $existingToken = true;
+//    }
+//
+//    if ($existingToken) {
+//      $question = new Question("Voulez-vous générer un nouveau token de connexion pour 'Badger' ? (oui/non)", "n");
+//      $question->setValidator(function (?string $value): string {
+//        if (empty($value)) {
+//          $value = "o";
+//        }
+//        return strtolower($value);
+//      });
+//      $question = $this->io->askQuestion($question);
+//      if ($question[0] !== "o") {
+//        return;
+//      }
+//    }
+//
+//    $badgerToken = $this->randomToken(mt_rand(180, 200));
+//    $this->globalSettingService->updateSettingValue(GlobalSetting::BADGER_TOKEN, $badgerToken);
+//
+//    $this->io->table([
+//      'token',
+//    ], [
+//      [
+//        $badgerToken,
+//      ]
+//    ]);
+//  }
 
   private function generateGlobalSettingsDefault(): void {
     $command = new ArrayInput([
       'command' => 'install:default-settings',
     ]);
     $this->getApplication()->doRun($command, $this->io);
-  }
-
-  private function randomToken(int $length): string {
-    $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-';
-    $charLength = strlen($characters) - 1;
-    $result = '';
-    for ($i = 0; $i < $length; $i++) {
-      $result .= $characters[mt_rand(0, $charLength)];
-    }
-    return $result;
   }
 }

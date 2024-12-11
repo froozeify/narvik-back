@@ -4,9 +4,11 @@ namespace App\Tests;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Symfony\Bundle\Test\Client;
+use App\Entity\Club;
 use App\Enum\ClubRole;
 use App\Enum\UserRole;
 use App\Tests\Enum\ResponseCodeEnum;
+use App\Tests\Story\_InitStory;
 use JetBrains\PhpStorm\NoReturn;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -72,6 +74,25 @@ abstract class AbstractTestCase extends ApiTestCase {
     return true;
   }
 
+  protected function loggedAsBadger(Club $club): bool {
+    $this->logout();
+    $response = static::createClient()->request(Request::METHOD_POST, '/auth/bdg', [
+      'json' => [
+        'token' => $club->getBadgerToken(),
+        'club' => $club->getUuid()->toString(),
+      ]
+    ]);
+
+    if ($response->getStatusCode() !== Response::HTTP_OK) {
+      return false;
+    }
+
+    $data = $response->toArray();
+    $this->accessToken = $data['token'];
+    $this->refreshToken = $data['refresh_token'];
+    return true;
+  }
+
   private function checkRequestResponse(ResponseCodeEnum $responseCode, ?array $payloadToValidate): void {
     $this->assertResponseStatusCodeSame($responseCode->value);
 
@@ -89,7 +110,9 @@ abstract class AbstractTestCase extends ApiTestCase {
     ResponseCodeEnum $adminClub1Code  = ResponseCodeEnum::ok,
     ?ResponseCodeEnum $adminClub2Code = ResponseCodeEnum::not_found,
     ResponseCodeEnum $superAdminCode = ResponseCodeEnum::ok,
-    ?\Closure $requestFunction = null
+    ResponseCodeEnum $badgerClub1Code = ResponseCodeEnum::forbidden,
+    ?ResponseCodeEnum $badgerClub2Code = ResponseCodeEnum::not_found,
+    ?\Closure $requestFunction = null,
   ): void {
     // Super admin
     $this->loggedAsSuperAdmin();
@@ -111,12 +134,22 @@ abstract class AbstractTestCase extends ApiTestCase {
     if ($requestFunction) $requestFunction(ClubRole::member->value, 1);
     $this->checkRequestResponse($memberClub1Code, $payloadToValidate);
 
+    // Badger club 1
+    $this->loggedAsBadgerClub1();
+    if ($requestFunction) $requestFunction(ClubRole::badger->value, 1);
+    $this->checkRequestResponse($badgerClub1Code, $payloadToValidate);
+
     // Club 2
     if ($adminClub2Code) {
       // Admin club 2
       $this->loggedAsAdminClub2();
       if ($requestFunction) $requestFunction(ClubRole::admin->value, 2);
       $this->checkRequestResponse($adminClub2Code, $payloadToValidate);
+
+      // Badger club 2
+      $this->loggedAsBadgerClub2();
+      if ($requestFunction) $requestFunction(ClubRole::badger->value, 2);
+      $this->checkRequestResponse($badgerClub2Code, $payloadToValidate);
     }
   }
 
@@ -137,6 +170,15 @@ abstract class AbstractTestCase extends ApiTestCase {
 
   public function loggedAsMemberClub1(): bool {
     return $this->loggedAs('member@club1.fr', 'member123');
+  }
+
+  public function loggedAsBadgerClub1(): bool {
+
+    return $this->loggedAsBadger(_InitStory::club_1());
+  }
+
+  public function loggedAsBadgerClub2(): bool {
+    return $this->loggedAsBadger(_InitStory::club_2());
   }
 
   private function prepareRequestOptions(?array $data = null, array $uriParameters = []): array {

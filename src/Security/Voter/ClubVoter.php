@@ -65,7 +65,7 @@ class ClubVoter extends Voter {
       return false;
     }
 
-    foreach ($user->getClubs() as $club) {
+    foreach ($user->getLinkedClubs() as $club) {
       if ($club['club']->getId() === $targetedClub->getId()) {
         /** @var ClubRole $role */
         $role = $club['role'];

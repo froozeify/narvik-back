@@ -65,7 +65,7 @@ security:
         - { path: ^/activities, roles: [ROLE_USER, ROLE_BADGER]}
         - { path: ^/age-categories, roles: [ROLE_SUPER_ADMIN]}
 
-        - { path: ^/clubs, roles: [ROLE_USER]}
+        - { path: ^/clubs, roles: [ROLE_USER, ROLE_BADGER]}
 
         - { path: ^/external-presences, roles: [ROLE_USER, ROLE_BADGER]}
         - { path: ^/global-settings, roles: [ROLE_SUPER_ADMIN]}

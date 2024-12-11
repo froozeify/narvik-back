@@ -77,4 +77,24 @@ abstract class AbstractEntityClubLinkedTestCase extends AbstractEntityTestCase {
 
     return $this->testGetCollectionWClubAs(ClubRole::member, _InitStory::club_1(), $this->TOTAL_MEMBER_CLUB_1);
   }
+
+  public function testGetCollectionAsBadgerClub1(): ResponseInterface {
+    $this->loggedAsBadgerClub1();
+
+    // We don't get any from club 2
+    $this->makeGetRequest($this->getRootWClubUrl(_InitStory::club_2()));
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::forbidden->value);
+
+    return $this->testGetCollectionWClubAs(ClubRole::badger, _InitStory::club_1(), $this->TOTAL_BADGER_CLUB_1);
+  }
+
+  public function testGetCollectionAsBadgerClub2(): ResponseInterface {
+    $this->loggedAsBadgerClub2();
+
+    // We don't get any from club 1
+    $this->makeGetRequest($this->getRootWClubUrl(_InitStory::club_1()));
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::forbidden->value);
+
+    return $this->testGetCollectionWClubAs(ClubRole::badger, _InitStory::club_2(), $this->TOTAL_BADGER_CLUB_2);
+  }
 }

@@ -6,6 +6,6 @@ enum UserRole: string {
   case super_admin = 'ROLE_SUPER_ADMIN';
   case user = 'ROLE_USER';
 
-  // This role is applied dynamically on the fake User created when a badger is login
+  // Badger have very specific and limited access
   case badger = 'ROLE_BADGER';
 }

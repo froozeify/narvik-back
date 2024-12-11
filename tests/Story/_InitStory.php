@@ -8,11 +8,10 @@ use App\Entity\User;
 use App\Enum\ClubRole;
 use App\Tests\Factory\ClubFactory;
 use App\Tests\Factory\MemberFactory;
-use App\Tests\Factory\MemberSeasonFactory;
 use App\Tests\Factory\UserFactory;
 use App\Tests\Factory\UserMemberFactory;
+use Ramsey\Uuid\Uuid;
 use Zenstruck\Foundry\Story;
-use function Zenstruck\Foundry\faker;
 
 /**
  * @method static User USER_super_admin()
@@ -34,12 +33,14 @@ final class _InitStory extends Story {
     $this->addState('USER_super_admin', UserFactory::new()->superAdmin("admin@admin.com")->create(), 'super_admin');
 
     $this->addState('club_1', ClubFactory::createOne([
+        'uuid' => Uuid::fromString('0193b683-b858-73ee-a9c7-41c84cd27fe2'),
         'name' => 'Club 1',
         'salesEnabled' => true,
         'smtpEnabled' => true,
         'badgerToken' => 'club1longbadgertoken',
       ]), 'clubs');
     $this->addState('club_2', ClubFactory::createOne([
+      'uuid' => Uuid::fromString('0193b683-b85b-71fd-9741-40c4bbf4feaf'),
       'name' => 'Club 2',
       'salesEnabled' => false,
       'smtpEnabled' => false,

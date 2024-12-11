@@ -51,6 +51,7 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
       adminClub1Code: ResponseCodeEnum::created,
       adminClub2Code: ResponseCodeEnum::forbidden,
       superAdminCode: ResponseCodeEnum::created,
+      badgerClub2Code: ResponseCodeEnum::forbidden,
       requestFunction: function (string $level, ?int $id) use ($club1, $payload) {
         $this->makePostRequest($this->getRootWClubUrl($club1), $payload);
       },
@@ -89,5 +90,19 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
     );
   }
 
+  public function testSearchMember(): void {
+//    $club = _InitStory::club_1();
+//    $memberClub1 = _InitStory::MEMBER_member_club_1();
+//
+//    $this->loggedAsBadgerClub1();
+//    $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/search", [
+//      'query' => $memberClub1->getFirstname()
+//    ]);
+//    $this->assertResponseStatusCodeSame(ResponseCodeEnum::ok->value);
+//
+//    dump($response->toArray());
+  }
+
   // TODO: Add custom route tests
+
 }

@@ -2,38 +2,39 @@
 
 namespace App\Controller;
 
-use App\Enum\GlobalSetting;
-use App\Repository\UserRepository;
-use App\Service\GlobalSettingService;
+use App\Controller\Abstract\AbstractController;
+use App\Entity\User;
+use App\Enum\UserRole;
+use App\Repository\ClubRepository;
+use App\Service\ClubService;
 use Gesdinet\JWTRefreshTokenBundle\Generator\RefreshTokenGeneratorInterface;
 use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 class SecurityController extends AbstractController {
 
-  #[Route(path: ['/auth/bdg/{token}'], name: 'auth_bdg', methods: ['POST'])]
-  public function loginBadger(string $token, JWTTokenManagerInterface $JWTTokenManager, RefreshTokenManagerInterface $refreshTokenManager, RefreshTokenGeneratorInterface $refreshTokenGenerator, GlobalSettingService $globalSettingService, UserRepository $userRepository): JsonResponse {
+  #[Route(path: ['/auth/bdg'], name: 'auth_bdg', methods: ['POST'])]
+  public function loginBadger(Request $request, JWTTokenManagerInterface $JWTTokenManager, RefreshTokenManagerInterface $refreshTokenManager, RefreshTokenGeneratorInterface $refreshTokenGenerator, ClubRepository $clubRepository, ClubService $clubService): JsonResponse {
+    $json = $this->checkAndGetJsonValues($request, ['token', 'club']);
 
-    // We get the db token
-    $dbToken = $globalSettingService->getRequiredSettingValue(GlobalSetting::BADGER_TOKEN);
+    $club = $clubRepository->findOneByUuid($json['club']);
 
-    if ($dbToken !== $token && $this->getParameter("kernel.environment") !== "dev") {
-      return new JsonResponse(status: Response::HTTP_NOT_FOUND);
+    if (!$club || $club->getBadgerToken() !== $json['token']) {
+      throw new HttpException(Response::HTTP_BAD_REQUEST);
     }
 
-    $badgerUser = $userRepository->findOneBy([
-      "email" => "badger"
-    ]);
+    $user = $clubService->getBadger($club);
 
-    $refreshToken = $refreshTokenGenerator->createForUserWithTtl($badgerUser, $this->getParameter("gesdinet_jwt_refresh_token.ttl"));
+    $refreshToken = $refreshTokenGenerator->createForUserWithTtl($user, $this->getParameter("gesdinet_jwt_refresh_token.ttl"));
     $refreshTokenManager->save($refreshToken); // We save the generated refresh token
 
     return new JsonResponse([
-      'token' => $JWTTokenManager->create($badgerUser),
+      'token' => $JWTTokenManager->create($user),
       'refresh_token' => $refreshToken->getRefreshToken(),
       'refresh_token_expiration' => $refreshToken->getValid()->getTimestamp()
     ]);

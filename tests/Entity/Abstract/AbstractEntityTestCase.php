@@ -18,6 +18,8 @@ abstract class AbstractEntityTestCase extends AbstractTestCase {
   protected int $TOTAL_ADMIN_CLUB_2 = 0;
   protected int $TOTAL_SUPERVISOR_CLUB_1 = 0;
   protected int $TOTAL_MEMBER_CLUB_1 = 0;
+  protected int $TOTAL_BADGER_CLUB_1 = 0;
+  protected int $TOTAL_BADGER_CLUB_2 = 0;
 
   abstract protected function getClassname() : string;
   abstract protected function getRootUrl() : string;
@@ -83,5 +85,15 @@ abstract class AbstractEntityTestCase extends AbstractTestCase {
   public function testGetCollectionAsMemberClub1(): ResponseInterface {
     $this->loggedAsMemberClub1();
     return $this->testGetCollectionAs(ClubRole::member, $this->TOTAL_MEMBER_CLUB_1);
+  }
+
+  public function testGetCollectionAsBadgerClub1(): ResponseInterface {
+    $this->loggedAsBadgerClub1();
+    return $this->testGetCollectionAs(ClubRole::badger, $this->TOTAL_BADGER_CLUB_1);
+  }
+
+  public function testGetCollectionAsBadgerClub2(): ResponseInterface {
+    $this->loggedAsBadgerClub2();
+    return $this->testGetCollectionAs(ClubRole::badger, $this->TOTAL_BADGER_CLUB_2);
   }
 }

@@ -10,6 +10,7 @@ use App\Enum\ClubRole;
 use App\Enum\ItacCsvHeaderMapping;
 use App\Message\ItacMembersMessage;
 use App\Repository\AgeCategoryRepository;
+use App\Repository\ClubRepository;
 use App\Repository\MemberRepository;
 use App\Repository\MemberSeasonRepository;
 use App\Repository\SeasonRepository;
@@ -27,6 +28,7 @@ class ItacMembersMessageHandler implements ResetInterface {
 
   public function __construct(
     private readonly EntityManagerInterface $entityManager,
+    private readonly ClubRepository $clubRepository,
     private readonly MemberRepository $memberRepository,
     private readonly SeasonRepository $seasonRepository,
     private readonly AgeCategoryRepository $ageCategoryRepository,
@@ -48,6 +50,8 @@ class ItacMembersMessageHandler implements ResetInterface {
 //      'success' => 0
 //    ];
 
+    // We can get a Proxy object, so we load it to have the correct Club object
+    $club = $this->clubRepository->findOneByUuid($message->getClub()->getUuid());
 
     foreach ($message->getRecords() as $record) {
       // We get the user, if he exists
@@ -58,12 +62,12 @@ class ItacMembersMessageHandler implements ResetInterface {
         $member = $this->members[$record[ItacCsvHeaderMapping::LICENCE->value]];
       } else {
         /** @var Member|null $member */
-        $member = $this->memberRepository->findOneByLicence($record[ItacCsvHeaderMapping::LICENCE->value]);
+        $member = $this->memberRepository->findOneByLicence($club, $record[ItacCsvHeaderMapping::LICENCE->value]);
 
         if (!$member) {
           $member = new Member();
+          $member->setClub($club);
           $member->setLicence($record[ItacCsvHeaderMapping::LICENCE->value]);
-          $member->setRole(ClubRole::member);
         }
         $this->members[$record[ItacCsvHeaderMapping::LICENCE->value]] = $member;
       }
@@ -80,7 +84,7 @@ class ItacMembersMessageHandler implements ResetInterface {
       $email = $record[ItacCsvHeaderMapping::EMAIL->value];
       if ($email) {
         // We check the email is not already define to another member
-        $dbMemberEmail = $this->memberRepository->findOneBy(["email" => $email]);
+        $dbMemberEmail = $this->memberRepository->findOneByEmail($club, $email);
         if ($dbMemberEmail) {
           $this->membersEmail[$email] = $dbMemberEmail;
         }
@@ -136,6 +140,7 @@ class ItacMembersMessageHandler implements ResetInterface {
       $this->defineMemberSeason($member, $record);
     }
 
+    dump("Flushing");
     $this->entityManager->flush();
 //    dump($response);
   }
@@ -156,7 +161,7 @@ class ItacMembersMessageHandler implements ResetInterface {
       $season = $this->seasons[$seasonCsv];
     } else {
       // We get it in the db
-      $seasonDb = $this->seasonRepository->findOneBy(["name" => $seasonCsv]);
+      $seasonDb = $this->seasonRepository->findOneByName($seasonCsv);
       if ($seasonDb) {
         $this->seasons[$seasonCsv] = $seasonDb;
         $season = $this->seasons[$seasonCsv];
@@ -185,7 +190,7 @@ class ItacMembersMessageHandler implements ResetInterface {
       $ageCategory = $this->ageCategories[$ageCodeCsv];
     } else {
       // We get it in the db
-      $ageCategoryDb = $this->ageCategoryRepository->findOneBy(["code" => $ageCodeCsv]);
+      $ageCategoryDb = $this->ageCategoryRepository->findOneByCode($ageCodeCsv);
       if ($ageCategoryDb) {
         $this->ageCategories[$ageCodeCsv] = $ageCategoryDb;
         $ageCategory = $this->ageCategories[$ageCodeCsv];
@@ -209,7 +214,7 @@ class ItacMembersMessageHandler implements ResetInterface {
     $memberSeason->setAgeCategory($ageCategory);
 
     // If this memberSeason already exist (ignore ageCategory) we don't create it
-    $msDb = $this->memberSeasonRepository->findOneBy(["member" => $memberSeason->getMember(), "season" => $memberSeason->getSeason()]);
+    $msDb = $this->memberSeasonRepository->findOneByMemberAndSeason($memberSeason->getMember(), $memberSeason->getSeason());
     if ($msDb) {
       return;
     }

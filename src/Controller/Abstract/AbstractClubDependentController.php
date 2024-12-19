@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 abstract class AbstractClubDependentController extends AbstractController {
-  private Club $club;
+  private readonly Club $club;
 
   public function __construct(
     RequestStack $requestStack,

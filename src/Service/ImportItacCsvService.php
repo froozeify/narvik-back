@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Club;
 use App\Enum\GlobalSetting;
 use App\Message\ItacMembersMessage;
 use App\Message\ItacSecondaryClubMembersMessage;
@@ -24,7 +25,7 @@ class ImportItacCsvService {
    * @throws \League\Csv\Exception
    * @throws \League\Csv\UnavailableStream
    */
-  public function importFromFile(string $filename): int {
+  public function importFromFile(Club $club, string $filename): int {
     $reader = Reader::createFromPath($filename);
     $reader->setHeaderOffset(0); // Header is in first line
     $records = $reader->getRecords();
@@ -36,10 +37,11 @@ class ImportItacCsvService {
           $chunk[$key][$this->convert($k)] = $this->convert($v);
         }
       }
-      $this->bus->dispatch(new ItacMembersMessage($chunk));
+      $this->bus->dispatch(new ItacMembersMessage($club, $chunk));
     }
+    // FIXME: Add DB col for last itac import
 
-    $this->globalSettingService->updateSettingValue(GlobalSetting::LAST_ITAC_IMPORT, (new \DateTimeImmutable())->format('c'));
+//    $this->globalSettingService->updateSettingValue(GlobalSetting::LAST_ITAC_IMPORT, (new \DateTimeImmutable())->format('c'));
 
     return count($array);
   }

@@ -77,7 +77,9 @@ class MemberRepository extends ServiceEntityRepository {
   public function findOneByLicence(Club $club, string $licence): ?Member {
     return $this->createQueryBuilder('m')
       ->andWhere('m.licence = :licence')
+      ->andWhere('m.club = :club')
       ->setParameter('licence', $licence)
+      ->setParameter('club', $club)
       ->setMaxResults(1)
       ->getQuery()
       ->getOneOrNullResult();
@@ -86,7 +88,9 @@ class MemberRepository extends ServiceEntityRepository {
   public function findOneByEmail(Club $club, string $email): ?Member {
     return $this->createQueryBuilder('m')
       ->andWhere('m.email = :email')
+      ->andWhere('m.club = :club')
       ->setParameter('email', $email)
+      ->setParameter('club', $club)
       ->setMaxResults(1)
       ->getQuery()
       ->getOneOrNullResult();
@@ -96,7 +100,7 @@ class MemberRepository extends ServiceEntityRepository {
     $qb = $this->createQueryBuilder('u');
 
     $memberAlreadyPresents = [];
-    $presents = $this->getEntityManager()->getRepository(MemberPresence::class)->findAllPresentToday();
+    $presents = $this->getEntityManager()->getRepository(MemberPresence::class)->findAllPresentToday($club);
     foreach ($presents as $p) {
       $memberAlreadyPresents[] = $p->getMember()->getId();
     }
@@ -107,6 +111,10 @@ class MemberRepository extends ServiceEntityRepository {
       );
       $qb->setParameter('presentUsers', $memberAlreadyPresents);
     }
+
+    $qb
+      ->andWhere('u.club = :club')
+      ->setParameter('club', $club);
 
     $qb
       ->addOrderBy('u.lastname', 'ASC')
@@ -120,6 +128,8 @@ class MemberRepository extends ServiceEntityRepository {
     return $qb
       ->select($qb->expr()->count("m.id"))
       ->andWhere($qb->expr()->isNotNull("m.licence"))
+      ->andWhere('m.club = :club')
+      ->setParameter('club', $club)
       ->getQuery()->getSingleScalarResult();
   }
 }

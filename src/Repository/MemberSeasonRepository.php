@@ -2,9 +2,11 @@
 
 namespace App\Repository;
 
+use App\Entity\ClubDependent\Member;
 use App\Entity\ClubDependent\MemberSeason;
 use App\Entity\Season;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -41,6 +43,21 @@ class MemberSeasonRepository extends ServiceEntityRepository {
     return $this->countTotalMembersForSeason($currentSeason);
   }
 
+  public function findOneByMemberAndSeason(Member $member, Season $season): ?MemberSeason {
+    $qb = $this->createQueryBuilder('m')
+               ->andWhere('m.member = :member')
+               ->andWhere('m.season = :season')
+               ->setParameter('member', $member)
+               ->setParameter('season', $season);
+
+    try {
+      return $qb->getQuery()->getOneOrNullResult();
+    }
+    catch (\Exception) {
+      return null;
+    }
+  }
+
 //    /**
 //     * @return MemberSeason[] Returns an array of MemberSeason objects
 //     */
@@ -53,16 +70,6 @@ class MemberSeasonRepository extends ServiceEntityRepository {
 //            ->setMaxResults(10)
 //            ->getQuery()
 //            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?MemberSeason
-//    {
-//        return $this->createQueryBuilder('m')
-//            ->andWhere('m.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
 //        ;
 //    }
 }

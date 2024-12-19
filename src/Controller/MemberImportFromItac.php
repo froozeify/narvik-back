@@ -2,14 +2,14 @@
 
 namespace App\Controller;
 
+use App\Controller\Abstract\AbstractClubDependentController;
 use App\Service\ImportItacCsvService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class MemberImportFromItac extends AbstractController {
+class MemberImportFromItac extends AbstractClubDependentController {
 
   public function __invoke(Request $request, ImportItacCsvService $itacCsvService): JsonResponse {
     /** @var UploadedFile|null $uploadedFile */
@@ -22,7 +22,7 @@ class MemberImportFromItac extends AbstractController {
       throw new BadRequestHttpException('The "file" must be a CSV');
     }
 
-    $response = $itacCsvService->importFromFile($uploadedFile->getPathname());
+    $response = $itacCsvService->importFromFile($this->getQueryClub(), $uploadedFile->getPathname());
 
     return new JsonResponse(["lines" => $response]);
   }

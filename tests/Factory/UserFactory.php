@@ -70,7 +70,7 @@ final class UserFactory extends PersistentProxyObjectFactory {
     ];
   }
 
-  public function superAdmin(string $email = null, string $password = null): self {
+  public function superAdmin(?string $email = null, ?string $password = null): self {
     return $this->with([
       'firstname'        => 'admin',
       'lastname'         => 'admin',

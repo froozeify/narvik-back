@@ -45,7 +45,7 @@ abstract class AbstractTestCase extends ApiTestCase {
     die; // The DB changes are actually persisted
   }
 
-  protected function createClientWithCredentials(string $token = null): Client {
+  protected function createClientWithCredentials(?string $token = null): Client {
     $token = $token ?? $this->accessToken;
 
     return static::createClient([], [
@@ -218,19 +218,19 @@ abstract class AbstractTestCase extends ApiTestCase {
     return $this->makeLoggedRequest(Request::METHOD_GET, $url, uriParameters: $uriParameters);
   }
 
-  public function makePostRequest(string $url, array $data = null, array $uriParameters = []): ResponseInterface {
+  public function makePostRequest(string $url, ?array $data = null, array $uriParameters = []): ResponseInterface {
     return $this->makeLoggedRequest(Request::METHOD_POST, $url, $data, $uriParameters);
   }
 
-  public function makePutRequest(string $url, array $data = null, array $uriParameters = []): ResponseInterface {
+  public function makePutRequest(string $url, ?array $data = null, array $uriParameters = []): ResponseInterface {
     return $this->makeLoggedRequest(Request::METHOD_PUT, $url, $data, $uriParameters);
   }
 
-  public function makePatchRequest(string $url, array $data = null, array $uriParameters = []): ResponseInterface {
+  public function makePatchRequest(string $url, ?array $data = null, array $uriParameters = []): ResponseInterface {
     return $this->makeLoggedRequest(Request::METHOD_PATCH, $url, $data, $uriParameters, ['headers' => ['Content-Type' => 'application/merge-patch+json']]);
   }
 
-  public function makeDeleteRequest(string $url, array $data = null, array $uriParameters = []): ResponseInterface {
+  public function makeDeleteRequest(string $url, ?array $data = null, array $uriParameters = []): ResponseInterface {
     return $this->makeLoggedRequest(Request::METHOD_DELETE, $url, $data, $uriParameters);
   }
 

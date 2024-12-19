@@ -15,12 +15,12 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 final class CurrentSeasonFilter extends AbstractFilter {
   public const PROPERTY_NAME = "currentSeason";
 
-  public function __construct(ManagerRegistry $managerRegistry, private readonly SeasonRepository $seasonRepository, LoggerInterface $logger = null, ?array $properties = null, ?NameConverterInterface $nameConverter = null) {
+  public function __construct(ManagerRegistry $managerRegistry, private readonly SeasonRepository $seasonRepository, ?LoggerInterface $logger = null, ?array $properties = null, ?NameConverterInterface $nameConverter = null) {
     parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
   }
 
 
-  protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void {
+  protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void {
 
     if ($property !== static::PROPERTY_NAME) return;
     if (!is_array($values)) return;

@@ -73,7 +73,7 @@ class EmailService {
     return $email;
   }
 
-  public function sendEmail(?TemplatedEmail $email, string $to = null): void {
+  public function sendEmail(?TemplatedEmail $email, ?string $to = null): void {
     if (!$this->canSendEmail() || !$email) {
       return;
     }

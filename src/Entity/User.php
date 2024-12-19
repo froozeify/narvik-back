@@ -199,15 +199,30 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
 
   public function getLinkedClubs(): array {
     $userClubs = [];
+    $multipleClubs = $this->getMemberships()->count() > 1;
+
     foreach ($this->getMemberships() as $membership) {
       $club = $membership?->getMember()?->getClub() ?? $membership->getBadgerClub();
       if ($club) {
-        $userClubs[] = [
+        $userClub = [
           'club' => $club,
           'role' => $membership->getRole(),
         ];
+        if ($membership->getMember()) {
+          $fullName = $club->getName();
+          if ($multipleClubs) {
+            $fullName .= " - " . $membership->getMember()->getFullName();
+          }
+          $userClub['displayName'] = $fullName;
+        }
+
+        $userClubs[] = $userClub;
       }
     }
+
+    usort($userClubs, function($a, $b) {
+      return $a['displayName'] <=> $b['displayName'];
+    });
 
     return $userClubs;
   }

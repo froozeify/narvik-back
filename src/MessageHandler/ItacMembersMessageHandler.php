@@ -14,6 +14,7 @@ use App\Repository\ClubRepository;
 use App\Repository\MemberRepository;
 use App\Repository\MemberSeasonRepository;
 use App\Repository\SeasonRepository;
+use App\Service\SeasonService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -22,7 +23,6 @@ use Symfony\Contracts\Service\ResetInterface;
 #[AsMessageHandler]
 class ItacMembersMessageHandler implements ResetInterface {
   private array $members = [];
-  private array $membersEmail = [];
   private array $seasons = [];
   private array $ageCategories = [];
 
@@ -33,12 +33,13 @@ class ItacMembersMessageHandler implements ResetInterface {
     private readonly SeasonRepository $seasonRepository,
     private readonly AgeCategoryRepository $ageCategoryRepository,
     private readonly MemberSeasonRepository $memberSeasonRepository,
-    private readonly ValidatorInterface $validator,) {
+    private readonly ValidatorInterface $validator,
+    private readonly SeasonService $seasonService,
+  ) {
   }
 
   public function reset(): void {
     $this->members = [];
-    $this->membersEmail = [];
     $this->seasons = [];
     $this->ageCategories = [];
   }
@@ -82,17 +83,8 @@ class ItacMembersMessageHandler implements ResetInterface {
       }
 
       $email = $record[ItacCsvHeaderMapping::EMAIL->value];
-      if ($email) {
-        // We check the email is not already define to another member
-        $dbMemberEmail = $this->memberRepository->findOneByEmail($club, $email);
-        if ($dbMemberEmail) {
-          $this->membersEmail[$email] = $dbMemberEmail;
-        }
-
-        if (!array_key_exists($email, $this->membersEmail)) {
-          $member->setEmail($email);
-          $this->membersEmail[$email] = $member;
-        }
+      if (!empty($email)) {
+        $member->setEmail($email);
       }
 
       $member
@@ -140,7 +132,6 @@ class ItacMembersMessageHandler implements ResetInterface {
       $this->defineMemberSeason($member, $record);
     }
 
-    dump("Flushing");
     $this->entityManager->flush();
 //    dump($response);
   }
@@ -167,9 +158,10 @@ class ItacMembersMessageHandler implements ResetInterface {
         $season = $this->seasons[$seasonCsv];
       } else {
         // We create it
-        $season = new Season();
-        $season->setName($seasonCsv);
-        $this->entityManager->persist($season);
+        $season = $this->seasonService->getOrCreateSeason($seasonCsv, false);
+        if (!$season) {
+          return;
+        }
         $this->seasons[$seasonCsv] = $season;
       }
     }
@@ -194,24 +186,19 @@ class ItacMembersMessageHandler implements ResetInterface {
       if ($ageCategoryDb) {
         $this->ageCategories[$ageCodeCsv] = $ageCategoryDb;
         $ageCategory = $this->ageCategories[$ageCodeCsv];
-      } else {
-        // We create it
-        $ageCategory = new AgeCategory();
-        $ageCategory
-          ->setName($record[ItacCsvHeaderMapping::AGE_CATEGORY->value])
-          ->setCode($ageCodeCsv);
-        $this->entityManager->persist($ageCategory);
-        $this->ageCategories[$ageCodeCsv] = $ageCategory;
       }
+      // Otherwise, no mapping with age category, we don't create (ageCategories are managed globally not at a club level)
     }
 
-    if ($ageCategory->getId()) {
-      $ref = $this->entityManager->getReference(AgeCategory::class, $ageCategory->getId());
-      if ($ref) {
-        $ageCategory = $ref;
+    if ($ageCategory) {
+      if ($ageCategory->getId()) {
+        $ref = $this->entityManager->getReference(AgeCategory::class, $ageCategory->getId());
+        if ($ref) {
+          $ageCategory = $ref;
+        }
       }
+      $memberSeason->setAgeCategory($ageCategory);
     }
-    $memberSeason->setAgeCategory($ageCategory);
 
     // If this memberSeason already exist (ignore ageCategory) we don't create it
     $msDb = $this->memberSeasonRepository->findOneByMemberAndSeason($memberSeason->getMember(), $memberSeason->getSeason());

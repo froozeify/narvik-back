@@ -15,7 +15,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: UserMemberRepository::class)]
-#[UniqueEntity(fields: ['member', 'user'], message: 'Member already linked')]
+#[UniqueEntity(fields: ['member'], message: 'Member already linked')]
 #[ApiResource(
   operations: [
     new Get(),

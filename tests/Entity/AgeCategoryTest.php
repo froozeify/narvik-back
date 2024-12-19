@@ -9,7 +9,7 @@ use App\Tests\Factory\AgeCategoryFactory;
 use App\Tests\Story\AgeCategoryStory;
 
 class AgeCategoryTest extends AbstractEntityTestCase {
-  protected int $TOTAL_SUPER_ADMIN = 3;
+  protected int $TOTAL_SUPER_ADMIN = 16;
 
   protected function getClassname(): string {
     return AgeCategory::class;

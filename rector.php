@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\Set\ValueObject\LevelSetList;
 use Rector\Symfony\Set\SymfonySetList;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRector;
-use Zenstruck\Foundry\Utils\Rector\FoundrySetList;
 
 return RectorConfig::configure()
   ->withPaths([
@@ -19,7 +19,7 @@ return RectorConfig::configure()
   ->withSets([
     SymfonySetList::SYMFONY_CODE_QUALITY,
     SymfonySetList::SYMFONY_CONSTRUCTOR_INJECTION,
-    FoundrySetList::UP_TO_FOUNDRY_2,
+    LevelSetList::UP_TO_PHP_84,
   ])
   ->withRules([
    AddVoidReturnTypeWhereNoReturnRector::class,

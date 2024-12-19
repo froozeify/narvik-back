@@ -20,16 +20,17 @@ class AppFixtures extends Fixture {
     // We create the bare minium required (some users and clubs)
     _InitStory::load();
 
-    // We create the default season
+    // We create the default seasons
     SeasonStory::load();
+
+    // We create the default age categories
+    AgeCategoryStory::load();
 
     // We create the default global settings
     GlobalSettingStory::load();
 
     // We generate the activities
     ActivityStory::load();
-
-    AgeCategoryStory::load();
 
     // We record some external presence
     ExternalPresenceFactory::new()->many(20, 40)->create();

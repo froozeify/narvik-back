@@ -2,13 +2,10 @@
 
 namespace App\Tests\Entity;
 
-use App\Entity\AgeCategory;
 use App\Entity\Season;
 use App\Tests\Entity\Abstract\AbstractEntityTestCase;
 use App\Tests\Enum\ResponseCodeEnum;
-use App\Tests\Factory\AgeCategoryFactory;
 use App\Tests\Factory\SeasonFactory;
-use App\Tests\Story\AgeCategoryStory;
 use App\Tests\Story\SeasonStory;
 
 class SeasonTest extends AbstractEntityTestCase {

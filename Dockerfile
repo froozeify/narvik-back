@@ -1,7 +1,7 @@
 #syntax=docker/dockerfile:1
 
 # Versions
-FROM dunglas/frankenphp:1.3.1-php8.3-alpine AS frankenphp_upstream
+FROM dunglas/frankenphp:1.3.3-php8.4 AS frankenphp_upstream
 
 # The different stages of this Dockerfile are meant to be built into separate images
 # https://docs.docker.com/develop/develop-images/multistage-build/#stop-at-a-specific-build-stage
@@ -17,12 +17,12 @@ VOLUME /app/var/
 
 # persistent / runtime deps
 # hadolint ignore=DL3018
-RUN apk add --no-cache \
-		acl \
-		file \
-		gettext \
-		git \
-	;
+RUN apt-get update && apt-get install -y --no-install-recommends \
+	acl \
+	file \
+	gettext \
+	git \
+	&& rm -rf /var/lib/apt/lists/*
 
 RUN set -eux; \
 	install-php-extensions \
@@ -42,10 +42,7 @@ ENV PHP_INI_SCAN_DIR=":$PHP_INI_DIR/app.conf.d"
 
 ###> recipes ###
 ###> doctrine/doctrine-bundle ###
-RUN apk add --no-cache --virtual .pgsql-deps postgresql-dev; \
-	docker-php-ext-install -j"$(nproc)" pdo_pgsql; \
-	apk add --no-cache --virtual .pgsql-rundeps so:libpq.so.5; \
-	apk del .pgsql-deps
+RUN install-php-extensions pdo_pgsql
 ###< doctrine/doctrine-bundle ###
 ###< recipes ###
 
@@ -56,7 +53,7 @@ COPY --link docker/frankenphp/Caddyfile /etc/caddy/Caddyfile
 ENTRYPOINT ["docker-entrypoint"]
 
 # Install supervisor for Symfony Messenger
-RUN apk add --no-cache supervisor
+RUN apt-get update && apt-get install -y --no-install-recommends supervisor
 COPY docker/messenger-worker.ini /etc/supervisor/conf.d/messenger-worker.ini
 
 HEALTHCHECK --start-period=60s CMD curl -f http://localhost:2019/metrics || exit 1

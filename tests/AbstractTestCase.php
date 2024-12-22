@@ -25,6 +25,7 @@ abstract class AbstractTestCase extends ApiTestCase {
 
   private ?string $accessToken = null;
   private ?string $refreshToken = null;
+  private ?string $selectedMember = null;
 
   public function setUp(): void {
     parent::setUp();
@@ -48,16 +49,22 @@ abstract class AbstractTestCase extends ApiTestCase {
   protected function createClientWithCredentials(?string $token = null): Client {
     $token = $token ?? $this->accessToken;
 
+    $headers = [
+      'Authorization' => 'Bearer ' . $token,
+    ];
+    if ($this->selectedMember) {
+      $headers['Member'] = $this->selectedMember;
+    }
+
     return static::createClient([], [
-      'headers' => [
-        'Authorization' => 'Bearer ' . $token,
-      ],
+      'headers' => $headers,
     ]);
   }
 
   protected function logout(): void {
     $this->accessToken = null;
     $this->refreshToken = null;
+    $this->selectedMember = null;
   }
 
   protected function loggedAs(string $email, string $password): bool {
@@ -86,7 +93,7 @@ abstract class AbstractTestCase extends ApiTestCase {
       'json' => [
         'token' => $club->getBadgerToken(),
         'club' => $club->getUuid()->toString(),
-      ]
+      ],
     ]);
 
     if ($response->getStatusCode() !== Response::HTTP_OK) {
@@ -97,6 +104,18 @@ abstract class AbstractTestCase extends ApiTestCase {
     $this->accessToken = $data['token'];
     $this->refreshToken = $data['refresh_token'];
     return true;
+  }
+
+  /**
+   * Possibility to define in the query headers the selectedProfile.
+   * Required when the user have multiple profile
+   *
+   * @param string|null $uuid
+   *
+   * @return void
+   */
+  public function selectedMember(?string $uuid): void {
+    $this->selectedMember = $uuid;
   }
 
   private function checkRequestResponse(ResponseCodeEnum $responseCode, ?array $payloadToValidate): void {

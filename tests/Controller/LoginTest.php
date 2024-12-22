@@ -2,9 +2,14 @@
 
 namespace App\Tests\Controller;
 
+use App\Enum\ClubRole;
+use App\Enum\UserRole;
 use App\Tests\AbstractTestCase;
 use App\Tests\Enum\ResponseCodeEnum;
+use App\Tests\Factory\MemberFactory;
 use App\Tests\Factory\UserFactory;
+use App\Tests\Factory\UserMemberFactory;
+use App\Tests\Story\_InitStory;
 use Symfony\Component\HttpFoundation\Response;
 
 class LoginTest extends AbstractTestCase {
@@ -59,5 +64,45 @@ class LoginTest extends AbstractTestCase {
   public function testLoginAsUnknown(): void {
     $this->loggedAs("notexisting@test.fr", "test");
     $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+  }
+
+  public function testLoginWithMultipleProfiles(): void {
+    $club1 = _InitStory::club_1();
+
+    $this->loggedAsAdminClub1();
+    $response = $this->makeGetRequest('/self');
+    $this->assertCount(1, $response->toArray()['linkedProfiles']);
+
+    // No error when getting members
+    $this->makeGetRequest($this->getIriFromResource($club1) . '/members');
+    $this->assertResponseIsSuccessful();
+
+    // We linked the admin club 1 with another account
+    $member = MemberFactory::createOne();
+    $userMember = UserMemberFactory::createOne([
+      "member" => $member,
+      "user" => _InitStory::USER_admin_club_1(),
+      "role" => ClubRole::member
+    ]);
+
+    $response = $this->makeGetRequest('/self');
+    $this->assertCount(2, $response->toArray()['linkedProfiles']);
+
+
+    $this->makeGetRequest($this->getIriFromResource($club1) . '/members');
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+    $this->assertJsonContains([
+      "detail" => "Missing required 'Member' header.",
+    ]);
+
+    // We try getting as regular member, access should be denied
+    $this->selectedMember($member->getUuid()->toString());
+    $this->makeGetRequest($this->getIriFromResource($club1) . '/members');
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::forbidden->value);
+
+    // As admin club no problem
+    $this->selectedMember(_InitStory::MEMBER_admin_club_1()->getUuid()->toString());
+    $this->makeGetRequest($this->getIriFromResource($club1) . '/members');
+    $this->assertResponseIsSuccessful();
   }
 }

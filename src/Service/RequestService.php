@@ -13,6 +13,10 @@ final readonly class RequestService {
   ) {
   }
 
+  public function getMemberUuidFromRequest(Request $request): ?string {
+    return $request->headers->get('Member');
+  }
+
   public function getClubUuidFromRequest(Request $request): ?string {
     $uuid = $request->attributes->get("clubUuid");
     $resourceClass = $request->attributes->get('_api_resource_class');

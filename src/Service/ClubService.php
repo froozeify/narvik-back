@@ -56,13 +56,13 @@ class ClubService {
       $this->entityManager->persist($user);
       $this->entityManager->persist($userMember);
       $this->entityManager->flush();
-      // We refresh so getLinkedClubs() contain the club
+      // We refresh so getLinkedProfiles() contain the club
       $this->entityManager->refresh($user);
     }
 
     // We check the club are matching
     $matched = false;
-    foreach ($user->getLinkedClubs() as $dbClub) {
+    foreach ($user->getLinkedProfiles() as $dbClub) {
       if ($dbClub['club'] === $club) {
         $matched = true;
         break;

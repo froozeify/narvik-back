@@ -10,6 +10,8 @@ use App\Enum\UserRole;
 use App\Service\RequestService;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
@@ -35,7 +37,9 @@ class ClubVoter extends Voter {
   }
 
   protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool {
+    $requestMemberUuid = null;
     if ($subject instanceof Request) {
+      $requestMemberUuid = $this->requestService->getMemberUuidFromRequest($subject);
       $subject = $this->requestService->getClubFromRequest($subject);
     }
 
@@ -65,10 +69,22 @@ class ClubVoter extends Voter {
       return false;
     }
 
-    foreach ($user->getLinkedClubs() as $club) {
-      if ($club['club']->getId() === $targetedClub->getId()) {
+    $linkedProfiles = $user->getLinkedProfiles();
+    // When user have multiple profiles linked, the member header must be specified
+    if (!$requestMemberUuid && count($linkedProfiles) > 1) {
+      throw new HttpException(Response::HTTP_BAD_REQUEST, "Missing required 'Member' header.");
+    }
+
+    foreach ($linkedProfiles as $linkedProfile) {
+      if ($requestMemberUuid) {
+        if (!$linkedProfile['member'] || $linkedProfile['member'] !== $requestMemberUuid) {
+          continue;
+        }
+      }
+
+      if ($linkedProfile['club']->getId() === $targetedClub->getId()) {
         /** @var ClubRole $role */
-        $role = $club['role'];
+        $role = $linkedProfile['role'];
         return $role->hasRole($targetedClubRole);
       }
     }

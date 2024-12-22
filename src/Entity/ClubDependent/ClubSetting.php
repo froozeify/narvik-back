@@ -34,9 +34,9 @@ use Symfony\Component\Validator\Constraints as Assert;
     'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
     'uuid'     => new Link(fromClass: self::class),
   ], normalizationContext: [
-    'groups' => ['setting', 'setting-read'],
+    'groups' => ['club-setting', 'club-setting-read'],
   ], denormalizationContext: [
-    'groups' => ['setting', 'setting-write'],
+    'groups' => ['club-setting', 'club-setting-write'],
   ], order: ['name' => 'asc'],)]
 class ClubSetting extends UuidEntity implements ClubLinkedEntityInterface {
   public static function getClubSqlPath(): string {
@@ -48,11 +48,11 @@ class ClubSetting extends UuidEntity implements ClubLinkedEntityInterface {
   private ?Club $club = null;
 
   #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
-  #[Groups(['setting-read'])]
+  #[Groups(['club-setting-read'])]
   private ?\DateTimeImmutable $itacImportDate = null;
 
   #[ORM\Column(options: ['default' => 0])]
-  #[Groups(['setting-read'])]
+  #[Groups(['club-setting-read'])]
   #[Assert\NotBlank]
   private int $itacImportRemaining = 0;
 

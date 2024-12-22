@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Entity\Abstract\UuidEntity;
+use App\Entity\ClubDependent\ClubSetting;
 use App\Entity\Interface\TimestampEntityInterface;
 use App\Entity\Trait\TimestampTrait;
 use App\Enum\ClubRole;
@@ -42,12 +43,16 @@ class Club extends UuidEntity implements TimestampEntityInterface {
   #[Assert\NotBlank]
   private ?string $name = null;
 
+  // TODO: Add club logo field
+
   #[ORM\Column(options: ['default' => false])]
-  #[Groups(['club-read', 'club-admin-write'])]
+  #[Groups(['club-read', 'super-admin-write'])]
+  #[ApiProperty(security: "is_granted('".ClubRole::admin->value."', object)")] // Property can be read by club admin
   private bool $smtpEnabled = false;
 
   #[ORM\Column(options: ['default' => false])]
-  #[Groups(['club-read', 'club-admin-write'])]
+  #[Groups(['club-read', 'super-admin-write'])]
+  #[ApiProperty(security: "is_granted('".ClubRole::supervisor->value."', object)")] // Property can be read by club admin/supervisor
   private bool $salesEnabled = false;
 
   #[ORM\Column(length: 255, nullable: true)]
@@ -55,8 +60,14 @@ class Club extends UuidEntity implements TimestampEntityInterface {
   #[ApiProperty(security: "is_granted('".ClubRole::admin->value."', object)")] // Property only viewable & writable by the club admin
   private ?string $badgerToken = null;
 
+  #[ORM\OneToOne(mappedBy: 'club', targetEntity: ClubSetting::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+  #[Groups(['club-read'])]
+  #[ApiProperty(security: "is_granted('".ClubRole::supervisor->value."', object)")] // Property can be read by club admin/supervisor
+  private ?ClubSetting $settings = null;
+
   public function __construct() {
     parent::__construct();
+    $this->setSettings(new ClubSetting());
   }
 
   public function getName(): ?string {
@@ -93,6 +104,20 @@ class Club extends UuidEntity implements TimestampEntityInterface {
   public function setBadgerToken(?string $badgerToken): static {
       $this->badgerToken = $badgerToken;
       return $this;
+  }
+
+  public function getSettings(): ?ClubSetting {
+    return $this->settings;
+  }
+
+  public function setSettings(ClubSetting $setting): static {
+    // set the owning side of the relation if necessary
+    if ($setting->getClub() !== $this) {
+      $setting->setClub($this);
+    }
+
+    $this->settings = $setting;
+    return $this;
   }
 
 }

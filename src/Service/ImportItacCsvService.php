@@ -16,6 +16,7 @@ class ImportItacCsvService {
   public function __construct(
     private readonly MessageBusInterface $bus,
     private readonly GlobalSettingService $globalSettingService,
+    private readonly ClubService $clubService,
   ) {
   }
 
@@ -30,7 +31,10 @@ class ImportItacCsvService {
     $reader->setHeaderOffset(0); // Header is in first line
     $records = $reader->getRecords();
     $array = iterator_to_array($records);
-    foreach (array_chunk($array, 100) as $recordsChunk) {
+    $recordsChunks = array_chunk($array, 100);
+    $this->clubService->setItacImport($club, count($recordsChunks));
+
+    foreach ($recordsChunks as $recordsChunk) {
       $chunk = [];
       foreach ($recordsChunk as $key => $value) {
         foreach ($value as $k => $v) {
@@ -39,9 +43,6 @@ class ImportItacCsvService {
       }
       $this->bus->dispatch(new ItacMembersMessage($club, $chunk));
     }
-    // FIXME: Add DB col for last itac import
-
-//    $this->globalSettingService->updateSettingValue(GlobalSetting::LAST_ITAC_IMPORT, (new \DateTimeImmutable())->format('c'));
 
     return count($array);
   }

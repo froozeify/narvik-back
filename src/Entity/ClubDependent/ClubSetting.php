@@ -1,0 +1,88 @@
+<?php
+
+namespace App\Entity\ClubDependent;
+
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use App\Controller\ActivityMerge;
+use App\Entity\Abstract\UuidEntity;
+use App\Entity\Club;
+use App\Entity\Interface\ClubLinkedEntityInterface;
+use App\Entity\Trait\SelfClubLinkedEntityTrait;
+use App\Enum\ClubRole;
+use App\Enum\UserRole;
+use App\Repository\SettingRepository;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+
+
+#[ORM\Entity(repositoryClass: SettingRepository::class)]
+#[UniqueEntity(fields: ['club'])]
+#[ApiResource(uriTemplate: '/clubs/{clubUuid}/settings/{uuid}.{_format}', operations: [
+    new Get(),
+    new Patch(security: "is_granted('" . ClubRole::admin->value . "', object)",),
+  ], uriVariables: [
+    'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+    'uuid'     => new Link(fromClass: self::class),
+  ], normalizationContext: [
+    'groups' => ['setting', 'setting-read'],
+  ], denormalizationContext: [
+    'groups' => ['setting', 'setting-write'],
+  ], order: ['name' => 'asc'],)]
+class ClubSetting extends UuidEntity implements ClubLinkedEntityInterface {
+  public static function getClubSqlPath(): string {
+    return "club";
+  }
+
+  #[ORM\OneToOne(inversedBy: 'settings', targetEntity: Club::class)]
+  #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+  private ?Club $club = null;
+
+  #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+  #[Groups(['setting-read'])]
+  private ?\DateTimeImmutable $itacImportDate = null;
+
+  #[ORM\Column(options: ['default' => 0])]
+  #[Groups(['setting-read'])]
+  #[Assert\NotBlank]
+  private int $itacImportRemaining = 0;
+
+  public function getClub(): ?Club {
+    return $this->club;
+  }
+
+  public function setClub(?Club $club): static {
+    $this->club = $club;
+    return $this;
+  }
+
+  public function getItacImportDate(): ?\DateTimeImmutable {
+    return $this->itacImportDate;
+  }
+
+  public function setItacImportDate(?\DateTimeImmutable $itacImportDate): ClubSetting {
+    $this->itacImportDate = $itacImportDate;
+    return $this;
+  }
+
+  public function getItacImportRemaining(): int {
+    return $this->itacImportRemaining;
+  }
+
+  public function setItacImportRemaining(int $itacImportRemaining): ClubSetting {
+    if ($itacImportRemaining < 0) {
+      $itacImportRemaining = 0;
+    }
+    $this->itacImportRemaining = $itacImportRemaining;
+    return $this;
+  }
+}

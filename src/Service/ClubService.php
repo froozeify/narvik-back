@@ -16,9 +16,7 @@ class ClubService {
     private EntityManagerInterface $entityManager,
     private UserRepository $userRepository,
   ) {
-
   }
-
 
   /**
    * Automatically create the Badger user if not present.
@@ -74,6 +72,16 @@ class ClubService {
     }
 
     return $user;
+  }
+
+  public function setItacImport(Club $club, int $numberOfBatches): void {
+    $clubSettings = $club->getSettings();
+    $clubSettings
+      ->setItacImportRemaining($numberOfBatches)
+      ->setItacImportDate(new \DateTimeImmutable());
+
+    $this->entityManager->persist($clubSettings);
+    $this->entityManager->flush();
   }
 
 }

@@ -13,8 +13,9 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class ClubService {
   public function __construct(
-    private EntityManagerInterface $entityManager,
-    private UserRepository $userRepository,
+    private readonly EntityManagerInterface $entityManager,
+    private readonly UserRepository $userRepository,
+    private readonly ClubRepository $clubRepository,
   ) {
   }
 
@@ -79,6 +80,20 @@ class ClubService {
     $clubSettings
       ->setItacImportRemaining($numberOfBatches)
       ->setItacImportDate(new \DateTimeImmutable());
+
+    $this->entityManager->persist($clubSettings);
+    $this->entityManager->flush();
+  }
+
+  public function consumeItacImport(string $clubUuid): void {
+    $club = $this->clubRepository->findOneByUuid($clubUuid);
+    if (!$club instanceof Club) {
+      return;
+    }
+
+    $clubSettings = $club->getSettings();
+    $clubSettings
+      ->setItacImportRemaining($clubSettings->getItacImportRemaining() - 1);
 
     $this->entityManager->persist($clubSettings);
     $this->entityManager->flush();

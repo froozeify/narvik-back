@@ -41,7 +41,7 @@ class ImportItacCsvService {
           $chunk[$key][$this->convert($k)] = $this->convert($v);
         }
       }
-      $this->bus->dispatch(new ItacMembersMessage($club, $chunk));
+      $this->bus->dispatch(new ItacMembersMessage($club->getUuid(), $chunk));
     }
 
     return count($array);

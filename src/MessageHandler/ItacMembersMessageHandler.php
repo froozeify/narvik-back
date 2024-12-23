@@ -51,8 +51,7 @@ class ItacMembersMessageHandler implements ResetInterface {
 //      'success' => 0
 //    ];
 
-    // We can get a Proxy object, so we load it to have the correct Club object
-    $club = $this->clubRepository->findOneByUuid($message->getClub()->getUuid());
+    $club = $this->clubRepository->findOneByUuid($message->getClubUuid());
 
     foreach ($message->getRecords() as $record) {
       // We get the user, if he exists

@@ -36,12 +36,12 @@ class UserMember {
 
   #[ORM\ManyToOne(inversedBy: 'memberships')]
   #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-  #[Groups(['member-read', 'club-admin-write'])]
+  #[Groups(['user-member-read', 'club-admin-write'])]
   private ?User $user = null;
 
   #[ORM\OneToOne()]
   #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
-  #[Groups(['member-read', 'club-admin-write'])]
+  #[Groups(['user-member-read', 'club-admin-write'])]
   private ?Member $member = null;
 
   #[ORM\ManyToOne(targetEntity: Club::class)]
@@ -49,7 +49,7 @@ class UserMember {
   private ?Club $badgerClub = null;
 
   #[ORM\Column(type: "string", enumType: ClubRole::class)]
-  #[Groups(['member-read', 'club-admin-write'])]
+  #[Groups(['user-member-read', 'club-admin-write'])]
   private ClubRole $role = ClubRole::member;
 
   public function getId(): ?int {

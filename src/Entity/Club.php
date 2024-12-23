@@ -30,7 +30,7 @@ use Symfony\Component\Validator\Constraints as Assert;
   new Patch(security: "is_granted('".UserRole::super_admin->value."')",),
   new Delete(security: "is_granted('".UserRole::super_admin->value."')",),
 ], normalizationContext: [
-  'groups' => ['club', 'club-read'],
+  'groups' => ['club', 'club-read', 'common-read'],
 ], denormalizationContext: [
   'groups' => ['club', 'club-write'],
 ], order: ['name' => 'ASC'],)]

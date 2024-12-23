@@ -177,7 +177,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
     'uuid' => new Link(fromClass: self::class),
   ], normalizationContext: [
-    'groups' => ['member', 'member-read']
+    'groups' => ['member', 'member-read', 'common-read']
   ], denormalizationContext: [
     'groups' => ['member', 'member-write']
   ],

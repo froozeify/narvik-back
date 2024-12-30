@@ -147,6 +147,27 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
     // 2 new members
     $response = $this->makeGetRequest($this->getRootWClubUrl($club));
     $this->assertCount($this->TOTAL_ADMIN_CLUB_1 + 2, $response->toArray()['member']);
+
+    // Running the import a second time should not change the count
+    $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/from-itac", [
+      '_not_json' => true,
+      'headers' => ['Content-Type' => 'multipart/form-data'],
+      'extra' => [
+        'files' => [
+          'file' => $file
+        ]
+      ]
+    ]);
+
+    $this->assertResponseIsSuccessful();
+    $this->assertEquals(2, $response->toArray()['lines']);
+    // We consume the queue
+    $this->transport('async_medium')->process();
+    $this->transport('async_medium')->queue()->assertEmpty();
+
+    // 2 new members
+    $response = $this->makeGetRequest($this->getRootWClubUrl($club));
+    $this->assertCount($this->TOTAL_ADMIN_CLUB_1 + 2, $response->toArray()['member']);
   }
 
   // TODO: Add custom route tests

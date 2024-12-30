@@ -5,15 +5,20 @@ namespace App\Tests\Entity\ClubDependent;
 use App\Entity\ClubDependent\Activity;
 use App\Entity\ClubDependent\Member;
 use App\Enum\ClubRole;
+use App\Message\ItacMembersMessage;
 use App\Tests\Entity\Abstract\AbstractEntityClubLinkedTestCase;
 use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Factory\ActivityFactory;
 use App\Tests\Factory\MemberFactory;
 use App\Tests\Story\_InitStory;
 use App\Tests\Story\ActivityStory;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Messenger\Test\InteractsWithMessenger;
 
 class MemberTest extends AbstractEntityClubLinkedTestCase {
+  use InteractsWithMessenger;
+
   protected int $TOTAL_SUPER_ADMIN = 3;
   protected int $TOTAL_ADMIN_CLUB_1 = 3;
   protected int $TOTAL_ADMIN_CLUB_2 = 2;
@@ -107,6 +112,41 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
     ]);
     $this->assertResponseStatusCodeSame(ResponseCodeEnum::ok->value);
     $this->assertCount(0, $response->toArray());
+  }
+
+  public function testImportItacMembers(): void {
+    $club = _InitStory::club_1();
+
+    $this->transport('async_medium')->queue()->assertEmpty();
+
+    $file = new UploadedFile(__DIR__ . '/../../fixtures/itac-members.csv', 'itac-members.csv');
+
+    $this->loggedAsAdminClub1();
+    $response = $this->makeGetRequest($this->getRootWClubUrl($club));
+    $this->assertCount($this->TOTAL_ADMIN_CLUB_1, $response->toArray()['member']);
+
+    $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/from-itac", [
+      '_not_json' => true,
+      'headers' => ['Content-Type' => 'multipart/form-data'],
+      'extra' => [
+        'files' => [
+          'file' => $file
+        ]
+      ]
+    ]);
+
+    $this->assertResponseIsSuccessful();
+    $this->assertEquals(2, $response->toArray()['lines']);
+    $this->transport('async_medium')->queue()->assertCount(1);
+    $this->transport('async_medium')->queue()->assertContains(ItacMembersMessage::class, 1);
+
+    // We consume the queue
+    $this->transport('async_medium')->process();
+    $this->transport('async_medium')->queue()->assertEmpty();
+
+    // 2 new members
+    $response = $this->makeGetRequest($this->getRootWClubUrl($club));
+    $this->assertCount($this->TOTAL_ADMIN_CLUB_1 + 2, $response->toArray()['member']);
   }
 
   // TODO: Add custom route tests

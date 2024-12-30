@@ -58,7 +58,7 @@ abstract class AbstractEntityTestCase extends AbstractTestCase {
 
     self::assertResponseIsSuccessful();
     self::assertMatchesResourceCollectionJsonSchema($this->getClassname());
-    $this->assertCount($total, $response->toArray()['member']);
+    $this->assertEquals($total, $response->toArray()['totalItems']);
     return $response;
   }
 

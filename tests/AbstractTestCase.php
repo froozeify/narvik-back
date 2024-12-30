@@ -209,12 +209,17 @@ abstract class AbstractTestCase extends ApiTestCase {
   private function prepareRequestOptions(?array $data = null, array $uriParameters = []): array {
     $options = [];
 
-    if (!empty($uriParameters)) {
-      $options['extra']['parameters'] = $uriParameters;
+    if (!is_null($data)) {
+      if (!array_key_exists('_not_json', $data)) {
+        $options['json'] = $data;
+      } else {
+        unset($data['_not_json']);
+        $options = $data;
+      }
     }
 
-    if (!is_null($data)) {
-      $options['json'] = $data;
+    if (!empty($uriParameters)) {
+      $options['extra']['parameters'] = $uriParameters;
     }
     return $options;
   }

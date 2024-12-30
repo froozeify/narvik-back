@@ -2,6 +2,7 @@
 
 namespace App\EventSubscriber\Kernel;
 
+use App\Message\Abstract\ClubLinkedMessage;
 use App\Message\ItacMembersMessage;
 use App\Service\ClubService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -42,8 +43,8 @@ final class MessengerSubscriber implements EventSubscriberInterface {
   }
 
   private function consumeMessage(object $message): void {
-    if ($message instanceof ItacMembersMessage) {
-      $this->clubService->consumeItacImport($message->getClubUuid());
+    if ($message instanceof ClubLinkedMessage) {
+      $this->clubService->consumeMessage($message->getClubUuid(), $message->getClubSettingRemainingField());
     }
   }
 }

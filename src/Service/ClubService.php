@@ -85,15 +85,18 @@ class ClubService {
     $this->entityManager->flush();
   }
 
-  public function consumeItacImport(string $clubUuid): void {
+  public function consumeMessage(string $clubUuid, string $clubSettingRemainingField): void {
     $club = $this->clubRepository->findOneByUuid($clubUuid);
     if (!$club instanceof Club) {
       return;
     }
 
+    $getter = "get" . $clubSettingRemainingField;
+    $setter = "set" . $clubSettingRemainingField;
+
     $clubSettings = $club->getSettings();
     $clubSettings
-      ->setItacImportRemaining($clubSettings->getItacImportRemaining() - 1);
+      ->$setter($clubSettings->$getter() - 1);
 
     $this->entityManager->persist($clubSettings);
     $this->entityManager->flush();

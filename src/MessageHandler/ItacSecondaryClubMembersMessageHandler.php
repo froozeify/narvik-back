@@ -10,10 +10,12 @@ use App\Enum\ClubRole;
 use App\Enum\ItacSecondaryClubCsvHeaderMapping;
 use App\Message\ItacSecondaryClubMembersMessage;
 use App\Repository\AgeCategoryRepository;
+use App\Repository\ClubRepository;
 use App\Repository\MemberRepository;
 use App\Repository\MemberSeasonRepository;
 use App\Repository\SeasonRepository;
 use App\Service\MemberPresenceService;
+use App\Service\SeasonService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -22,29 +24,31 @@ use Symfony\Contracts\Service\ResetInterface;
 #[AsMessageHandler]
 class ItacSecondaryClubMembersMessageHandler implements ResetInterface {
   private array $members = [];
-  private array $membersEmail = [];
   private array $seasons = [];
   private array $ageCategories = [];
 
   public function __construct(
     private readonly EntityManagerInterface $entityManager,
+    private readonly ClubRepository $clubRepository,
     private readonly MemberRepository $memberRepository,
     private readonly SeasonRepository $seasonRepository,
     private readonly AgeCategoryRepository $ageCategoryRepository,
     private readonly MemberSeasonRepository $memberSeasonRepository,
     private readonly ValidatorInterface $validator,
-    private readonly MemberPresenceService $memberPresenceService,) {
+    private readonly MemberPresenceService $memberPresenceService,
+    private readonly SeasonService $seasonService,
+  ) {
   }
 
   public function reset(): void {
     $this->members = [];
-    $this->membersEmail = [];
     $this->seasons = [];
     $this->ageCategories = [];
   }
 
 
   public function __invoke(ItacSecondaryClubMembersMessage $message): void {
+    $club = $this->clubRepository->findOneByUuid($message->getClubUuid());
 
     foreach ($message->getRecords() as $record) {
       // We get the user, if he exists
@@ -55,12 +59,12 @@ class ItacSecondaryClubMembersMessageHandler implements ResetInterface {
         $member = $this->members[$record[ItacSecondaryClubCsvHeaderMapping::LICENCE->value]];
       } else {
         /** @var Member|null $member */
-        $member = $this->memberRepository->findOneByLicence($record[ItacSecondaryClubCsvHeaderMapping::LICENCE->value]);
+        $member = $this->memberRepository->findOneByLicence($club, $record[ItacSecondaryClubCsvHeaderMapping::LICENCE->value]);
 
         if (!$member) {
           $member = new Member();
+          $member->setClub($club);
           $member->setLicence($record[ItacSecondaryClubCsvHeaderMapping::LICENCE->value]);
-          $member->setRole(ClubRole::member);
         }
         $this->members[$record[ItacSecondaryClubCsvHeaderMapping::LICENCE->value]] = $member;
       }
@@ -75,17 +79,8 @@ class ItacSecondaryClubMembersMessageHandler implements ResetInterface {
       }
 
       $email = $record[ItacSecondaryClubCsvHeaderMapping::EMAIL->value];
-      if ($email) {
-        // We check the email is not already define to another member
-        $dbMemberEmail = $this->memberRepository->findOneBy(["email" => $email]);
-        if ($dbMemberEmail) {
-          $this->membersEmail[$email] = $dbMemberEmail;
-        }
-
-        if (!array_key_exists($email, $this->membersEmail)) {
-          $member->setEmail($email);
-          $this->membersEmail[$email] = $member;
-        }
+      if (!empty($email)) {
+        $member->setEmail($email);
       }
 
       $member
@@ -112,7 +107,7 @@ class ItacSecondaryClubMembersMessageHandler implements ResetInterface {
     $this->entityManager->flush();
 
     // We run the migration
-    $this->memberPresenceService->importFromExternalPresence();
+    $this->memberPresenceService->importFromExternalPresence($club);
   }
 
   private function toBoolean($value): bool {
@@ -131,15 +126,16 @@ class ItacSecondaryClubMembersMessageHandler implements ResetInterface {
       $season = $this->seasons[$seasonCsv];
     } else {
       // We get it in the db
-      $seasonDb = $this->seasonRepository->findOneBy(["name" => $seasonCsv]);
+      $seasonDb = $this->seasonRepository->findOneByName($seasonCsv);
       if ($seasonDb) {
         $this->seasons[$seasonCsv] = $seasonDb;
         $season = $this->seasons[$seasonCsv];
       } else {
         // We create it
-        $season = new Season();
-        $season->setName($seasonCsv);
-        $this->entityManager->persist($season);
+        $season = $this->seasonService->getOrCreateSeason($seasonCsv, false);
+        if (!$season) {
+          return;
+        }
         $this->seasons[$seasonCsv] = $season;
       }
     }
@@ -160,29 +156,29 @@ class ItacSecondaryClubMembersMessageHandler implements ResetInterface {
       $ageCategory = $this->ageCategories[$ageCodeNameCsv];
     } else {
       // We get it in the db
-      $ageCategoryDb = $this->ageCategoryRepository->findOneBy(["name" => $ageCodeNameCsv]);
+      $ageCategoryDb = $this->ageCategoryRepository->findOneByCode($ageCodeNameCsv);
       if ($ageCategoryDb) {
         $this->ageCategories[$ageCodeNameCsv] = $ageCategoryDb;
         $ageCategory = $this->ageCategories[$ageCodeNameCsv];
       }
+      // Otherwise, no mapping with age category, we don't create (ageCategories are managed globally not at a club level)
     }
 
-    if (!$ageCategory) {
-      return;
-    }
-
-
-    if ($ageCategory->getId()) {
-      $ref = $this->entityManager->getReference(AgeCategory::class, $ageCategory->getId());
-      if ($ref) {
-        $ageCategory = $ref;
+    if ($ageCategory) {
+      if ($ageCategory->getId()) {
+        $ref = $this->entityManager->getReference(AgeCategory::class, $ageCategory->getId());
+        if ($ref) {
+          $ageCategory = $ref;
+        }
       }
+      $memberSeason->setAgeCategory($ageCategory);
     }
+
+
     $memberSeason->setIsSecondaryClub(true);
-    $memberSeason->setAgeCategory($ageCategory);
 
     // If this memberSeason already exist (ignore ageCategory) we don't create it
-    $msDb = $this->memberSeasonRepository->findOneBy(["member" => $memberSeason->getMember(), "season" => $memberSeason->getSeason()]);
+    $msDb = $this->memberSeasonRepository->findOneByMemberAndSeason($memberSeason->getMember(), $memberSeason->getSeason());
     if ($msDb) {
       return;
     }

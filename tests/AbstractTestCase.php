@@ -41,7 +41,7 @@ abstract class AbstractTestCase extends ApiTestCase {
   public function initDefaultFixtures(): void {}
 
   #[NoReturn]
-  public function debugTestDatabase(): void {
+  public function debugTestDatabase(): never {
     \DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver::commit();
     die; // The DB changes are actually persisted
   }

@@ -6,6 +6,7 @@ use App\Entity\ClubDependent\Activity;
 use App\Entity\ClubDependent\Member;
 use App\Enum\ClubRole;
 use App\Message\ItacMembersMessage;
+use App\Message\ItacSecondaryClubMembersMessage;
 use App\Tests\Entity\Abstract\AbstractEntityClubLinkedTestCase;
 use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Factory\ActivityFactory;
@@ -170,6 +171,60 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
     $this->assertCount($this->TOTAL_ADMIN_CLUB_1 + 2, $response->toArray()['member']);
   }
 
-  // TODO: Add custom route tests
+  public function testImportItacSecondaryMembers(): void {
+    $club = _InitStory::club_1();
 
+    $transport = $this->transport('async_low');
+    $transport->queue()->assertEmpty();
+
+    $file = new UploadedFile(__DIR__ . '/../../fixtures/itac-secondary-members.csv', 'itac-secondary-members.csv');
+
+    $this->loggedAsAdminClub1();
+    $response = $this->makeGetRequest($this->getRootWClubUrl($club));
+    $this->assertCount($this->TOTAL_ADMIN_CLUB_1, $response->toArray()['member']);
+
+    $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/secondary-from-itac", [
+      '_not_json' => true,
+      'headers' => ['Content-Type' => 'multipart/form-data'],
+      'extra' => [
+        'files' => [
+          'file' => $file
+        ]
+      ]
+    ]);
+
+    $this->assertResponseIsSuccessful();
+    $this->assertEquals(2, $response->toArray()['lines']);
+    $transport->queue()->assertCount(1);
+    $transport->queue()->assertContains(ItacSecondaryClubMembersMessage::class, 1);
+
+    // We consume the queue
+    $transport->process();
+    $transport->queue()->assertEmpty();
+
+    // 2 new members
+    $response = $this->makeGetRequest($this->getRootWClubUrl($club));
+    $this->assertCount($this->TOTAL_ADMIN_CLUB_1 + 2, $response->toArray()['member']);
+
+    // Running the import a second time should not change the count
+    $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/secondary-from-itac", [
+      '_not_json' => true,
+      'headers' => ['Content-Type' => 'multipart/form-data'],
+      'extra' => [
+        'files' => [
+          'file' => $file
+        ]
+      ]
+    ]);
+
+    $this->assertResponseIsSuccessful();
+    $this->assertEquals(2, $response->toArray()['lines']);
+    // We consume the queue
+    $transport->process();
+    $transport->queue()->assertEmpty();
+
+    // 2 new members
+    $response = $this->makeGetRequest($this->getRootWClubUrl($club));
+    $this->assertCount($this->TOTAL_ADMIN_CLUB_1 + 2, $response->toArray()['member']);
+  }
 }

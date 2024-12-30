@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Club;
 use App\Entity\ClubDependent\MemberPresence;
 use App\Entity\ExternalPresence;
 use App\Repository\ExternalPresenceRepository;
@@ -17,17 +18,17 @@ class MemberPresenceService {
     private readonly MemberPresenceRepository $memberPresenceRepository,
   ) {
   }
-  public function importFromExternalPresence(): int {
+  public function importFromExternalPresence(Club $club): int {
     $totalImported = 0;
 
     $presencesWithLicences = $this->externalPresenceRepository->findAllWithLicence();
     /** @var ExternalPresence $extPresence */
     foreach ($presencesWithLicences as $extPresence) {
-      $member = $this->memberRepository->findOneByLicence($extPresence->getLicence());
+      $member = $this->memberRepository->findOneByLicence($club, $extPresence->getLicence());
       if (!$member) continue;
 
       // We check we don't have any record of it already
-      $alreadyPresent = $this->memberPresenceRepository->findBy(["member" => $member, "date" => $extPresence->getDate()]);
+      $alreadyPresent = $this->memberPresenceRepository->findOneByDay($member, $extPresence->getDate());
       if ($alreadyPresent) {
         $this->em->remove($extPresence);
         continue;

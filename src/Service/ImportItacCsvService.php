@@ -53,22 +53,23 @@ class ImportItacCsvService {
    * @throws \League\Csv\Exception
    * @throws \League\Csv\UnavailableStream
    */
-  public function importSecondaryFromFile(string $filename): int {
+  public function importSecondaryFromFile(Club $club, string $filename): int {
     $reader = Reader::createFromPath($filename);
     $reader->setHeaderOffset(0); // Header is in first line
     $records = $reader->getRecords();
     $array = iterator_to_array($records);
-    foreach (array_chunk($array, 100) as $recordsChunk) {
+    $recordsChunks = array_chunk($array, 100);
+    $this->clubService->setItacSecondaryImport($club, count($recordsChunks));
+
+    foreach ($recordsChunks as $recordsChunk) {
       $chunk = [];
       foreach ($recordsChunk as $key => $value) {
         foreach ($value as $k => $v) {
           $chunk[$key][$this->convert($k)] = $this->convert($v);
         }
       }
-      $this->bus->dispatch(new ItacSecondaryClubMembersMessage($chunk));
+      $this->bus->dispatch(new ItacSecondaryClubMembersMessage($club->getUuid(), $chunk));
     }
-
-    $this->globalSettingService->updateSettingValue(GlobalSetting::LAST_SECONDARY_CLUB_ITAC_IMPORT, (new \DateTimeImmutable())->format('c'));
 
     return count($array);
   }

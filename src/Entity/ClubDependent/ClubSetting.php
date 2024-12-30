@@ -56,6 +56,15 @@ class ClubSetting extends UuidEntity implements ClubLinkedEntityInterface {
   #[Assert\NotBlank]
   private int $itacImportRemaining = 0;
 
+  #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+  #[Groups(['club-setting-read'])]
+  private ?\DateTimeImmutable $itacSecondaryImportDate = null;
+
+  #[ORM\Column(options: ['default' => 0])]
+  #[Groups(['club-setting-read'])]
+  #[Assert\NotBlank]
+  private int $itacSecondaryImportRemaining = 0;
+
   public function getClub(): ?Club {
     return $this->club;
   }
@@ -83,6 +92,27 @@ class ClubSetting extends UuidEntity implements ClubLinkedEntityInterface {
       $itacImportRemaining = 0;
     }
     $this->itacImportRemaining = $itacImportRemaining;
+    return $this;
+  }
+
+  public function getItacSecondaryImportDate(): ?\DateTimeImmutable {
+    return $this->itacSecondaryImportDate;
+  }
+
+  public function setItacSecondaryImportDate(?\DateTimeImmutable $itacSecondaryImportDate): ClubSetting {
+    $this->itacSecondaryImportDate = $itacSecondaryImportDate;
+    return $this;
+  }
+
+  public function getItacSecondaryImportRemaining(): int {
+    return $this->itacSecondaryImportRemaining;
+  }
+
+  public function setItacSecondaryImportRemaining(int $itacSecondaryImportRemaining): ClubSetting {
+    if ($itacSecondaryImportRemaining < 0) {
+      $itacSecondaryImportRemaining = 0;
+    }
+    $this->itacSecondaryImportRemaining = $itacSecondaryImportRemaining;
     return $this;
   }
 }

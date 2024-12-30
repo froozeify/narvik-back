@@ -2,12 +2,19 @@
 
 namespace App\Message;
 
-class ItacSecondaryClubMembersMessage {
+use App\Message\Abstract\ClubLinkedMessage;
 
-  //TODO: Add a message batch id, so we can log in db after the success/warnings with some stats
+class ItacSecondaryClubMembersMessage extends ClubLinkedMessage {
+
+  public function getClubSettingRemainingField(): string {
+    return "itacSecondaryImportRemaining";
+  }
+
   public function __construct(
+    string $clubUuid,
     private readonly array $records,
   ) {
+    parent::__construct($clubUuid);
   }
 
   public function getRecords(): array {

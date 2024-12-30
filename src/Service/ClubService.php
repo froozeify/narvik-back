@@ -85,6 +85,16 @@ class ClubService {
     $this->entityManager->flush();
   }
 
+  public function setItacSecondaryImport(Club $club, int $numberOfBatches): void {
+    $clubSettings = $club->getSettings();
+    $clubSettings
+      ->setItacSecondaryImportRemaining($numberOfBatches)
+      ->setItacSecondaryImportDate(new \DateTimeImmutable());
+
+    $this->entityManager->persist($clubSettings);
+    $this->entityManager->flush();
+  }
+
   public function consumeMessage(string $clubUuid, string $clubSettingRemainingField): void {
     $club = $this->clubRepository->findOneByUuid($clubUuid);
     if (!$club instanceof Club) {

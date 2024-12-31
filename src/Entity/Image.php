@@ -35,7 +35,7 @@ class Image {
 
   #[ApiProperty(identifier: true)]
   #[Groups(['image'])]
-  private string $id; // base64 encode of public path
+  private string $id; // UUID of File
 
   #[Groups(['image'])]
   private string $name;

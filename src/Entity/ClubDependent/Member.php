@@ -20,6 +20,7 @@ use App\Controller\MemberImportSecondaryClubFromItac;
 use App\Controller\MemberPhotosImportFromItac;
 use App\Entity\Abstract\UuidEntity;
 use App\Entity\Club;
+use App\Entity\File;
 use App\Entity\Interface\ClubLinkedEntityInterface;
 use App\Entity\Sale;
 use App\Entity\Trait\SelfClubLinkedEntityTrait;
@@ -198,8 +199,10 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
   #[ORM\OneToMany(mappedBy: 'seller', targetEntity: Sale::class)]
   private Collection $sales;
 
+  #[ORM\OneToOne(targetEntity: File::class)]
+  #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
   #[Groups(['member-read', 'member-presence-read'])]
-  private ?string $profileImage = null;
+  private ?File $profileImage = null;
 
   #[Groups(['member-read', 'member-presence-read'])]
   private ?\DateTimeImmutable $lastControlShooting = null;
@@ -307,11 +310,11 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
     $this->sales = new ArrayCollection();
   }
 
-  public function getProfileImage(): ?string {
+  public function getProfileImage(): ?File {
     return $this->profileImage;
   }
 
-  public function setProfileImage(?string $profileImage): Member {
+  public function setProfileImage(?File $profileImage): Member {
     $this->profileImage = $profileImage;
     return $this;
   }

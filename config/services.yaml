@@ -7,9 +7,9 @@ parameters:
     env(EXPOSE_VERSION): "false"
     app.expose_version: '%env(bool:resolve:EXPOSE_VERSION)%'
     
-    app.images: '%kernel.project_dir%/private/images'
-    app.public_images: '%kernel.project_dir%/private/images/public'
-    app.members_photos: '%app.images%/members'
+    app.files: '%kernel.project_dir%/private/files'
+    # app.public_images: '%kernel.project_dir%/private/images/public'
+    # app.members_photos: '%app.files%/members'
 
 services:
     # default configuration for services in *this* file

@@ -3,17 +3,27 @@
 namespace App\Service;
 
 use App\Entity\Club;
+use App\Entity\File as FileEntity;
 use App\Entity\Image;
+use App\Enum\FileCategory;
+use App\Repository\FileRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\Part\File;
+use Symfony\Component\HttpFoundation\File\File as SfFile;
+
 
 class ImageService {
 
   public function __construct(
     private readonly Filesystem $fs,
     private readonly ContainerBagInterface $params,
+    private readonly FileRepository $fileRepository,
+    private readonly FileService $fileService,
+    private readonly EntityManagerInterface $entityManager,
   ) {
   }
 
@@ -25,11 +35,13 @@ class ImageService {
   }
 
   public function getLogo(): ?Image {
-    $publicFolder = $this->params->get('app.public_images');
-    return $this->loadImageFromPath('logo.png', "$publicFolder/logo.png", true);
+    //FIXME: Deprecated
+    $publicFolder = $this->params->get('app.files');
+    return $this->loadImageFromFile('logo.png', "$publicFolder/logo.png", true);
   }
 
   public function getLogoFile(): ?File {
+    //FIXME: Deprecated
     $logo = $this->getLogo();
     if (!$logo) {
       return null;
@@ -38,7 +50,8 @@ class ImageService {
   }
 
   public function importLogo(UploadedFile $file): string {
-    $publicFolder = $this->params->get('app.public_images');
+    //FIXME: Deprecated
+    $publicFolder = $this->params->get('app.files');
     $this->createFolderIfNotExist($publicFolder);
 
     $file->move($publicFolder, "logo.png");
@@ -46,70 +59,70 @@ class ImageService {
   }
 
   public function importItacPhotos(Club $club, UploadedFile $file): void {
-    //FIXME: Migrate all that for DB managed images
-    $imagesFolder = $this->params->get('app.members_photos');
-    $this->createFolderIfNotExist($imagesFolder);
+    // We remove all old profile images
+    $oldPictures = $this->fileRepository->findByClubAndCategory($club, FileCategory::member_picture);
+    foreach ($oldPictures as $oldPicture) {
+      $this->fileService->remove($oldPicture);
+    }
 
+    // We import from the zip
     $zipArchive = new \ZipArchive();
     $zipArchive->open($file->getRealPath());
-    $zipArchive->extractTo($imagesFolder);
-  }
-
-  /**
-   * Return the member asset public image path
-   *
-   * @param string $licence
-   * @return string|null
-   */
-  public function getMemberPhotoPath(string $licence): ?string {
-    $possibleExtensions = [
-      'jpg',
-      'JPG',
-      'jpeg',
-      'JPEG',
-    ];
-
-    $memberImage = $this->params->get('app.members_photos') . "/$licence";
-    foreach ($possibleExtensions as $extension) {
-      if ($this->fs->exists("$memberImage.$extension")) {
-        return bin2hex("members/$licence.$extension");
+    for ($i = 0; $zipFile = $zipArchive->statIndex($i); $i++) {
+      if (\is_dir($zipFile['name'])) {
+        continue;
       }
+
+      // file contents
+      $content = $zipArchive->getFromIndex($i);
+      $imageRaw = imagecreatefromstring($content);
+
+      if (!$imageRaw) {
+        continue;
+      }
+
+      $fileFolder = $this->params->get('app.files');
+      $tmpFile = $fileFolder . '/' . UuidService::generateUuid() . '_' . $zipFile['name'] . '.webp';
+      imagewebp($imageRaw, $tmpFile);
+      $uploadedFile = new SfFile($tmpFile);
+      $this->fileService->importFile($uploadedFile, $zipFile['name'], FileCategory::member_picture, club: $club, flush: false);
+
+      // We unset the tmp one
+      imagedestroy($imageRaw);
     }
-    return null;
+    $zipArchive->close();
+
+    $this->entityManager->flush();
   }
 
   public function loadImageFromProtectedPath(string $publicId, bool $isInline = false): ?Image {
-    $path = $this->decodeEncodedUriId($publicId);
-
-    if (!$path || str_contains('./', $path)) {
+    $uuid = $this->decodeEncodedUriId($publicId);
+    $file = $this->fileRepository->findOneByUuid($uuid->toString());
+    if (!$file instanceof FileEntity) {
       return null;
     }
 
-    // Image accessible to everyone logged
-    $imageFolder = $this->params->get('app.images');
-    return $this->loadImageFromPath($publicId, "$imageFolder/$path", $isInline);
+    return $this->loadImageFromFile($file, $isInline);
   }
 
   public function loadImageFromPublicPath(string $publicId, bool $isInline = false): ?Image {
-    $path = $this->decodeEncodedUriId($publicId);
-
-    // Public resource is at root
-    if (!$path || str_contains('/', $path)) {
+    $uuid = $this->decodeEncodedUriId($publicId);
+    $file = $this->fileRepository->findOneByUuid($uuid->toString());
+    if (!$file instanceof FileEntity || !$file->getIsPublic()) {
       return null;
     }
 
-    $imageFolder = $this->params->get('app.public_images');
-    return $this->loadImageFromPath($publicId, "$imageFolder/$path", $isInline);
+    return $this->loadImageFromFile($file, $isInline);
   }
 
-  private function loadImageFromPath(string $publicId, string $path, bool $isInline = false): ?Image {
-    if ($this->fs->exists($path)) {
-      $filename = explode("/", $path);
-      $filename = end($filename);
+  private function loadImageFromFile(FileEntity $file, bool $isInline = false): ?Image {
+    $imageFolder = $this->params->get('app.files');
+    $path = "$imageFolder/{$file->getPath()}";
 
+    if ($this->fs->exists($path)) {
       $image = new Image();
-      $image->setId($publicId)
-            ->setName($filename)
+      $image->setId(UuidService::encodeToReadable($file->getUuid()))
+            ->setName($file->getFilename())
             ->setPath($path);
 
       if (!$isInline) {
@@ -121,10 +134,8 @@ class ImageService {
     return null;
   }
 
-  private function decodeEncodedUriId(string $encodedId): ?string {
-    if (!ctype_xdigit($encodedId)) return null;
-
-    return hex2bin($encodedId);
+  private function decodeEncodedUriId(string $encodedId): UuidInterface {
+    return UuidService::fromReadable($encodedId);
   }
 
   private function setDataUri($imagePath, Image $image): void {

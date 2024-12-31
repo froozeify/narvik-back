@@ -2,14 +2,14 @@
 
 namespace App\Controller;
 
+use App\Controller\Abstract\AbstractClubDependentController;
 use App\Service\ImageService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class MemberPhotosImportFromItac extends AbstractController {
+class MemberPhotosImportFromItac extends AbstractClubDependentController {
 
   public function __invoke(Request $request, ImageService $importPhotosService): JsonResponse {
     /** @var UploadedFile|null $uploadedFile */
@@ -22,7 +22,7 @@ class MemberPhotosImportFromItac extends AbstractController {
       throw new BadRequestHttpException('The "file" must be a ZIP');
     }
 
-    $importPhotosService->importItacPhotos($uploadedFile);
+    $importPhotosService->importItacPhotos($this->getQueryClub(), $uploadedFile);
 
     return new JsonResponse();
   }

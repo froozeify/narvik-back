@@ -169,7 +169,8 @@ use Symfony\Component\Validator\Constraints as Assert;
           ])
         )
       ),
-      securityPostDenormalize: "is_granted('CLUB_ADMIN', object)",
+      securityPostDenormalize: "is_granted('".ClubRole::admin->value."', request)",
+      read: false,
       deserialize: false,
     )
   ],

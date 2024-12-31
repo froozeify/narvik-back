@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Club;
 use App\Entity\Image;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -44,7 +45,8 @@ class ImageService {
     return bin2hex("logo.png");
   }
 
-  public function importItacPhotos(UploadedFile $file): void {
+  public function importItacPhotos(Club $club, UploadedFile $file): void {
+    //FIXME: Migrate all that for DB managed images
     $imagesFolder = $this->params->get('app.members_photos');
     $this->createFolderIfNotExist($imagesFolder);
 

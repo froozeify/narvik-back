@@ -103,13 +103,13 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
 
     $this->loggedAsBadgerClub1();
     $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/search", [
-      'query' => $memberClub1->getFullName()
+      'query' => $memberClub1->getFullName(),
     ]);
     $this->assertResponseStatusCodeSame(ResponseCodeEnum::ok->value);
     $this->assertCount(1, $response->toArray());
 
     $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/search", [
-      'query' => $memberClub2->getFullName()
+      'query' => $memberClub2->getFullName(),
     ]);
     $this->assertResponseStatusCodeSame(ResponseCodeEnum::ok->value);
     $this->assertCount(0, $response->toArray());
@@ -131,9 +131,9 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
       'headers' => ['Content-Type' => 'multipart/form-data'],
       'extra' => [
         'files' => [
-          'file' => $file
-        ]
-      ]
+          'file' => $file,
+        ],
+      ],
     ]);
 
     $this->assertResponseIsSuccessful();
@@ -155,9 +155,9 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
       'headers' => ['Content-Type' => 'multipart/form-data'],
       'extra' => [
         'files' => [
-          'file' => $file
-        ]
-      ]
+          'file' => $file,
+        ],
+      ],
     ]);
 
     $this->assertResponseIsSuccessful();
@@ -188,9 +188,9 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
       'headers' => ['Content-Type' => 'multipart/form-data'],
       'extra' => [
         'files' => [
-          'file' => $file
-        ]
-      ]
+          'file' => $file,
+        ],
+      ],
     ]);
 
     $this->assertResponseIsSuccessful();
@@ -212,9 +212,9 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
       'headers' => ['Content-Type' => 'multipart/form-data'],
       'extra' => [
         'files' => [
-          'file' => $file
-        ]
-      ]
+          'file' => $file,
+        ],
+      ],
     ]);
 
     $this->assertResponseIsSuccessful();
@@ -226,5 +226,10 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
     // 2 new members
     $response = $this->makeGetRequest($this->getRootWClubUrl($club));
     $this->assertCount($this->TOTAL_ADMIN_CLUB_1 + 2, $response->toArray()['member']);
+  }
+
+  public function testImportItacPhotos(): void {
+    // We update a member licence so it's match the one in the fixture zip
+    
   }
 }

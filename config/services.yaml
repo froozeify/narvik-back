@@ -11,6 +11,10 @@ parameters:
     # app.public_images: '%kernel.project_dir%/private/images/public'
     # app.members_photos: '%app.files%/members'
 
+when@test:
+    parameters:
+        app.files: '%kernel.project_dir%/private/test'
+
 services:
     # default configuration for services in *this* file
     _defaults:

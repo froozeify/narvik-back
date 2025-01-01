@@ -11,6 +11,7 @@ use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Story\_InitStory;
 use Doctrine\DBAL\Connection;
 use JetBrains\PhpStorm\NoReturn;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -37,6 +38,17 @@ abstract class AbstractTestCase extends ApiTestCase {
 
     $this->initDefaultFixtures();
   }
+
+  public function tearDown(): void {
+    $fs = self::getContainer()->get(FileSystem::class);
+    $testFolder = self::$kernel->getContainer()->getParameter('app.files');
+    if ($fs->exists($testFolder)) {
+      $fs->remove($testFolder);
+    }
+
+    parent::tearDown();
+  }
+
 
   public function initDefaultFixtures(): void {}
 

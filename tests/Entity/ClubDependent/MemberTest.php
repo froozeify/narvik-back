@@ -258,5 +258,9 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
 
     $response = $this->makeGetRequest($memberIri);
     $this->assertJsonHasKey("profileImage", $response);
+
+    // We get the image
+    $r = $this->makeGetRequest($response->toArray(false)['profileImage']['privateUrl']);
+    $this->assertResponseIsSuccessful();
   }
 }

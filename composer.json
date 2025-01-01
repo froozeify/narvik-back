@@ -9,9 +9,9 @@
     "require": {
         "php": ">=8.4",
         "ext-ctype": "*",
-        "ext-iconv": "*",
         "ext-gd": "*",
         "ext-gmp": "*",
+        "ext-iconv": "*",
         "ext-zip": "*",
         "api-platform/doctrine-orm": "^4.0",
         "api-platform/ramsey-uuid": "^4.0",
@@ -35,6 +35,7 @@
         "symfony/dotenv": "7.1.*",
         "symfony/expression-language": "7.1.*",
         "symfony/filesystem": "7.1.*",
+        "symfony/finder": "7.1.*",
         "symfony/flex": "^2",
         "symfony/form": "7.1.*",
         "symfony/framework-bundle": "7.1.*",

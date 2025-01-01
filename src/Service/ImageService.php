@@ -12,9 +12,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpFoundation\File\File as SfFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mime\Part\File;
-use Symfony\Component\HttpFoundation\File\File as SfFile;
 
 
 class ImageService {
@@ -33,6 +34,12 @@ class ImageService {
   private function createFolderIfNotExist(string $path): void {
     if (!$this->fs->exists($path)) {
       mkdir($path, recursive: true);
+    }
+  }
+
+  private function removeFolder(string $path): void {
+    if ($this->fs->exists($path)) {
+      $this->fs->remove($path);
     }
   }
 
@@ -67,16 +74,25 @@ class ImageService {
       $this->entityManager->remove($oldPicture);
     }
 
+    $fileFolder = $this->params->get('app.files');
+    $tmpFolder = $fileFolder . '/tmp_zip_itac_photos_' . UuidService::generateUuid();
+    $this->createFolderIfNotExist($tmpFolder);
+
     // We import from the zip
     $zipArchive = new \ZipArchive();
     $zipArchive->open($file->getRealPath());
-    for ($i = 0; $zipFile = $zipArchive->statIndex($i); $i++) {
-      if (\is_dir($zipFile['name'])) {
-        continue;
-      }
+    $zipArchive->extractTo($tmpFolder);
+    $zipArchive->close();
 
+    $finder = new Finder();
+    $finder->files()->in($tmpFolder);
+    if (!$finder->hasResults()) {
+      return;
+    }
+
+    foreach ($finder as $findFile) {
       // We only import for match member
-      $licence = explode('.', $zipFile['name'], 2)[0];
+      $licence = explode('.', $findFile->getFilename(), 2)[0];
       if (empty($licence)) {
         continue;
       }
@@ -85,29 +101,15 @@ class ImageService {
         continue;
       }
 
-      // file contents
-      $content = $zipArchive->getFromIndex($i);
-      $imageRaw = imagecreatefromstring($content);
-
-      if (!$imageRaw) {
-        continue;
-      }
-
-      $fileFolder = $this->params->get('app.files');
-      $tmpFile = $fileFolder . '/' . UuidService::generateUuid() . '_' . $zipFile['name'] . '.webp';
-      imagewebp($imageRaw, $tmpFile);
-      $uploadedFile = new SfFile($tmpFile);
-      $dbFile = $this->fileService->importFile($uploadedFile, $zipFile['name'], FileCategory::member_picture, club: $club, flush: false);
+      $uploadedFile = new SfFile($findFile->getRealPath());
+      $dbFile = $this->fileService->importFile($uploadedFile, $findFile->getFilename(), FileCategory::member_picture, club: $club, flush: false);
 
       $member->setProfileImage($dbFile);
       $this->entityManager->persist($member);
-
-      // We unset the tmp one
-      imagedestroy($imageRaw);
     }
-    $zipArchive->close();
 
     $this->entityManager->flush();
+    $this->removeFolder($tmpFolder);
   }
 
   public function loadImageFromProtectedPath(string $publicId, bool $isInline = false): ?Image {

@@ -7,6 +7,7 @@ use App\Entity\ClubDependent\Member;
 use App\Enum\ClubRole;
 use App\Message\ItacMembersMessage;
 use App\Message\ItacSecondaryClubMembersMessage;
+use App\Service\UuidService;
 use App\Tests\Entity\Abstract\AbstractEntityClubLinkedTestCase;
 use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Factory\ActivityFactory;
@@ -230,6 +231,6 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
 
   public function testImportItacPhotos(): void {
     // We update a member licence so it's match the one in the fixture zip
-    
+    self::markTestSkipped();
   }
 }

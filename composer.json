@@ -10,6 +10,7 @@
         "php": ">=8.4",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "ext-gd": "*",
         "ext-gmp": "*",
         "ext-zip": "*",
         "api-platform/doctrine-orm": "^4.0",

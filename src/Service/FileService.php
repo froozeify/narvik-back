@@ -32,8 +32,6 @@ class FileService {
     if ($this->fs->exists($path)) {
       $this->fs->remove($path);
     }
-
-    $this->entityManager->remove($file);
   }
 
   public function importFile(SfFile $file, string $filename, FileCategory $fileCategory, bool $isPublic = false, ?Club $club = null, bool $flush = true): FileEntity {

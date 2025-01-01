@@ -230,7 +230,33 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
   }
 
   public function testImportItacPhotos(): void {
+    $club = _InitStory::club_1();
     // We update a member licence so it's match the one in the fixture zip
-    self::markTestSkipped();
+    $member = _InitStory::MEMBER_member_club_1();
+    $memberIri = $this->getIriFromResource($member);
+
+    $this->loggedAsAdminClub1();
+    $this->makePatchRequest($memberIri, ["licence" => "01234321"]);
+    $this->assertResponseIsSuccessful();
+
+    $response = $this->makeGetRequest($memberIri);
+    $this->assertJsonNotHasKey("profileImage", $response);
+    $this->assertJsonContains(["licence" => "01234321"]);
+
+    // We upload the zip
+    $file = new UploadedFile(__DIR__ . '/../../fixtures/profile-pictures.zip', 'profile-pictures.zip');
+    $this->makePostRequest($this->getRootWClubUrl($club) . "/-/photos-from-itac", [
+      '_not_json' => true,
+      'headers' => ['Content-Type' => 'multipart/form-data'],
+      'extra' => [
+        'files' => [
+          'file' => $file,
+        ],
+      ],
+    ]);
+    $this->assertResponseIsSuccessful();
+
+    $response = $this->makeGetRequest($memberIri);
+    $this->assertJsonHasKey("profileImage", $response);
   }
 }

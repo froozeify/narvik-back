@@ -5,6 +5,7 @@ namespace App\EventSubscriber\Doctrine;
 use App\Entity\ClubDependent\Member;
 use App\Entity\File;
 use App\Entity\Sale;
+use App\Service\FileService;
 use App\Service\UuidService;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\Event\PostLoadEventArgs;
@@ -17,6 +18,11 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 #[AsEntityListener(entity: File::class)]
 class FileSubscriber extends AbstractEventSubscriber {
+  public function __construct(
+    private readonly FileService $fileService,
+  ) {
+  }
+
 
   public function postLoad(File $file, PostLoadEventArgs $args): void {
     $fileId = UuidService::encodeToReadable($file->getUuid());
@@ -31,8 +37,6 @@ class FileSubscriber extends AbstractEventSubscriber {
   }
 
   public function postRemove(File $file, PostRemoveEventArgs $args): void {
-    // TODO: Remove the file
-    dump($file->getUuid()->toString());
-    dump($file->getPath());
+    $this->fileService->remove($file);
   }
 }

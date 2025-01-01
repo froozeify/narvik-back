@@ -75,25 +75,37 @@ class MemberRepository extends ServiceEntityRepository {
   }
 
   public function findOneByLicence(Club $club, string $licence): ?Member {
-    return $this->createQueryBuilder('m')
+    $query = $this->createQueryBuilder('m')
       ->andWhere('m.licence = :licence')
       ->andWhere('m.club = :club')
       ->setParameter('licence', $licence)
       ->setParameter('club', $club)
       ->setMaxResults(1)
-      ->getQuery()
-      ->getOneOrNullResult();
+      ->getQuery();
+
+    try {
+      return $query->getOneOrNullResult();
+    }
+    catch (\Exception $e) {
+      return null;
+    }
   }
 
   public function findOneByEmail(Club $club, string $email): ?Member {
-    return $this->createQueryBuilder('m')
+    $query = $this->createQueryBuilder('m')
       ->andWhere('m.email = :email')
       ->andWhere('m.club = :club')
       ->setParameter('email', $email)
       ->setParameter('club', $club)
       ->setMaxResults(1)
-      ->getQuery()
-      ->getOneOrNullResult();
+      ->getQuery();
+
+    try {
+      return $query->getOneOrNullResult();
+    }
+    catch (\Exception $e) {
+      return null;
+    }
   }
 
   public function findAllNotPresentToday(Club $club): array {

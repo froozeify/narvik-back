@@ -7,6 +7,7 @@ use App\Entity\File as FileEntity;
 use App\Entity\Image;
 use App\Enum\FileCategory;
 use App\Repository\FileRepository;
+use App\Repository\MemberRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
@@ -22,6 +23,7 @@ class ImageService {
     private readonly Filesystem $fs,
     private readonly ContainerBagInterface $params,
     private readonly FileRepository $fileRepository,
+    private readonly MemberRepository $memberRepository,
     private readonly FileService $fileService,
     private readonly EntityManagerInterface $entityManager,
   ) {
@@ -62,7 +64,7 @@ class ImageService {
     // We remove all old profile images
     $oldPictures = $this->fileRepository->findByClubAndCategory($club, FileCategory::member_picture);
     foreach ($oldPictures as $oldPicture) {
-      $this->fileService->remove($oldPicture);
+      $this->entityManager->remove($oldPicture);
     }
 
     // We import from the zip
@@ -70,6 +72,16 @@ class ImageService {
     $zipArchive->open($file->getRealPath());
     for ($i = 0; $zipFile = $zipArchive->statIndex($i); $i++) {
       if (\is_dir($zipFile['name'])) {
+        continue;
+      }
+
+      // We only import for match member
+      $licence = explode('.', $zipFile['name'], 2)[0];
+      if (empty($licence)) {
+        continue;
+      }
+      $member = $this->memberRepository->findOneByLicence($club, $licence);
+      if (!$member) {
         continue;
       }
 
@@ -85,7 +97,10 @@ class ImageService {
       $tmpFile = $fileFolder . '/' . UuidService::generateUuid() . '_' . $zipFile['name'] . '.webp';
       imagewebp($imageRaw, $tmpFile);
       $uploadedFile = new SfFile($tmpFile);
-      $this->fileService->importFile($uploadedFile, $zipFile['name'], FileCategory::member_picture, club: $club, flush: false);
+      $dbFile = $this->fileService->importFile($uploadedFile, $zipFile['name'], FileCategory::member_picture, club: $club, flush: false);
+
+      $member->setProfileImage($dbFile);
+      $this->entityManager->persist($member);
 
       // We unset the tmp one
       imagedestroy($imageRaw);

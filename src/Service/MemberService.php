@@ -18,12 +18,6 @@ class MemberService {
   ) {
   }
 
-  public function setProfileImage(Member $member): void {
-    if ($member->getLicence() && $photoPath = $this->imageService->getMemberPhotoPath($member->getLicence())) {
-      $member->setProfileImage($photoPath);
-    }
-  }
-
   public function setCurrentSeason(Member $member): void {
     $currentSeason = $this->seasonRepository->findCurrentSeason();
     if (!$currentSeason) return;

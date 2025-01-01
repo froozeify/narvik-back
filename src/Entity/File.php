@@ -22,9 +22,6 @@ class File implements UuidEntityInterface {
   #[Groups(['common-read'])]
   private ?string $privateUrl = null;
 
-  #[Groups(['common-read'])]
-  private ?string $privateInlineUrl = null;
-
   #[ORM\Column(type: "string", enumType: FileCategory::class)]
   private ?FileCategory $category = null;
 
@@ -68,15 +65,6 @@ class File implements UuidEntityInterface {
 
   public function setPrivateUrl(?string $privateUrl): File {
     $this->privateUrl = $privateUrl;
-    return $this;
-  }
-
-  public function getPrivateInlineUrl(): ?string {
-    return $this->privateInlineUrl;
-  }
-
-  public function setPrivateInlineUrl(?string $privateInlineUrl): File {
-    $this->privateInlineUrl = $privateInlineUrl;
     return $this;
   }
 

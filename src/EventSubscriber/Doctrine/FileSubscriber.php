@@ -28,7 +28,6 @@ class FileSubscriber extends AbstractEventSubscriber {
     }
 
     $file->setPrivateUrl("/images/$fileId");
-    $file->setPrivateInlineUrl("/images/inline/$fileId");
   }
 
   public function postRemove(File $file, PostRemoveEventArgs $args): void {

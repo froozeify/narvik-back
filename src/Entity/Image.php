@@ -12,10 +12,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ApiResource(
   operations: [
     new Get(),
-    new Get(
-      uriTemplate: '/images/inline/{id}',
-      name: 'inline_image'
-    ),
 
     new Get(
       uriTemplate: '/public/images/{id}',

@@ -63,8 +63,8 @@ jobs:
       -
         name: Run PHPUnit
         run: | 
-          docker compose exec -T php XDEBUG_MODE=coverage bin/phpunit --coverage-clover coverage.xml .
-          docker compose cp php:coverage.xml .
+          docker compose exec -T sh -c 'php XDEBUG_MODE=coverage bin/phpunit --coverage-clover /app/coverage.xml .'
+          docker compose cp php:/app/coverage.xml ./coverage.xml
       -
         name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5

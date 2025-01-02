@@ -1,4 +1,4 @@
-App\Entity\MemberPresence:
+App\Entity\ClubDependent\Plugin\Presence\MemberPresence:
     id: ~
     date: ~
     createdAt: ~ 

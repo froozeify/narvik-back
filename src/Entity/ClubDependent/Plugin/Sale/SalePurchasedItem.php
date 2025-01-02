@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\ClubDependent\Plugin\Sale;
 
 use App\Entity\Abstract\UuidEntity;
 use App\Entity\Interface\TimestampEntityInterface;
+use App\Entity\InventoryItem;
 use App\Entity\Trait\TimestampTrait;
 use App\Repository\SalePurchasedItemRepository;
 use App\Service\UtilsService;

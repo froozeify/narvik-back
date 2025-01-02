@@ -2,19 +2,12 @@
 
 namespace App\EventSubscriber\Doctrine;
 
-use App\Entity\ClubDependent\Member;
 use App\Entity\File;
-use App\Entity\Sale;
 use App\Service\FileService;
 use App\Service\UuidService;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\Event\PostLoadEventArgs;
-use Doctrine\ORM\Event\PostPersistEventArgs;
 use Doctrine\ORM\Event\PostRemoveEventArgs;
-use Doctrine\ORM\Event\PrePersistEventArgs;
-use Doctrine\ORM\Event\PreUpdateEventArgs;
-use Doctrine\Persistence\Event\LifecycleEventArgs;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 #[AsEntityListener(entity: File::class)]
 class FileSubscriber extends AbstractEventSubscriber {

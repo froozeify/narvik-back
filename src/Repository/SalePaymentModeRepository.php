@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\SalePaymentMode;
+use App\Entity\ClubDependent\Plugin\Sale\SalePaymentMode;
 use App\Repository\Interface\SortableRepositoryInterface;
 use App\Repository\Trait\SortableEntityRepositoryTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;

@@ -1,4 +1,4 @@
-App\Entity\Sale:
+App\Entity\ClubDependent\Plugin\Sale\Sale:
     id: ~
     createdAt: ~ 
     updatedAt: ~ 

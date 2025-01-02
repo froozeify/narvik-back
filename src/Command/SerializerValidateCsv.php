@@ -23,8 +23,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class SerializerValidateCsv extends Command {
   private OutputInterface $output;
   private SymfonyStyle $io;
-  private $entities = [];
-  private $customCsvConfigs = [];
+  private array $entities = [];
+  private array $customCsvConfigs = [];
 
   public function __construct(
     private readonly KernelInterface $kernel,

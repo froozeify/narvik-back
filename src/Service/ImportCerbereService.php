@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Entity\ClubDependent\Activity;
+use App\Entity\ClubDependent\Plugin\Presence\Activity;
 use App\Message\CerberePresencesDateMessage;
 use App\Repository\ActivityRepository;
 use Doctrine\ORM\EntityManagerInterface;

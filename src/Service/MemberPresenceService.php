@@ -3,8 +3,8 @@
 namespace App\Service;
 
 use App\Entity\Club;
-use App\Entity\ClubDependent\MemberPresence;
-use App\Entity\ExternalPresence;
+use App\Entity\ClubDependent\Plugin\Presence\ExternalPresence;
+use App\Entity\ClubDependent\Plugin\Presence\MemberPresence;
 use App\Repository\ExternalPresenceRepository;
 use App\Repository\MemberPresenceRepository;
 use App\Repository\MemberRepository;

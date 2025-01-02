@@ -2,7 +2,7 @@
 
 namespace App\Importer;
 
-use App\Entity\ClubDependent\MemberPresence;
+use App\Entity\ClubDependent\Plugin\Presence\MemberPresence;
 use App\Importer\Model\AbstractImportedItemResult;
 use App\Importer\Model\ErrorImportedItem;
 use App\Importer\Model\SuccessImportedItem;

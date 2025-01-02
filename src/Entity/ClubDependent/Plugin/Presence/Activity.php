@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity\ClubDependent;
+namespace App\Entity\ClubDependent\Plugin\Presence;
 
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiFilter;
@@ -11,10 +11,10 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use App\Controller\ActivityMerge;
+use ApiPlatform\OpenApi\Model;
+use App\Controller\ClubDependent\Plugin\Presence\ActivityMerge;
 use App\Entity\Abstract\UuidEntity;
 use App\Entity\Club;
-use App\Entity\ExternalPresence;
 use App\Entity\Interface\ClubLinkedEntityInterface;
 use App\Entity\Trait\SelfClubLinkedEntityTrait;
 use App\Enum\ClubRole;
@@ -24,7 +24,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use ApiPlatform\OpenApi\Model;
 
 
 #[ORM\Entity(repositoryClass: ActivityRepository::class)]

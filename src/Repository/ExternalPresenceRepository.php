@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\ExternalPresence;
+use App\Entity\ClubDependent\Plugin\Presence\ExternalPresence;
 use App\Repository\Interface\PresenceRepositoryInterface;
 use App\Repository\Trait\PresenceRepositoryTrait;
 use App\Service\GlobalSettingService;

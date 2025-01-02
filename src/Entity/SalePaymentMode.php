@@ -13,7 +13,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\OpenApi\Model;
-use App\Controller\SalePaymentModeMove;
+use App\Controller\ClubDependent\Plugin\Sale\SalePaymentModeMove;
 use App\Entity\Abstract\UuidEntity;
 use App\Entity\Interface\SortableEntityInterface;
 use App\Repository\SalePaymentModeRepository;

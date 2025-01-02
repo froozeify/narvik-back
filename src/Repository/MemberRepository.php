@@ -5,7 +5,7 @@ namespace App\Repository;
 use App\DQL\CustomExpr;
 use App\Entity\Club;
 use App\Entity\ClubDependent\Member;
-use App\Entity\ClubDependent\MemberPresence;
+use App\Entity\ClubDependent\Plugin\Presence\MemberPresence;
 use App\Repository\Trait\UuidEntityRepositoryTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;

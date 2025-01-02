@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity\ClubDependent;
+namespace App\Entity\ClubDependent\Plugin\Sale;
 
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiFilter;
@@ -13,7 +13,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\OpenApi\Model;
-use App\Controller\InventoryCategoryMove;
+use App\Controller\ClubDependent\Plugin\Sale\InventoryCategoryMove;
 use App\Entity\Abstract\UuidEntity;
 use App\Entity\Club;
 use App\Entity\Interface\ClubLinkedEntityInterface;

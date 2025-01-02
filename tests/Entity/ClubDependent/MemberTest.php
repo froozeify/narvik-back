@@ -2,20 +2,14 @@
 
 namespace App\Tests\Entity\ClubDependent;
 
-use App\Entity\ClubDependent\Activity;
 use App\Entity\ClubDependent\Member;
-use App\Enum\ClubRole;
 use App\Message\ItacMembersMessage;
 use App\Message\ItacSecondaryClubMembersMessage;
-use App\Service\UuidService;
 use App\Tests\Entity\Abstract\AbstractEntityClubLinkedTestCase;
 use App\Tests\Enum\ResponseCodeEnum;
-use App\Tests\Factory\ActivityFactory;
 use App\Tests\Factory\MemberFactory;
 use App\Tests\Story\_InitStory;
-use App\Tests\Story\ActivityStory;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Messenger\Test\InteractsWithMessenger;
 
 class MemberTest extends AbstractEntityClubLinkedTestCase {

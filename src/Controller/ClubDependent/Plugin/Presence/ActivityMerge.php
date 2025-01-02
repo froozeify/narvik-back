@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\ClubDependent\Plugin\Presence;
 
+use App\Controller\Abstract\AbstractClubDependentController;
 use App\Controller\Abstract\AbstractController;
-use App\Entity\ClubDependent\Activity;
+use App\Entity\ClubDependent\Plugin\Presence\Activity;
 use App\Repository\ActivityRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class ActivityMerge extends AbstractController {
+class ActivityMerge extends AbstractClubDependentController {
 
   public function __invoke(Request $request, Activity $activity, ActivityRepository $activityRepository): Response {
     $json = $this->checkAndGetJsonValues($request, ['target']);

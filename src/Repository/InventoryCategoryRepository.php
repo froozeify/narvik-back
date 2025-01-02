@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\ClubDependent\InventoryCategory;
+use App\Entity\ClubDependent\Plugin\Sale\InventoryCategory;
 use App\Repository\Interface\SortableRepositoryInterface;
 use App\Repository\Trait\SortableEntityRepositoryTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;

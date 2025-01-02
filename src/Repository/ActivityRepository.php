@@ -2,9 +2,9 @@
 
 namespace App\Repository;
 
-use App\Entity\ClubDependent\Activity;
-use App\Entity\ClubDependent\MemberPresence;
-use App\Entity\ExternalPresence;
+use App\Entity\ClubDependent\Plugin\Presence\Activity;
+use App\Entity\ClubDependent\Plugin\Presence\ExternalPresence;
+use App\Entity\ClubDependent\Plugin\Presence\MemberPresence;
 use App\Repository\Trait\UuidEntityRepositoryTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;

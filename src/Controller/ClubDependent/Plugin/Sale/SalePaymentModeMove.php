@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\ClubDependent\Plugin\Sale;
 
 use App\Controller\Abstract\SortableController;
 use App\Entity\SalePaymentMode;

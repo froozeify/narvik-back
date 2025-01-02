@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity\ClubDependent;
+namespace App\Entity\ClubDependent\Plugin\Presence;
 
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
@@ -14,11 +14,12 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
-use App\Controller\MemberPresencesFromCsv;
-use App\Controller\MemberPresencesFromItac;
-use App\Controller\MemberPresencesImportFromExternal;
-use App\Controller\MemberPresenceToday;
+use App\Controller\ClubDependent\Plugin\Presence\MemberPresencesFromCsv;
+use App\Controller\ClubDependent\Plugin\Presence\MemberPresencesFromItac;
+use App\Controller\ClubDependent\Plugin\Presence\MemberPresencesImportFromExternal;
+use App\Controller\ClubDependent\Plugin\Presence\MemberPresenceToday;
 use App\Entity\Abstract\UuidEntity;
+use App\Entity\ClubDependent\Member;
 use App\Entity\Interface\TimestampEntityInterface;
 use App\Entity\Trait\TimestampTrait;
 use App\Filter\MultipleFilter;

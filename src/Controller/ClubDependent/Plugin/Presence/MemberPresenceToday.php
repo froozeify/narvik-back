@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\ClubDependent\Plugin\Presence;
 
 use App\Enum\GlobalSetting;
 use App\Repository\MemberPresenceRepository;

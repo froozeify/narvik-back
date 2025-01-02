@@ -2,7 +2,7 @@
 
 namespace App\Repository\Interface;
 
-use App\Entity\ClubDependent\Activity;
+use App\Entity\ClubDependent\Plugin\Presence\Activity;
 
 interface PresenceRepositoryInterface {
   public function findAllPresentToday(): array;

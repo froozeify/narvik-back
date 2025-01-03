@@ -9,6 +9,7 @@ use App\Enum\ClubRole;
 use App\Tests\Entity\Abstract\AbstractEntityClubLinkedTestCase;
 use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Factory\MemberFactory;
+use App\Tests\Factory\MemberSeasonFactory;
 use App\Tests\Story\_InitStory;
 use App\Tests\Story\SeasonStory;
 
@@ -76,36 +77,36 @@ class MemberSeasonTest extends AbstractEntityClubLinkedTestCase {
   }
 
   public function testPatch(): void {
-    self::markTestSkipped();
-//    $this->makeAllLoggedRequests(
-//      requestFunction: function (string $level, ?int $id) {
-//        $member = MemberFactory::createOne([
-//          'club' => _InitStory::club_1(),
-//        ]);
-//        $iri = $this->getIriFromResource($member);
-//
-//        $payload = [
-//          "firstname" => 'Updated name',
-//        ];
-//
-//        $this->makePatchRequest($iri, $payload);
-//      },
-//    );
+    // Patch is not enabled
+    $memberSeason = MemberSeasonFactory::random();
+    $iri = $this->getIriFromResource($memberSeason);
+
+    $this->makeAllLoggedRequests(
+      memberClub1Code: ResponseCodeEnum::not_allowed,
+      supervisorClub1Code: ResponseCodeEnum::not_allowed,
+      adminClub1Code: ResponseCodeEnum::not_allowed,
+      adminClub2Code: ResponseCodeEnum::not_allowed,
+      superAdminCode: ResponseCodeEnum::not_allowed,
+      badgerClub1Code: ResponseCodeEnum::not_allowed,
+      badgerClub2Code: ResponseCodeEnum::not_allowed,
+      requestFunction: function (string $level, ?int $id) use ($iri) {
+        $this->makePatchRequest($iri);
+      },
+    );
   }
 
   public function testDelete(): void {
-    self::markTestSkipped();
-//    $this->makeAllLoggedRequests(
-//      supervisorClub1Code: ResponseCodeEnum::forbidden,
-//      adminClub1Code: ResponseCodeEnum::no_content,
-//      superAdminCode: ResponseCodeEnum::no_content,
-//      requestFunction: function (string $level, ?int $id) {
-//        $member = MemberFactory::createOne([
-//          'club' => _InitStory::club_1(),
-//        ]);
-//        $iri = $this->getIriFromResource($member);
-//        $this->makeDeleteRequest($iri);
-//      },
-//    );
+    $this->makeAllLoggedRequests(
+      supervisorClub1Code: ResponseCodeEnum::no_content,
+      adminClub1Code: ResponseCodeEnum::no_content,
+      superAdminCode: ResponseCodeEnum::no_content,
+      requestFunction: function (string $level, ?int $id) {
+        $memberSeason = MemberSeasonFactory::createOne([
+          'member' => $this->selectedMember,
+        ]);
+        $iri = $this->getIriFromResource($memberSeason);
+        $this->makeDeleteRequest($iri);
+      },
+    );
   }
 }

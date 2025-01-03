@@ -120,7 +120,7 @@
         ],
         "reload-schema": [
             "php bin/console doctrine:schema:drop --force",
-            "php bin/console doctrine:schema:update --force"
+            "php bin/console doctrine:schema:update --complete --force"
         ],
         "reload-fixture": [
             "@reload-schema",
@@ -128,7 +128,7 @@
         ],
         "reload-test": [
             "php bin/console --env=test doctrine:schema:drop --force",
-            "php bin/console --env=test doctrine:schema:update --force",
+            "php bin/console --env=test doctrine:schema:update --complete --force",
             "php bin/console --env=test doctrine:fixtures:load -q"
         ],
         "test": [

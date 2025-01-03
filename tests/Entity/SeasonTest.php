@@ -9,7 +9,7 @@ use App\Tests\Factory\SeasonFactory;
 use App\Tests\Story\SeasonStory;
 
 class SeasonTest extends AbstractEntityTestCase {
-  protected int $TOTAL_SUPER_ADMIN = 6;
+  protected int $TOTAL_SUPER_ADMIN = 10;
 
   protected function getClassname(): string {
     return Season::class;
@@ -26,17 +26,16 @@ class SeasonTest extends AbstractEntityTestCase {
 
   public function testCreate(): void {
     $payload = [
-      "name" => '2018/2019',
+      "name" => '2010/2011',
     ];
 
     // Only super admin can create
     $this->makeAllLoggedRequests(
-      $payload,
-      ResponseCodeEnum::forbidden,
-      ResponseCodeEnum::forbidden,
-      ResponseCodeEnum::forbidden,
-      ResponseCodeEnum::forbidden,
-      ResponseCodeEnum::created,
+      memberClub1Code: ResponseCodeEnum::forbidden,
+      supervisorClub1Code: ResponseCodeEnum::forbidden,
+      adminClub1Code: ResponseCodeEnum::forbidden,
+      adminClub2Code: ResponseCodeEnum::forbidden,
+      superAdminCode: ResponseCodeEnum::created,
       badgerClub2Code: ResponseCodeEnum::forbidden,
       requestFunction: function (string $level, ?int $id) use ($payload) {
         $this->makePostRequest($this->getRootUrl(), $payload);
@@ -46,7 +45,7 @@ class SeasonTest extends AbstractEntityTestCase {
   }
 
   public function testPatch(): void {
-    $season = SeasonStory::getRandom('seasons');
+    $season = SeasonStory::season_2019();
     $iri = $this->getIriFromResource($season);
 
     $payload = [
@@ -70,11 +69,10 @@ class SeasonTest extends AbstractEntityTestCase {
   public function testDelete(): void {
     // Only super admin can delete
     $this->makeAllLoggedRequests(
-      null,
-      ResponseCodeEnum::forbidden,
-      ResponseCodeEnum::forbidden,
-      ResponseCodeEnum::forbidden,
-      ResponseCodeEnum::forbidden,
+      memberClub1Code: ResponseCodeEnum::forbidden,
+      supervisorClub1Code: ResponseCodeEnum::forbidden,
+      adminClub1Code: ResponseCodeEnum::forbidden,
+      adminClub2Code: ResponseCodeEnum::forbidden,
       superAdminCode: ResponseCodeEnum::no_content,
       badgerClub2Code: ResponseCodeEnum::forbidden,
       requestFunction: function (string $level, ?int $id) {

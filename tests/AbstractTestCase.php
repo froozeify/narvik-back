@@ -141,7 +141,7 @@ abstract class AbstractTestCase extends ApiTestCase {
   }
 
   public function makeAllLoggedRequests(
-    ?array $payloadToValidate = null,
+    ?array &$payloadToValidate = null,
     ResponseCodeEnum $memberClub1Code = ResponseCodeEnum::forbidden,
     ResponseCodeEnum $supervisorClub1Code = ResponseCodeEnum::ok,
     ResponseCodeEnum $adminClub1Code  = ResponseCodeEnum::ok,

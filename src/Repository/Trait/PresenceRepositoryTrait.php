@@ -2,6 +2,7 @@
 
 namespace App\Repository\Trait;
 
+use App\Entity\Club;
 use App\Entity\ClubDependent\Plugin\Presence\Activity;
 use App\Enum\GlobalSetting;
 use Doctrine\ORM\Query\Expr\Join;
@@ -38,12 +39,14 @@ trait PresenceRepositoryTrait {
   /**
    * @return array Returns an array of presences
    */
-  public function findAllPresentToday(): array {
+  public function findAllPresentToday(Club $club): array {
     $qb = $this->createQueryBuilder('m');
     return
       $this->applyTodayConstraint($qb)
-           ->orderBy('m.createdAt', 'DESC')
-           ->getQuery()->getResult()
+            ->andWhere('m.' . $this->getClassName()::getClubSqlPath(), ':club')
+            ->setParameter(':club', $club)
+            ->orderBy('m.createdAt', 'DESC')
+            ->getQuery()->getResult()
       ;
   }
 

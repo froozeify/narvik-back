@@ -71,11 +71,10 @@ class AgeCategoryTest extends AbstractEntityTestCase {
   public function testDelete(): void {
     // Only super admin can delete
     $this->makeAllLoggedRequests(
-      null,
-      ResponseCodeEnum::forbidden,
-      ResponseCodeEnum::forbidden,
-      ResponseCodeEnum::forbidden,
-      ResponseCodeEnum::forbidden,
+      memberClub1Code: ResponseCodeEnum::forbidden,
+      supervisorClub1Code: ResponseCodeEnum::forbidden,
+      adminClub1Code: ResponseCodeEnum::forbidden,
+      adminClub2Code: ResponseCodeEnum::forbidden,
       superAdminCode: ResponseCodeEnum::no_content,
       badgerClub2Code: ResponseCodeEnum::forbidden,
       requestFunction: function (string $level, ?int $id) {

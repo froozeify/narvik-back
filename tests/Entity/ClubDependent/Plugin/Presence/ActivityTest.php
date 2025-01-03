@@ -60,7 +60,10 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
       adminClub2Code: ResponseCodeEnum::forbidden,
       superAdminCode: ResponseCodeEnum::created,
       badgerClub2Code: ResponseCodeEnum::forbidden,
-      requestFunction: function (string $level, ?int $id) use ($club1, $payload) {
+      requestFunction: function (string $level, ?int $id) use ($club1, &$payload, &$payloadCheck) {
+        // We update for each test since the name must be unique
+        $payload['name'] .= '1';
+        $payloadCheck['name'] .= '1';
         $this->makePostRequest($this->getRootWClubUrl($club1), $payload);
       },
     );
@@ -100,7 +103,6 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
 
   public function testDelete(): void {
     $this->makeAllLoggedRequests(
-      null,
       supervisorClub1Code: ResponseCodeEnum::forbidden,
       adminClub1Code: ResponseCodeEnum::no_content,
       superAdminCode: ResponseCodeEnum::no_content,
@@ -163,7 +165,6 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
 
   public function testActivityMerge(): void {
     $this->makeAllLoggedRequests(
-      null,
       supervisorClub1Code: ResponseCodeEnum::forbidden,
       requestFunction: function () {
         $activity = ActivityFactory::createOne([

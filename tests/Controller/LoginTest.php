@@ -15,14 +15,13 @@ use Symfony\Component\HttpFoundation\Response;
 class LoginTest extends AbstractTestCase {
   public function testSuccessful(): void {
     $this->makeAllLoggedRequests(
-      null,
-      ResponseCodeEnum::ok,
-      ResponseCodeEnum::ok,
-      ResponseCodeEnum::ok,
-      ResponseCodeEnum::ok,
-      ResponseCodeEnum::ok,
-      ResponseCodeEnum::ok,
-      ResponseCodeEnum::ok,
+      memberClub1Code: ResponseCodeEnum::ok,
+      supervisorClub1Code: ResponseCodeEnum::ok,
+      adminClub1Code: ResponseCodeEnum::ok,
+      adminClub2Code: ResponseCodeEnum::ok,
+      superAdminCode: ResponseCodeEnum::ok,
+      badgerClub1Code: ResponseCodeEnum::ok,
+      badgerClub2Code: ResponseCodeEnum::ok,
     );
   }
 

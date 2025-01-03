@@ -64,10 +64,9 @@ class ClubTest extends AbstractEntityTestCase {
   public function testDelete(): void {
     // Only super admin can delete
     $this->makeAllLoggedRequests(
-      null,
-      ResponseCodeEnum::not_found,
-      ResponseCodeEnum::not_found,
-      ResponseCodeEnum::not_found,
+      memberClub1Code: ResponseCodeEnum::not_found,
+      supervisorClub1Code: ResponseCodeEnum::not_found,
+      adminClub1Code: ResponseCodeEnum::not_found,
       superAdminCode: ResponseCodeEnum::no_content,
       badgerClub1Code: ResponseCodeEnum::not_found,
       requestFunction: function (string $level, ?int $id) {

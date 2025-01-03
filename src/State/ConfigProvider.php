@@ -7,6 +7,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\ClubDependent\Member;
 use App\Entity\Config;
+use App\Entity\User;
 use App\Enum\ClubRole;
 use App\Enum\GlobalSetting;
 use App\Mailer\EmailService;
@@ -34,13 +35,13 @@ class ConfigProvider implements ProviderInterface {
     $config = new Config();
     $this->getDefaultConfig($config);
 
-    $member = $this->security->getUser();
+    $user = $this->security->getUser();
 
-    if (!$member instanceof Member) {
+    if (!$user instanceof User) {
       return $config;
     }
 
-    $this->getUserConfig($config, $member);
+    $this->getUserConfig($config, $user);
 
     return $config;
   }
@@ -60,8 +61,13 @@ class ConfigProvider implements ProviderInterface {
     ]);
   }
 
-  public function getUserConfig(Config $config, Member $member): void {
+  public function getUserConfig(Config $config, User $user): void {
     $config->setId('user');
+    if ($this->authorizationChecker->isGranted(ClubRole::supervisor->value) || $this->authorizationChecker->isGranted(ClubRole::badger->value)) {
+      $config->addModule('presences', [
+        'enabled' => true,
+      ]);
+    }
 
     // User a supervisor, he can have access to the sale management
     if ($this->authorizationChecker->isGranted(ClubRole::supervisor->value)) {

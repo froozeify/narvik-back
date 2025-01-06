@@ -19,9 +19,13 @@ use App\Controller\ClubDependent\Plugin\Presence\MemberPresencesFromItac;
 use App\Controller\ClubDependent\Plugin\Presence\MemberPresencesImportFromExternal;
 use App\Controller\ClubDependent\Plugin\Presence\MemberPresenceToday;
 use App\Entity\Abstract\UuidEntity;
+use App\Entity\Club;
 use App\Entity\ClubDependent\Member;
+use App\Entity\Interface\ClubLinkedEntityInterface;
 use App\Entity\Interface\TimestampEntityInterface;
+use App\Entity\Trait\SelfClubLinkedEntityTrait;
 use App\Entity\Trait\TimestampTrait;
+use App\Enum\ClubRole;
 use App\Filter\MultipleFilter;
 use App\Repository\MemberPresenceRepository;
 use App\Validator\Constraints\ActivityMustBeEnabled;
@@ -33,77 +37,105 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: MemberPresenceRepository::class)]
-#[UniqueEntity(fields: ['member', 'date'], message: 'Member already registered for that day')]
+#[UniqueEntity(fields: ['member', 'club', 'date'], message: 'Member already registered for that day')]
 #[ApiResource(
+  uriTemplate: '/clubs/{clubUuid}/member-presences/{uuid}',
   operations: [
-    new GetCollection(),
-    new Get(),
-    new Post(),
-    new Patch(),
-    new Delete(),
+    new GetCollection(
+      uriTemplate: '/clubs/{clubUuid}/member-presences.{_format}',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
+      security: "is_granted('".ClubRole::supervisor->value."', request) || is_granted('".ClubRole::badger->value."', request)",
+    ),
+    new Get(
+      security: "is_granted('".ClubRole::supervisor->value."', request) || is_granted('".ClubRole::badger->value."', request)",
+    ),
+    new Post(
+      uriTemplate: '/clubs/{clubUuid}/member-presences',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
+      securityPostDenormalize: "is_granted('".ClubRole::supervisor->value."', request) || is_granted('".ClubRole::badger->value."', request)",
+      read: false
+    ),
+    new Patch(
+      security: "is_granted('".ClubRole::supervisor->value."', request) || is_granted('".ClubRole::badger->value."', request)",
+    ),
+    new Delete(
+      security: "is_granted('".ClubRole::supervisor->value."', request) || is_granted('".ClubRole::badger->value."', request)",
+    ),
 
     new GetCollection(
-      uriTemplate: '/member-presences/-/today',
+      uriTemplate: '/clubs/{clubUuid}/member-presences/-/today',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
       controller: MemberPresenceToday::class,
       openapi: new Model\Operation(
         summary: 'Get all members present today',
       ),
+      security: "is_granted('".ClubRole::supervisor->value."', request) || is_granted('".ClubRole::badger->value."', request)",
       read: false,
-      write: false
+      write: false,
     ),
 
-    new Post(
-      uriTemplate: '/member-presences/-/from-cerbere',
-      controller: MemberPresencesFromItac::class,
-      openapi: new Model\Operation(
-        requestBody: new Model\RequestBody(
-          content: new \ArrayObject([
-            'multipart/form-data' => [
-              'schema' => [
-                'type' => 'object',
-                'properties' => [
-                  'file' => [
-                    'type' => 'string',
-                    'format' => 'binary'
-                  ]
-                ]
-              ]
-            ]
-          ])
-        )
-      ),
-      security: "is_granted('ROLE_ADMIN')",
-      deserialize: false,
-    ),
-    new Post(
-      uriTemplate: '/member-presences/-/from-csv',
-      controller: MemberPresencesFromCsv::class,
-      openapi: new Model\Operation(
-        requestBody: new Model\RequestBody(
-          content: new \ArrayObject([
-            'multipart/form-data' => [
-              'schema' => [
-                'type' => 'object',
-                'properties' => [
-                  'file' => [
-                    'type' => 'string',
-                    'format' => 'binary'
-                  ]
-                ]
-              ]
-            ]
-          ])
-        )
-      ),
-      security: "is_granted('ROLE_ADMIN')",
-      deserialize: false,
-    ),
-    new Post(
-      uriTemplate: '/member-presences/-/import-from-external-presences',
-      controller: MemberPresencesImportFromExternal::class,
-      security: "is_granted('ROLE_ADMIN')",
-      deserialize: false,
-    )
+//    new Post(
+//      uriTemplate: '/member-presences/-/from-cerbere',
+//      controller: MemberPresencesFromItac::class,
+//      openapi: new Model\Operation(
+//        requestBody: new Model\RequestBody(
+//          content: new \ArrayObject([
+//            'multipart/form-data' => [
+//              'schema' => [
+//                'type' => 'object',
+//                'properties' => [
+//                  'file' => [
+//                    'type' => 'string',
+//                    'format' => 'binary'
+//                  ]
+//                ]
+//              ]
+//            ]
+//          ])
+//        )
+//      ),
+//      security: "is_granted('ROLE_ADMIN')",
+//      deserialize: false,
+//    ),
+//    new Post(
+//      uriTemplate: '/member-presences/-/from-csv',
+//      controller: MemberPresencesFromCsv::class,
+//      openapi: new Model\Operation(
+//        requestBody: new Model\RequestBody(
+//          content: new \ArrayObject([
+//            'multipart/form-data' => [
+//              'schema' => [
+//                'type' => 'object',
+//                'properties' => [
+//                  'file' => [
+//                    'type' => 'string',
+//                    'format' => 'binary'
+//                  ]
+//                ]
+//              ]
+//            ]
+//          ])
+//        )
+//      ),
+//      security: "is_granted('ROLE_ADMIN')",
+//      deserialize: false,
+//    ),
+//    new Post(
+//      uriTemplate: '/member-presences/-/import-from-external-presences',
+//      controller: MemberPresencesImportFromExternal::class,
+//      security: "is_granted('ROLE_ADMIN')",
+//      deserialize: false,
+//    )
+  ],
+  uriVariables: [
+    'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+    'uuid' => new Link(fromClass: self::class),
   ],
   normalizationContext: [
     'groups' => ['member-presence', 'member-presence-read']
@@ -113,23 +145,24 @@ use Symfony\Component\Serializer\Attribute\Groups;
   ],
   paginationClientEnabled: true,
 )]
-#[ApiResource(
-  uriTemplate: '/members/{memberId}/presences.{_format}',
-  operations: [
-    new GetCollection(),
-  ], uriVariables: [
-    'memberId' => new Link(toProperty: 'member', fromClass: Member::class),
-  ], normalizationContext: [
-    'groups' => ['member-presence', 'member-presence-read']
-  ],
-  paginationClientEnabled: true,
-)]
+//#[ApiResource(
+//  uriTemplate: '/members/{memberId}/presences.{_format}',
+//  operations: [
+//    new GetCollection(),
+//  ], uriVariables: [
+//  'memberId' => new Link(toProperty: 'member', fromClass: Member::class),
+//], normalizationContext: [
+//  'groups' => ['member-presence', 'member-presence-read']
+//],
+//  paginationClientEnabled: true,
+//)]
 #[ApiFilter(DateFilter::class, properties: ['date' => DateFilter::EXCLUDE_NULL])]
 #[ApiFilter(OrderFilter::class, properties: ['date' => 'DESC', 'createdAt' => 'DESC'])]
 #[ApiFilter(MultipleFilter::class, properties: ['member.firstname', 'member.lastname', 'member.licence'])]
 #[ApiFilter(SearchFilter::class, properties: ['activities.uuid' => 'exact'])]
-class MemberPresence extends UuidEntity implements TimestampEntityInterface {
+class MemberPresence extends UuidEntity implements TimestampEntityInterface, ClubLinkedEntityInterface {
   use TimestampTrait;
+  use SelfClubLinkedEntityTrait;
 
   #[ORM\ManyToOne(targetEntity: Member::class, inversedBy: 'memberPresences')]
   #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -151,12 +184,25 @@ class MemberPresence extends UuidEntity implements TimestampEntityInterface {
     $this->date = new \DateTimeImmutable();
   }
 
+  public function getClub(): ?Club {
+    return $this->member?->getClub();
+  }
+
+  public function setClub(?Club $club): static {
+    $this->member?->setClub($club);
+    return $this;
+  }
+
+
   public function getMember(): ?Member {
     return $this->member;
   }
 
   public function setMember(?Member $member): static {
     $this->member = $member;
+    if ($member) {
+      $this->club = $member->getClub();
+    }
 
     return $this;
   }

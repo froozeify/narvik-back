@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use App\Entity\Abstract\UuidEntity;
 use App\Entity\Club;
+use App\Entity\ClubDependent\Plugin\Presence\Activity;
 use App\Entity\Interface\ClubLinkedEntityInterface;
 use App\Enum\ClubRole;
 use App\Repository\SettingRepository;
@@ -40,6 +41,10 @@ class ClubSetting extends UuidEntity implements ClubLinkedEntityInterface {
   #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
   private ?Club $club = null;
 
+  #[ORM\OneToOne(targetEntity: Activity::class)]
+  #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+  private ?Activity $controlShootingActivity = null;
+
   #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
   #[Groups(['club-setting-read'])]
   private ?\DateTimeImmutable $itacImportDate = null;
@@ -64,6 +69,15 @@ class ClubSetting extends UuidEntity implements ClubLinkedEntityInterface {
 
   public function setClub(?Club $club): static {
     $this->club = $club;
+    return $this;
+  }
+
+  public function getControlShootingActivity(): ?Activity {
+    return $this->controlShootingActivity;
+  }
+
+  public function setControlShootingActivity(?Activity $controlShootingActivity): ClubSetting {
+    $this->controlShootingActivity = $controlShootingActivity;
     return $this;
   }
 

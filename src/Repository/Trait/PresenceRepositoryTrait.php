@@ -14,11 +14,10 @@ trait PresenceRepositoryTrait {
   }
 
   private function applyDayConstraint(QueryBuilder $qb, \DateTime $date): QueryBuilder {
-    return
-      $qb->andWhere($qb->expr()->between('m.date', ':from', ':to'),)
-         ->setParameter('from', $date->setTime(0, 0, 0))
-         ->setParameter('to', $date->setTime(23, 59, 59))
-    ;
+    $qb->andWhere($qb->expr()->between('m.date', ':from', ':to'))
+       ->setParameter('from', $date->setTime(0, 0, 0))
+       ->setParameter('to', $date->setTime(23, 59, 59));
+    return $qb;
   }
 
   private function applyActivityExclusionConstraint(QueryBuilder $qb): void {
@@ -41,9 +40,10 @@ trait PresenceRepositoryTrait {
    */
   public function findAllPresentToday(Club $club): array {
     $qb = $this->createQueryBuilder('m');
+
     return
       $this->applyTodayConstraint($qb)
-            ->andWhere('m.' . $this->getClassName()::getClubSqlPath(), ':club')
+            ->andWhere($qb->expr()->eq('m.' . $this->getClassName()::getClubSqlPath(), ':club'))
             ->setParameter(':club', $club)
             ->orderBy('m.createdAt', 'DESC')
             ->getQuery()->getResult()

@@ -63,7 +63,7 @@ final class MemberPresenceFactory extends PersistentProxyObjectFactory {
   protected function defaults(): array {
     return [
       'date'       => DateTimeImmutable::createFromMutable(self::faker()->dateTimeBetween('-10 days', 'now')),
-      'member'     => MemberFactory::randomOrCreate(),
+      'member'     => MemberFactory::random(),
       'activities' => ActivityStory::getRandomRange('activities_club1', 1, 4),
     ];
   }

@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\ClubDependent\Member;
+use App\Entity\ClubDependent\Plugin\Presence\Activity;
 use App\Enum\GlobalSetting;
 use App\Repository\ActivityRepository;
 use App\Repository\MemberPresenceRepository;
@@ -30,18 +31,8 @@ class MemberService {
     }
   }
 
-  public function setLastControlShooting(Member $member, ?string $controlShootingActivity = null): void {
+  public function setLastControlShooting(Member $member, ?Activity $controlShootingActivity = null): void {
     if (!$controlShootingActivity) {
-      $controlShootingActivity = $this->globalSettingService->getSettingValue(GlobalSetting::CONTROL_SHOOTING_ACTIVITY_ID);
-    }
-
-    // No control shooting defined
-    if (!$controlShootingActivity || !is_numeric($controlShootingActivity)) {
-      return;
-    }
-
-    $controlShootingActivity = $this->activityRepository->find($controlShootingActivity);
-    if (!$controlShootingActivity) { // Control shooting id passed does not exist
       return;
     }
 

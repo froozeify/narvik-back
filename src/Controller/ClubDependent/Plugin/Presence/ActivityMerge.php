@@ -3,7 +3,6 @@
 namespace App\Controller\ClubDependent\Plugin\Presence;
 
 use App\Controller\Abstract\AbstractClubDependentController;
-use App\Controller\Abstract\AbstractController;
 use App\Entity\ClubDependent\Plugin\Presence\Activity;
 use App\Repository\ActivityRepository;
 use Symfony\Component\HttpFoundation\Request;

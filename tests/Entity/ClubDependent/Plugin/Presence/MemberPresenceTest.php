@@ -7,6 +7,7 @@ use App\Enum\ClubRole;
 use App\Tests\Entity\Abstract\AbstractEntityClubLinkedTestCase;
 use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Factory\ActivityFactory;
+use App\Tests\Factory\MemberFactory;
 use App\Tests\Factory\MemberPresenceFactory;
 use App\Tests\Story\_InitStory;
 use App\Tests\Story\ActivityStory;
@@ -51,15 +52,83 @@ class MemberPresenceTest extends AbstractEntityClubLinkedTestCase {
   }
 
   public function testCreate(): void {
-    self::markTestSkipped();
+    $payloadCheck = [];
+    $this->makeAllLoggedRequests(
+      $payloadCheck,
+      supervisorClub1Code: ResponseCodeEnum::created,
+      adminClub1Code: ResponseCodeEnum::created,
+      adminClub2Code: ResponseCodeEnum::bad_request,
+      superAdminCode: ResponseCodeEnum::created,
+      badgerClub1Code: ResponseCodeEnum::created,
+      badgerClub2Code: ResponseCodeEnum::bad_request,
+      requestFunction: function (string $level, ?int $id) use (&$payloadCheck) {
+        $club1 = _InitStory::club_1();
+
+        // New member to be sure it has no presence registered to him
+        $member = MemberFactory::createOne([
+          'club' => $club1,
+          'email' => 'membertest@club1.fr',
+        ]);
+
+        $clubIri = $this->getIriFromResource($club1);
+        $memberIri = $this->getIriFromResource($member);
+
+        $payload = [
+          "member" => $memberIri,
+        ];
+
+        $payloadCheck = [
+          "club" => [
+            '@id' => $clubIri,
+          ],
+          "member" => [
+            '@id' => $memberIri,
+          ]
+        ];
+
+        $this->makePostRequest($this->getRootWClubUrl($club1), $payload);
+      },
+    );
   }
 
   public function testPatch(): void {
-    self::markTestSkipped();
+    $payloadCheck = [];
+    $this->makeAllLoggedRequests(
+      $payloadCheck,
+      badgerClub1Code: ResponseCodeEnum::ok,
+      requestFunction: function (string $level, ?int $id) use (&$payloadCheck) {
+        $memberPresence = MemberPresenceFactory::createOne([
+          'club' => _InitStory::club_1(),
+          'member' => _InitStory::MEMBER_member_club_1(),
+        ]);
+
+        $payloadCheck = [
+          "activities" => []
+        ];
+
+        // We remove all activities
+        $this->makePatchRequest($this->getIriFromResource($memberPresence), ["activities" => []]);
+      },
+    );
   }
 
   public function testDelete(): void {
-    self::markTestSkipped();
+    $this->makeAllLoggedRequests(
+      $payloadCheck,
+      supervisorClub1Code: ResponseCodeEnum::no_content,
+      adminClub1Code: ResponseCodeEnum::no_content,
+      adminClub2Code: ResponseCodeEnum::not_found,
+      superAdminCode: ResponseCodeEnum::no_content,
+      badgerClub1Code: ResponseCodeEnum::no_content,
+      badgerClub2Code: ResponseCodeEnum::not_found,
+      requestFunction: function (string $level, ?int $id) use (&$payloadCheck) {
+        $memberPresence = MemberPresenceFactory::createOne([
+          'club' => _InitStory::club_1(),
+          'member' => _InitStory::MEMBER_member_club_1(),
+        ]);
+        $this->makeDeleteRequest($this->getIriFromResource($memberPresence));
+      },
+    );
   }
 
   public function testGetTodayPresences(): void {

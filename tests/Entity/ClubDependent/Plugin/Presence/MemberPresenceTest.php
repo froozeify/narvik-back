@@ -105,7 +105,7 @@ class MemberPresenceTest extends AbstractEntityClubLinkedTestCase {
       requestFunction: function (string $level, ?int $id) use (&$payloadCheck) {
         $memberPresence = MemberPresenceFactory::createOne([
           'club' => _InitStory::club_1(),
-          'member' => _InitStory::MEMBER_member_club_1(),
+          'member' => MemberFactory::createOne(),
         ]);
 
         $payloadCheck = [

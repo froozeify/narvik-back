@@ -7,7 +7,6 @@ use App\Entity\ClubDependent\Plugin\Presence\Activity;
 use App\Entity\ClubDependent\Plugin\Presence\MemberPresence;
 use App\Repository\Interface\PresenceRepositoryInterface;
 use App\Repository\Trait\PresenceRepositoryTrait;
-use App\Service\GlobalSettingService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
@@ -23,11 +22,8 @@ use Doctrine\Persistence\ManagerRegistry;
 class MemberPresenceRepository extends ServiceEntityRepository implements PresenceRepositoryInterface {
   use PresenceRepositoryTrait;
 
-  private GlobalSettingService $globalSettingService;
-
-  public function __construct(ManagerRegistry $registry, GlobalSettingService $globalSettingService) {
+  public function __construct(ManagerRegistry $registry) {
     parent::__construct($registry, MemberPresence::class);
-    $this->globalSettingService = $globalSettingService;
   }
 
   public function findOneToday(Member $member): ?MemberPresence {

@@ -6,6 +6,8 @@ use App\DQL\CustomExpr;
 use App\Entity\Club;
 use App\Entity\ClubDependent\Member;
 use App\Entity\ClubDependent\Plugin\Presence\MemberPresence;
+use App\Repository\Interface\ClubLinkedInterface;
+use App\Repository\Trait\ClubLinkedTrait;
 use App\Repository\Trait\UuidEntityRepositoryTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -21,8 +23,9 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
  * @method Member[]    findAll()
  * @method Member[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class MemberRepository extends ServiceEntityRepository {
+class MemberRepository extends ServiceEntityRepository implements ClubLinkedInterface {
   use UuidEntityRepositoryTrait;
+  use ClubLinkedTrait;
 
   public function __construct(ManagerRegistry $registry) {
     parent::__construct($registry, Member::class);

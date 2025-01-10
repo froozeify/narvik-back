@@ -94,7 +94,7 @@ class ImportMemberPresence extends AbstractCsvImporter {
     $this->em->persist($memberPresence);
 
     return new SuccessImportedItem([
-      "id" => $memberPresence->getId()
+      "uuid" => $memberPresence->getUuid()
     ]);
   }
 }

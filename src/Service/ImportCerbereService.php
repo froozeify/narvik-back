@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Club;
 use App\Entity\ClubDependent\Plugin\Presence\Activity;
 use App\Message\CerberePresencesDateMessage;
 use App\Repository\ActivityRepository;
@@ -14,6 +15,7 @@ class ImportCerbereService {
 
   public function __construct(
     private readonly EntityManagerInterface $em,
+    private readonly ClubService $clubService,
     private readonly ActivityRepository $activityRepository,
     private readonly MessageBusInterface $bus,
   ) {
@@ -26,34 +28,37 @@ class ImportCerbereService {
    * @throws \PhpOffice\PhpSpreadsheet\Exception
    * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
    */
-  public function importFromFile(string $filename): int {
+  public function importFromFile(Club $club, string $filename): int {
     $reader = new Xls();
     $spreadsheet = $reader->load($filename);
     $rows = $spreadsheet->getSheet(0)->toArray();
     $presences = $this->extractFormattedDatesSubArray($rows);
 
     // We save the activities
-    $this->saveCsvActivities();
+    $this->saveCsvActivities($club);
 
+    $this->clubService->setCerbereImport($club, count($presences));
     foreach ($presences as $k => $presence) {
       /** @var \DateTimeImmutable $date */
       $date = $presence['date'];
-      $this->bus->dispatch(new CerberePresencesDateMessage($date, $presence['datas']));
+      $this->bus->dispatch(new CerberePresencesDateMessage($club->getUuid()->toString(), $date, $presence['datas']));
     }
 
     return count($presences);
   }
 
-  private function saveCsvActivities(): void {
+  private function saveCsvActivities(Club $club): void {
     foreach ($this->csvActivities as $csvActivity) {
       $csvActivity = trim((string) $csvActivity);
-      $dbActivity = $this->activityRepository->findOneBy(["name" => $csvActivity]);
+      $dbActivity = $this->activityRepository->findOneByName($club, $csvActivity);
       if ($dbActivity) {
         continue;
       }
 
       $activity = new Activity();
-      $activity->setName($csvActivity);
+      $activity
+        ->setClub($club)
+        ->setName($csvActivity);
       $this->em->persist($activity);
     }
     $this->em->flush();

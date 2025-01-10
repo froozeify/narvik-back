@@ -92,6 +92,7 @@ final class _InitStory extends Story {
     $this->addState('MEMBER_member_club_1', MemberFactory::createOne([
       'club' => self::club_1(),
       'email' => 'member@club1.fr',
+      'licence' => '10000001'
     ]));
     $this->addState('MEMBER_member_club_2', MemberFactory::createOne([
       'club' => self::club_2(),

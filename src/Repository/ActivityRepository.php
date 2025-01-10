@@ -2,13 +2,15 @@
 
 namespace App\Repository;
 
+use App\Entity\Club;
 use App\Entity\ClubDependent\Plugin\Presence\Activity;
 use App\Entity\ClubDependent\Plugin\Presence\ExternalPresence;
 use App\Entity\ClubDependent\Plugin\Presence\MemberPresence;
+use App\Repository\Interface\ClubLinkedInterface;
+use App\Repository\Trait\ClubLinkedTrait;
 use App\Repository\Trait\UuidEntityRepositoryTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use function Doctrine\ORM\QueryBuilder;
 
 /**
  * @extends ServiceEntityRepository<Activity>
@@ -18,31 +20,39 @@ use function Doctrine\ORM\QueryBuilder;
  * @method Activity[]    findAll()
  * @method Activity[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ActivityRepository extends ServiceEntityRepository {
+class ActivityRepository extends ServiceEntityRepository implements ClubLinkedInterface {
   use UuidEntityRepositoryTrait;
+  use ClubLinkedTrait;
 
   public function __construct(ManagerRegistry $registry) {
     parent::__construct($registry, Activity::class);
   }
 
-  public function findOneByName(string $name): ?Activity {
+  public function findOneByName(Club $club, string $name): ?Activity {
     $qb = $this->createQueryBuilder('a');
-
-    return $qb
+    $query = $qb
       ->andWhere($qb->expr()->like($qb->expr()->lower('a.name'), $qb->expr()->lower(':name')))
+      ->andWhere("a.club = :club")
       ->setParameter('name', $name)
-      ->getQuery()
-      ->getOneOrNullResult();
+      ->setParameter('club', $club)
+      ->getQuery();
+
+    try {
+      return $query->getOneOrNullResult();
+    }
+    catch (\Exception $e) {
+      return null;
+    }
   }
 
-  public function findByIds(array $activities): array {
-    $qb = $this->createQueryBuilder('a');
-    return $qb
-      ->andWhere($qb->expr()->in('a.uuid', ':activities'))
-      ->setParameter('activities', $activities)
-      ->getQuery()
-      ->getResult();
-  }
+//  public function findByIds(array $activities): array {
+//    $qb = $this->createQueryBuilder('a');
+//    return $qb
+//      ->andWhere($qb->expr()->in('a.uuid', ':activities'))
+//      ->setParameter('activities', $activities)
+//      ->getQuery()
+//      ->getResult();
+//  }
 
   public function mergeAndDelete(Activity $activityToMerge, Activity $targetActivity): void {
     // We update all the member presences
@@ -67,29 +77,4 @@ class ActivityRepository extends ServiceEntityRepository {
 
     $this->getEntityManager()->flush();
   }
-
-//    /**
-//     * @return Activity[] Returns an array of Activity objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('a.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Activity
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

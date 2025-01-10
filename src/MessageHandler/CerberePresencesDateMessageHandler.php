@@ -2,12 +2,14 @@
 
 namespace App\MessageHandler;
 
+use App\Entity\Club;
 use App\Entity\ClubDependent\Member;
 use App\Entity\ClubDependent\Plugin\Presence\Activity;
 use App\Entity\ClubDependent\Plugin\Presence\ExternalPresence;
 use App\Entity\ClubDependent\Plugin\Presence\MemberPresence;
 use App\Message\CerberePresencesDateMessage;
 use App\Repository\ActivityRepository;
+use App\Repository\ClubRepository;
 use App\Repository\ExternalPresenceRepository;
 use App\Repository\MemberRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,10 +28,12 @@ class CerberePresencesDateMessageHandler implements ResetInterface {
 
   public function __construct(
     private readonly EntityManagerInterface $entityManager,
+    private readonly ClubRepository $clubRepository,
     private readonly MemberRepository $memberRepository,
     private readonly ExternalPresenceRepository $externalPresenceRepository,
     private readonly ActivityRepository $activityRepository,
-    private readonly ValidatorInterface $validator,) {
+    private readonly ValidatorInterface $validator,
+  ) {
   }
 
   public function reset(): void {
@@ -39,9 +43,11 @@ class CerberePresencesDateMessageHandler implements ResetInterface {
   }
 
   public function __invoke(CerberePresencesDateMessage $message): void {
-    $this->generateActivitiesList();
-    $this->generateMembersList();
-    $this->generateExternalPresenceList();
+    $club = $this->clubRepository->findOneByUuid($message->getClubUuid());
+
+    $this->generateActivitiesList($club);
+    $this->generateMembersList($club);
+    $this->generateExternalPresenceList($club);
 
     $date = $message->getDate();
     foreach ($message->getDatas() as $data) {
@@ -49,30 +55,24 @@ class CerberePresencesDateMessageHandler implements ResetInterface {
       $activities = $data['activities'];
 
       if (!array_key_exists($licence, $this->members)) {
-        $this->registerExternalPresence($licence, $data['fullName'], $activities, $date);
+        $this->registerExternalPresence($club, $licence, $data['fullName'], $activities, $date);
         continue;
       }
 
       $member = $this->members[$licence];
 
       // We verify the presence is not already saved
-      $presenceAlreadyRegistered = false;
       foreach ($member->getMemberPresences() as $dbMemberPresence) {
         if ($dbMemberPresence->getDate()->format("Y-m-d") === $date->format("Y-m-d")) {
-          $presenceAlreadyRegistered = true;
-          break;
+          continue 2; // 2 so we break both foreach loop and go to next presence
         }
-      }
-
-      if ($presenceAlreadyRegistered) {
-        continue;
       }
 
       $memberPresence = new MemberPresence();
       $memberPresence
+        ->setClub($club)
         ->setMember($member)
         ->setDate($date);
-
 
       foreach ($activities as $activity) {
         $memberPresence->addActivity($this->activities[$activity]);
@@ -84,30 +84,30 @@ class CerberePresencesDateMessageHandler implements ResetInterface {
     $this->entityManager->flush();
   }
 
-  private function generateMembersList(): void {
+  private function generateMembersList(Club $club): void {
     $this->members = [];
-    foreach ($this->memberRepository->findAll() as $dbMember) {
+    foreach ($this->memberRepository->findAllByClub($club) as $dbMember) {
       $this->members[$dbMember->getLicence()] = $dbMember;
     }
   }
 
-  private function generateExternalPresenceList(): void {
+  private function generateExternalPresenceList(Club $club): void {
     $this->externalMembers = [];
-    foreach ($this->externalPresenceRepository->findAll() as $dbExtPresence) {
+    foreach ($this->externalPresenceRepository->findAllByClub($club) as $dbExtPresence) {
       if ($dbExtPresence->getLicence() && $dbExtPresence->getDate()) {
         $this->externalMembers[$dbExtPresence->getLicence()][] = $dbExtPresence->getDate()->format("Y-m-d");
       }
     }
   }
 
-  private function generateActivitiesList(): void {
+  private function generateActivitiesList(Club $club): void {
     $this->activities = [];
-    foreach ($this->activityRepository->findAll() as $activity) {
+    foreach ($this->activityRepository->findAllByClub($club) as $activity) {
       $this->activities[$activity->getName()] = $activity;
     }
   }
 
-  private function registerExternalPresence(string $licence, string $fullName, array $activities, \DateTimeImmutable $date): void {
+  private function registerExternalPresence(Club $club, string $licence, string $fullName, array $activities, \DateTimeImmutable $date): void {
     // We verify the presence is not already saved
     $presenceAlreadyRegistered = false;
     if (array_key_exists($licence, $this->externalMembers)) {
@@ -124,6 +124,7 @@ class CerberePresencesDateMessageHandler implements ResetInterface {
 
     $externalPresence = new ExternalPresence();
     $externalPresence
+      ->setClub($club)
       ->setLicence($licence)
       ->setLastname($fullName[0])
       ->setFirstname($fullName[1])

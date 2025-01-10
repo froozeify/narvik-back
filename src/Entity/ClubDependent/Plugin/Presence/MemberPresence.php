@@ -15,7 +15,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\ClubDependent\Plugin\Presence\MemberPresencesFromCsv;
-use App\Controller\ClubDependent\Plugin\Presence\MemberPresencesFromItac;
+use App\Controller\ClubDependent\Plugin\Presence\MemberPresencesFromCerbere;
 use App\Controller\ClubDependent\Plugin\Presence\MemberPresencesImportFromExternal;
 use App\Controller\ClubDependent\Plugin\Presence\MemberPresenceToday;
 use App\Entity\Abstract\UuidEntity;
@@ -80,29 +80,34 @@ use Symfony\Component\Serializer\Attribute\Groups;
       write: false,
     ),
 
-//    new Post(
-//      uriTemplate: '/member-presences/-/from-cerbere',
-//      controller: MemberPresencesFromItac::class,
-//      openapi: new Model\Operation(
-//        requestBody: new Model\RequestBody(
-//          content: new \ArrayObject([
-//            'multipart/form-data' => [
-//              'schema' => [
-//                'type' => 'object',
-//                'properties' => [
-//                  'file' => [
-//                    'type' => 'string',
-//                    'format' => 'binary'
-//                  ]
-//                ]
-//              ]
-//            ]
-//          ])
-//        )
-//      ),
-//      security: "is_granted('ROLE_ADMIN')",
-//      deserialize: false,
-//    ),
+    new Post(
+      uriTemplate: '/clubs/{clubUuid}/member-presences/-/from-cerbere',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
+      controller: MemberPresencesFromCerbere::class,
+      openapi: new Model\Operation(
+        requestBody: new Model\RequestBody(
+          content: new \ArrayObject([
+            'multipart/form-data' => [
+              'schema' => [
+                'type' => 'object',
+                'properties' => [
+                  'file' => [
+                    'type' => 'string',
+                    'format' => 'binary'
+                  ]
+                ]
+              ]
+            ]
+          ])
+        )
+      ),
+      securityPostDenormalize: "is_granted('".ClubRole::admin->value."', request)",
+      read: false,
+      deserialize: false,
+    ),
+
 //    new Post(
 //      uriTemplate: '/member-presences/-/from-csv',
 //      controller: MemberPresencesFromCsv::class,

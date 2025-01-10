@@ -4,6 +4,7 @@ namespace App\Tests\Factory;
 
 use App\Entity\ClubDependent\Plugin\Presence\ExternalPresence;
 use App\Repository\ExternalPresenceRepository;
+use App\Tests\Story\_InitStory;
 use App\Tests\Story\ActivityStory;
 use DateTimeImmutable;
 use Zenstruck\Foundry\FactoryCollection;
@@ -66,6 +67,7 @@ final class ExternalPresenceFactory extends PersistentProxyObjectFactory {
       'firstname'  => self::faker()->firstName,
       'lastname'   => self::faker()->lastName,
       'activities' => ActivityStory::getRandomRange('activities_club1', 1, 4),
+      'club'       => _InitStory::club_1(),
     ];
   }
 

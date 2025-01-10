@@ -13,7 +13,9 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\ClubDependent\Plugin\Presence\ExternalPresenceToday;
 use App\Entity\Abstract\UuidEntity;
+use App\Entity\Interface\ClubLinkedEntityInterface;
 use App\Entity\Interface\TimestampEntityInterface;
+use App\Entity\Trait\SelfClubLinkedEntityTrait;
 use App\Entity\Trait\TimestampTrait;
 use App\Filter\MultipleFilter;
 use App\Repository\ExternalPresenceRepository;
@@ -54,8 +56,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ApiFilter(DateFilter::class, properties: ['date' => DateFilter::EXCLUDE_NULL])]
 #[ApiFilter(OrderFilter::class, properties: ['date' => 'DESC', 'createdAt' => 'DESC'])]
 #[ApiFilter(MultipleFilter::class, properties: ['firstname', 'lastname', 'licence'])]
-class ExternalPresence extends UuidEntity implements TimestampEntityInterface {
+class ExternalPresence extends UuidEntity implements TimestampEntityInterface, ClubLinkedEntityInterface {
   use TimestampTrait;
+  use SelfClubLinkedEntityTrait;
 
   #[ORM\Column(type: 'string', nullable: true)]
   #[Groups(['external-presence'])]

@@ -4,6 +4,8 @@ namespace App\Tests\Entity\ClubDependent\Plugin\Presence;
 
 use App\Entity\ClubDependent\Plugin\Presence\MemberPresence;
 use App\Enum\ClubRole;
+use App\Message\CerberePresencesDateMessage;
+use App\Message\ItacSecondaryClubMembersMessage;
 use App\Tests\Entity\Abstract\AbstractEntityClubLinkedTestCase;
 use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Factory\ActivityFactory;
@@ -11,9 +13,13 @@ use App\Tests\Factory\MemberFactory;
 use App\Tests\Factory\MemberPresenceFactory;
 use App\Tests\Story\_InitStory;
 use App\Tests\Story\ActivityStory;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Zenstruck\Messenger\Test\InteractsWithMessenger;
 use function Zenstruck\Foundry\faker;
 
 class MemberPresenceTest extends AbstractEntityClubLinkedTestCase {
+  use InteractsWithMessenger;
+
   protected int $TOTAL_SUPER_ADMIN = 10;
   protected int $TOTAL_ADMIN_CLUB_1 = 10;
   protected int $TOTAL_ADMIN_CLUB_2 = 5;
@@ -146,6 +152,62 @@ class MemberPresenceTest extends AbstractEntityClubLinkedTestCase {
     $response = $this->makeGetRequest($this->getRootWClubUrl(_InitStory::club_1()) . "/-/today");
     $this->assertResponseStatusCodeSame(ResponseCodeEnum::ok->value);
     $this->assertCount(5, $response->toArray()['member']);
+  }
 
+  public function testImportPresencesFromCerbere(): void {
+    $club = _InitStory::club_1();
+
+    $transport = $this->transport('async_low');
+    $transport->queue()->assertEmpty();
+
+    $file = new UploadedFile(__DIR__ . '/../../../../fixtures/presence-cerbere.xls', 'presence-cerbere.xls');
+
+    $this->loggedAsAdminClub1();
+    $response = $this->makeGetRequest($this->getRootWClubUrl($club));
+    $this->assertCount($this->TOTAL_ADMIN_CLUB_1, $response->toArray()['member']);
+
+    $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/from-cerbere", [
+      '_not_json' => true,
+      'headers' => ['Content-Type' => 'multipart/form-data'],
+      'extra' => [
+        'files' => [
+          'file' => $file,
+        ],
+      ],
+    ]);
+
+    $this->assertResponseIsSuccessful();
+    $this->assertEquals(2, $response->toArray()['days']);
+    $transport->queue()->assertCount(2);
+    $transport->queue()->assertContains(CerberePresencesDateMessage::class, 2);
+
+    // We consume the queue
+    $transport->process();
+    $transport->queue()->assertEmpty();
+
+    // 2 new presences (and 1 external but will be tested in ExternalPresenceTest)
+    $response = $this->makeGetRequest($this->getRootWClubUrl($club));
+    $this->assertCount($this->TOTAL_ADMIN_CLUB_1 + 2, $response->toArray()['member']);
+
+    // Running the import a second time should not change the count
+    $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/from-cerbere", [
+      '_not_json' => true,
+      'headers' => ['Content-Type' => 'multipart/form-data'],
+      'extra' => [
+        'files' => [
+          'file' => $file,
+        ],
+      ],
+    ]);
+
+    $this->assertResponseIsSuccessful();
+    $this->assertEquals(2, $response->toArray()['days']);
+    // We consume the queue
+    $transport->process();
+    $transport->queue()->assertEmpty();
+
+    // 2 new presences (and 1 external but will be tested in ExternalPresenceTest)
+    $response = $this->makeGetRequest($this->getRootWClubUrl($club));
+    $this->assertCount($this->TOTAL_ADMIN_CLUB_1 + 2, $response->toArray()['member']);
   }
 }

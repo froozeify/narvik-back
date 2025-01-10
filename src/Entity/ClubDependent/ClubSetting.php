@@ -63,6 +63,11 @@ class ClubSetting extends UuidEntity implements ClubLinkedEntityInterface {
   #[Assert\NotBlank]
   private int $itacSecondaryImportRemaining = 0;
 
+  #[ORM\Column(options: ['default' => 0])]
+  #[Groups(['club-setting-read'])]
+  #[Assert\NotBlank]
+  private int $cerbereImportRemaining = 0;
+
   public function getClub(): ?Club {
     return $this->club;
   }
@@ -120,6 +125,18 @@ class ClubSetting extends UuidEntity implements ClubLinkedEntityInterface {
       $itacSecondaryImportRemaining = 0;
     }
     $this->itacSecondaryImportRemaining = $itacSecondaryImportRemaining;
+    return $this;
+  }
+
+  public function getCerbereImportRemaining(): int {
+    return $this->cerbereImportRemaining;
+  }
+
+  public function setCerbereImportRemaining(int $cerbereImportRemaining): ClubSetting {
+    if ($cerbereImportRemaining < 0) {
+      $cerbereImportRemaining = 0;
+    }
+    $this->cerbereImportRemaining = $cerbereImportRemaining;
     return $this;
   }
 }

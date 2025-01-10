@@ -9,6 +9,8 @@ use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 trait PresenceRepositoryTrait {
+  use ClubLinkedTrait;
+
   private function applyTodayConstraint(QueryBuilder $qb): QueryBuilder {
     return $this->applyDayConstraint($qb, new \DateTime());
   }

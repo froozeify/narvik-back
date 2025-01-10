@@ -2,14 +2,14 @@
 
 namespace App\Controller\ClubDependent\Plugin\Presence;
 
+use App\Controller\Abstract\AbstractClubDependentController;
 use App\Service\ImportCerbereService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class MemberPresencesFromItac extends AbstractController {
+class MemberPresencesFromCerbere extends AbstractClubDependentController {
 
   public function __invoke(Request $request, ImportCerbereService $importCerbereService): JsonResponse {
     /** @var UploadedFile|null $uploadedFile */
@@ -22,7 +22,7 @@ class MemberPresencesFromItac extends AbstractController {
       throw new BadRequestHttpException('The "file" must be a xls');
     }
 
-    $response = $importCerbereService->importFromFile($uploadedFile->getPathname());
+    $response = $importCerbereService->importFromFile($this->getQueryClub(), $uploadedFile->getPathname());
 
     return new JsonResponse(["days" => $response]);
   }

@@ -1,0 +1,4 @@
+member.licence,date,activities.0.name,activities.1.name,activities.2.name,activities.3.name
+10000001,2000-01-03T00:00:00+00:00,Permanence,,,
+10000001,2000-01-10T00:00:00+00:00,10M,Bureau,Permanence,Travaux
+99999999,2000-01-05T00:00:00+00:00,10M,Bureau,Permanence,Travaux

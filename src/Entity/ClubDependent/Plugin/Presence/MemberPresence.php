@@ -108,29 +108,33 @@ use Symfony\Component\Serializer\Attribute\Groups;
       deserialize: false,
     ),
 
-//    new Post(
-//      uriTemplate: '/member-presences/-/from-csv',
-//      controller: MemberPresencesFromCsv::class,
-//      openapi: new Model\Operation(
-//        requestBody: new Model\RequestBody(
-//          content: new \ArrayObject([
-//            'multipart/form-data' => [
-//              'schema' => [
-//                'type' => 'object',
-//                'properties' => [
-//                  'file' => [
-//                    'type' => 'string',
-//                    'format' => 'binary'
-//                  ]
-//                ]
-//              ]
-//            ]
-//          ])
-//        )
-//      ),
-//      security: "is_granted('ROLE_ADMIN')",
-//      deserialize: false,
-//    ),
+    new Post(
+      uriTemplate: '/clubs/{clubUuid}/member-presences/-/from-csv',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
+      controller: MemberPresencesFromCsv::class,
+      openapi: new Model\Operation(
+        requestBody: new Model\RequestBody(
+          content: new \ArrayObject([
+            'multipart/form-data' => [
+              'schema' => [
+                'type' => 'object',
+                'properties' => [
+                  'file' => [
+                    'type' => 'string',
+                    'format' => 'binary'
+                  ]
+                ]
+              ]
+            ]
+          ])
+        )
+      ),
+      securityPostDenormalize: "is_granted('".ClubRole::admin->value."', request)",
+      read: false,
+      deserialize: false
+    ),
 //    new Post(
 //      uriTemplate: '/member-presences/-/import-from-external-presences',
 //      controller: MemberPresencesImportFromExternal::class,

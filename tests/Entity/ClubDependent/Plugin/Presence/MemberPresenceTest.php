@@ -210,4 +210,52 @@ class MemberPresenceTest extends AbstractEntityClubLinkedTestCase {
     $response = $this->makeGetRequest($this->getRootWClubUrl($club));
     $this->assertCount($this->TOTAL_ADMIN_CLUB_1 + 2, $response->toArray()['member']);
   }
+
+  public function testImportPresencesFromCSV(): void {
+    $club = _InitStory::club_1();
+
+    $file = new UploadedFile(__DIR__ . '/../../../../fixtures/narvik-presences.csv', 'narvik-presences.csv');
+
+    $this->loggedAsAdminClub1();
+    $response = $this->makeGetRequest($this->getRootWClubUrl($club));
+    $this->assertCount($this->TOTAL_ADMIN_CLUB_1, $response->toArray()['member']);
+
+    $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/from-csv", [
+      '_not_json' => true,
+      'headers' => ['Content-Type' => 'multipart/form-data'],
+      'extra' => [
+        'files' => [
+          'file' => $file,
+        ],
+      ],
+    ]);
+
+    $this->assertResponseIsSuccessful();
+
+    $this->assertCount(2, $response->toArray()['created']);
+    $this->assertCount(0, $response->toArray()['warnings']);
+    $this->assertCount(1, $response->toArray()['errors']);
+
+    // 2 new presences (and 1 external but will be tested in ExternalPresenceTest)
+    $response = $this->makeGetRequest($this->getRootWClubUrl($club));
+    $this->assertCount($this->TOTAL_ADMIN_CLUB_1 + 2, $response->toArray()['member']);
+
+    // Running the import a second time should not change the count
+    $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/from-csv", [
+      '_not_json' => true,
+      'headers' => ['Content-Type' => 'multipart/form-data'],
+      'extra' => [
+        'files' => [
+          'file' => $file,
+        ],
+      ],
+    ]);
+    $this->assertResponseIsSuccessful();
+    $this->assertCount(0, $response->toArray()['created']);
+    $this->assertCount(2, $response->toArray()['warnings']); // Already registered
+    $this->assertCount(1, $response->toArray()['errors']);
+
+    $response = $this->makeGetRequest($this->getRootWClubUrl($club));
+    $this->assertCount($this->TOTAL_ADMIN_CLUB_1 + 2, $response->toArray()['member']);
+  }
 }

@@ -55,11 +55,12 @@ abstract class AbstractCsvImporter {
     /** @var \SplFileObject $fo */
     $fo = $file->openFile("r");
     $fo->setFlags(\SplFileObject::READ_CSV | \SplFileObject::READ_AHEAD | \SplFileObject::DROP_NEW_LINE | \SplFileObject::SKIP_EMPTY);
+    $fo->setCsvControl($delimiter, '"', "\\");
 
     $rows = [];
     while (!$fo->eof()) {
       // Row initialisation
-      $row = $fo->fgetcsv($delimiter);
+      $row = $fo->fgetcsv();
       if (!$row) continue;
       $rows[] = $row;
     }

@@ -2,6 +2,7 @@
 
 namespace App\Importer;
 
+use App\Entity\Club;
 use App\Entity\ClubDependent\Plugin\Presence\MemberPresence;
 use App\Importer\Model\AbstractImportedItemResult;
 use App\Importer\Model\ErrorImportedItem;
@@ -14,6 +15,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ImportMemberPresence extends AbstractCsvImporter {
+  private Club $club;
+
   public const COL_LICENCE = 'member.licence';
   public const COL_DATE = 'date';
   public const COL_ACTIVITIES = 'activities';
@@ -38,7 +41,6 @@ class ImportMemberPresence extends AbstractCsvImporter {
     parent::__construct($em, $validator);
   }
 
-
   protected function getRequiredCols(): array {
     return [
       self::COL_LICENCE,
@@ -58,7 +60,7 @@ class ImportMemberPresence extends AbstractCsvImporter {
     $licence = $this->getCurrentRowValue(self::COL_LICENCE);
     if (empty($licence)) return new ErrorImportedItem($licence, self::ERROR_CODES[100]);
 
-    $member = $this->memberRepository->findOneByLicence($licence);
+    $member = $this->memberRepository->findOneByLicence($this->getClub(), $licence);
     if (!$member) return new ErrorImportedItem($licence, self::ERROR_CODES[100]);
 
     $date = $this->getCurrentRowValue(self::COL_DATE);
@@ -83,7 +85,7 @@ class ImportMemberPresence extends AbstractCsvImporter {
       foreach ($v as $value) {
         if (!array_key_exists("name", $value) || empty($value["name"])) continue;
         $activityName = $value["name"];
-        $activity = $this->activityRepository->findOneByName($activityName);
+        $activity = $this->activityRepository->findOneByName($this->getClub(), $activityName);
 
         if (!$activity) continue; // We don't create activity, we just ignore
 
@@ -96,5 +98,14 @@ class ImportMemberPresence extends AbstractCsvImporter {
     return new SuccessImportedItem([
       "uuid" => $memberPresence->getUuid()
     ]);
+  }
+
+  public function getClub(): Club {
+    return $this->club;
+  }
+
+  public function setClub(Club $club): ImportMemberPresence {
+    $this->club = $club;
+    return $this;
   }
 }

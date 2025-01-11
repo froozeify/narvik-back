@@ -2,14 +2,14 @@
 
 namespace App\Controller\ClubDependent\Plugin\Presence;
 
+use App\Controller\Abstract\AbstractClubDependentController;
 use App\Service\MemberPresenceService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class MemberPresencesImportFromExternal extends AbstractController {
+class MemberPresencesImportFromExternal extends AbstractClubDependentController {
 
   public function __invoke(MemberPresenceService $memberPresenceService): JsonResponse {
-    $totalImported = $memberPresenceService->importFromExternalPresence();
+    $totalImported = $memberPresenceService->importFromExternalPresence($this->getQueryClub());
     return new JsonResponse(["imported" => $totalImported]);
   }
 

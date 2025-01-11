@@ -12,10 +12,10 @@ trait PresenceRepositoryTrait {
   use ClubLinkedTrait;
 
   private function applyTodayConstraint(QueryBuilder $qb): QueryBuilder {
-    return $this->applyDayConstraint($qb, new \DateTime());
+    return $this->applyDayConstraint($qb, new \DateTimeImmutable());
   }
 
-  private function applyDayConstraint(QueryBuilder $qb, \DateTime $date): QueryBuilder {
+  private function applyDayConstraint(QueryBuilder $qb, \DateTimeImmutable $date): QueryBuilder {
     $qb->andWhere($qb->expr()->between('m.date', ':from', ':to'))
        ->setParameter('from', $date->setTime(0, 0, 0))
        ->setParameter('to', $date->setTime(23, 59, 59));

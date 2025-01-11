@@ -21,7 +21,7 @@ class MemberPresenceService {
   public function importFromExternalPresence(Club $club): int {
     $totalImported = 0;
 
-    $presencesWithLicences = $this->externalPresenceRepository->findAllWithLicence();
+    $presencesWithLicences = $this->externalPresenceRepository->findAllWithLicence($club);
     /** @var ExternalPresence $extPresence */
     foreach ($presencesWithLicences as $extPresence) {
       $member = $this->memberRepository->findOneByLicence($club, $extPresence->getLicence());
@@ -36,7 +36,8 @@ class MemberPresenceService {
 
       // We create the presence
       $presence = new MemberPresence();
-      $presence->setMember($member)
+      $presence
+        ->setMember($member)
         ->setDate($extPresence->getDate())
         ->setCreatedAt($extPresence->getCreatedAt());
 

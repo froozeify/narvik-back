@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Club;
 use App\Entity\ClubDependent\Plugin\Presence\ExternalPresence;
 use App\Repository\Interface\PresenceRepositoryInterface;
 use App\Repository\Trait\PresenceRepositoryTrait;
@@ -27,10 +28,12 @@ class ExternalPresenceRepository extends ServiceEntityRepository implements Pres
     $this->globalSettingService = $globalSettingService;
   }
 
-  public function findAllWithLicence(): ?array {
+  public function findAllWithLicence(Club $club): ?array {
     $qb = $this->createQueryBuilder('e');
     return $qb
       ->where($qb->expr()->isNotNull("e.licence"))
+      ->andWhere("e.club = :club")
+      ->setParameter("club", $club)
       ->orderBy("e.licence", "ASC")
       ->getQuery()->getResult();
   }

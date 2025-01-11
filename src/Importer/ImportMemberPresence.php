@@ -69,7 +69,7 @@ class ImportMemberPresence extends AbstractCsvImporter {
     $date = new \DateTimeImmutable($date);
 
     // We check the presence is not already registered
-    $existingPresence = $this->memberPresenceRepository->findOneByDay($member, \DateTime::createFromImmutable($date));
+    $existingPresence = $this->memberPresenceRepository->findOneByDay($member, $date);
     if ($existingPresence) {
       $warning = new WarningImportedItem($member->getLicence());
       $warning->addWarning(self::ERROR_CODES[200]);

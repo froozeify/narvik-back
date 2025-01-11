@@ -64,8 +64,8 @@ final class ExternalPresenceFactory extends PersistentProxyObjectFactory {
   protected function defaults(): array {
     return [
       'date'       => DateTimeImmutable::createFromMutable(self::faker()->dateTimeBetween('-10 days', 'now')),
-      'firstname'  => self::faker()->firstName,
-      'lastname'   => self::faker()->lastName,
+      'firstname'  => self::faker()->firstName(),
+      'lastname'   => self::faker()->lastName(),
       'activities' => ActivityStory::getRandomRange('activities_club1', 1, 4),
       'club'       => _InitStory::club_1(),
     ];

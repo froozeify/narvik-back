@@ -135,12 +135,16 @@ use Symfony\Component\Serializer\Attribute\Groups;
       read: false,
       deserialize: false
     ),
-//    new Post(
-//      uriTemplate: '/member-presences/-/import-from-external-presences',
-//      controller: MemberPresencesImportFromExternal::class,
-//      security: "is_granted('ROLE_ADMIN')",
-//      deserialize: false,
-//    )
+    new Post(
+      uriTemplate: '/clubs/{clubUuid}/member-presences/-/import-from-external-presences',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
+      controller: MemberPresencesImportFromExternal::class,
+      securityPostDenormalize: "is_granted('".ClubRole::admin->value."', request)",
+      read: false,
+      deserialize: false,
+    )
   ],
   uriVariables: [
     'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),

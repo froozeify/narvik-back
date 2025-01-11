@@ -9,6 +9,7 @@ use App\Message\ItacSecondaryClubMembersMessage;
 use App\Tests\Entity\Abstract\AbstractEntityClubLinkedTestCase;
 use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Factory\ActivityFactory;
+use App\Tests\Factory\ExternalPresenceFactory;
 use App\Tests\Factory\MemberFactory;
 use App\Tests\Factory\MemberPresenceFactory;
 use App\Tests\Story\_InitStory;
@@ -236,7 +237,7 @@ class MemberPresenceTest extends AbstractEntityClubLinkedTestCase {
     $this->assertCount(0, $response->toArray()['warnings']);
     $this->assertCount(1, $response->toArray()['errors']);
 
-    // 2 new presences (and 1 external but will be tested in ExternalPresenceTest)
+    // 2 new presences
     $response = $this->makeGetRequest($this->getRootWClubUrl($club));
     $this->assertCount($this->TOTAL_ADMIN_CLUB_1 + 2, $response->toArray()['member']);
 
@@ -257,5 +258,31 @@ class MemberPresenceTest extends AbstractEntityClubLinkedTestCase {
 
     $response = $this->makeGetRequest($this->getRootWClubUrl($club));
     $this->assertCount($this->TOTAL_ADMIN_CLUB_1 + 2, $response->toArray()['member']);
+  }
+
+  public function testImportPresencesFromExternalPresences(): void {
+    $club = _InitStory::club_1();
+    ExternalPresenceFactory::createOne([
+      'licence' => '10000001',
+      'date' => \DateTimeImmutable::createFromFormat('Y-m-d', '2020-01-01'),
+    ]);
+
+    $this->loggedAsAdminClub1();
+    $response = $this->makeGetRequest($this->getRootWClubUrl($club));
+    $this->assertCount($this->TOTAL_ADMIN_CLUB_1, $response->toArray()['member']);
+
+    $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/import-from-external-presences");
+    $this->assertResponseIsSuccessful();
+    $this->assertEquals(1, $response->toArray()['imported']);
+
+    $response = $this->makeGetRequest($this->getRootWClubUrl($club));
+    $this->assertCount($this->TOTAL_ADMIN_CLUB_1 + 1, $response->toArray()['member']);
+
+    $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/import-from-external-presences");
+    $this->assertResponseIsSuccessful();
+    $this->assertEquals(0, $response->toArray()['imported']);
+
+    $response = $this->makeGetRequest($this->getRootWClubUrl($club));
+    $this->assertCount($this->TOTAL_ADMIN_CLUB_1 + 1, $response->toArray()['member']);
   }
 }

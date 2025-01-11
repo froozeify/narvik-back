@@ -27,27 +27,41 @@ class MemberPresenceRepository extends ServiceEntityRepository implements Presen
   }
 
   public function findOneToday(Member $member): ?MemberPresence {
-    return $this->findOneByDay($member, new \DateTime());
+    return $this->findOneByDay($member, new \DateTimeImmutable());
   }
 
-  public function findOneByDay(Member $member, \DateTime $date): ?MemberPresence {
+  public function findOneByDay(Member $member, \DateTimeImmutable $date): ?MemberPresence {
     $qb = $this->createQueryBuilder('m');
-    return $this->applyDayConstraint($qb, $date)
+    $query = $this
+      ->applyDayConstraint($qb, $date)
       ->andWhere("m.member = :member")
       ->setParameter("member", $member)
-      ->getQuery()->getOneOrNullResult();
+      ->getQuery();
+
+    try {
+      return $query->getOneOrNullResult();
+    } catch (\Exception $e) {
+      return null;
+    }
   }
 
   public function findLastOneByActivity(Member $member, Activity $activity): ?MemberPresence {
     $qb = $this->createQueryBuilder('m');
-    return $qb
+    $query = $qb
       ->andWhere("m.member = :member")
       ->innerJoin("m.activities", "a", Join::WITH, $qb->expr()->eq("a.id", ":activity"))
       ->orderBy("m.date", "DESC")
       ->setParameter("activity", $activity)
       ->setParameter("member", $member)
       ->setMaxResults(1)
-      ->getQuery()->getOneOrNullResult();
+      ->getQuery();
+
+    try {
+      return $query->getOneOrNullResult();
+    }
+    catch (\Exception $e) {
+      return null;
+    }
   }
 
 }

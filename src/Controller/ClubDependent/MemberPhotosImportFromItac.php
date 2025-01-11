@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\ClubDependent\Plugin\Presence;
+namespace App\Controller\ClubDependent;
 
 use App\Controller\Abstract\AbstractClubDependentController;
 use App\Service\ImageService;

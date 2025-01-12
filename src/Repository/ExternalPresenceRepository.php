@@ -21,11 +21,8 @@ use Doctrine\Persistence\ManagerRegistry;
 class ExternalPresenceRepository extends ServiceEntityRepository implements PresenceRepositoryInterface {
   use PresenceRepositoryTrait;
 
-  private GlobalSettingService $globalSettingService;
-
-  public function __construct(ManagerRegistry $registry, GlobalSettingService $globalSettingService) {
+  public function __construct(ManagerRegistry $registry) {
     parent::__construct($registry, ExternalPresence::class);
-    $this->globalSettingService = $globalSettingService;
   }
 
   public function findAllWithLicence(Club $club): ?array {

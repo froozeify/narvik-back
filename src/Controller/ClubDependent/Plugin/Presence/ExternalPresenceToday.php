@@ -2,13 +2,13 @@
 
 namespace App\Controller\ClubDependent\Plugin\Presence;
 
+use App\Controller\Abstract\AbstractClubDependentController;
 use App\Repository\ExternalPresenceRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class ExternalPresenceToday extends AbstractController {
+class ExternalPresenceToday extends AbstractClubDependentController {
 
   public function __invoke(ExternalPresenceRepository $externalPresenceRepository): ?array {
-    return $externalPresenceRepository->findAllPresentToday();
+    return $externalPresenceRepository->findAllPresentToday($this->getQueryClub());
   }
 
 }

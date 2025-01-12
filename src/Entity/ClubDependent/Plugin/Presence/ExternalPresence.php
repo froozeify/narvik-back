@@ -7,16 +7,20 @@ use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\ClubDependent\Plugin\Presence\ExternalPresenceToday;
 use App\Entity\Abstract\UuidEntity;
+use App\Entity\Club;
 use App\Entity\Interface\ClubLinkedEntityInterface;
 use App\Entity\Interface\TimestampEntityInterface;
 use App\Entity\Trait\SelfClubLinkedEntityTrait;
 use App\Entity\Trait\TimestampTrait;
+use App\Enum\ClubRole;
 use App\Filter\MultipleFilter;
 use App\Repository\ExternalPresenceRepository;
 use App\Validator\Constraints\ActivityMustBeEnabled;
@@ -28,23 +32,52 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ExternalPresenceRepository::class)]
-#[UniqueEntity(fields: ['licence', 'date'], message: 'Member already registered for that day')]
+#[UniqueEntity(fields: ['licence', 'club', 'date'], message: 'Member already registered for that day')]
 #[ApiResource(
+  uriTemplate: '/clubs/{clubUuid}/external-presences/{uuid}',
   operations: [
-    new GetCollection(),
-    new Post(),
-    new Patch(),
-    new Delete(),
+    new GetCollection(
+      uriTemplate: '/clubs/{clubUuid}/external-presences.{_format}',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
+      security: "is_granted('".ClubRole::supervisor->value."', request) || is_granted('".ClubRole::badger->value."', request)",
+    ),
+    new Post(
+      uriTemplate: '/clubs/{clubUuid}/external-presences',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
+      securityPostDenormalize: "is_granted('".ClubRole::supervisor->value."', request) || is_granted('".ClubRole::badger->value."', request)",
+      read: false
+    ),
+    new Get(
+      security: "is_granted('".ClubRole::supervisor->value."', request) || is_granted('".ClubRole::badger->value."', request)",
+    ),
+    new Patch(
+      security: "is_granted('".ClubRole::supervisor->value."', request) || is_granted('".ClubRole::badger->value."', request)",
+    ),
+    new Delete(
+      security: "is_granted('".ClubRole::supervisor->value."', request) || is_granted('".ClubRole::badger->value."', request)",
+    ),
 
     new GetCollection(
-      uriTemplate: '/external-presences/-/today',
+      uriTemplate: '/clubs/{clubUuid}/external-presences/-/today',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
       controller: ExternalPresenceToday::class,
       openapi: new Model\Operation(
         summary: 'Get all external presence for today',
       ),
+      security: "is_granted('".ClubRole::supervisor->value."', request) || is_granted('".ClubRole::badger->value."', request)",
       read: false,
       write: false
     )
+  ],
+  uriVariables: [
+    'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+    'uuid' => new Link(fromClass: self::class),
   ],
   normalizationContext: [
     'groups' => ['external-presence', 'external-presence-read']

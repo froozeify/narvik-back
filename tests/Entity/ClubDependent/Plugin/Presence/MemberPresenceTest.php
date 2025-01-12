@@ -5,16 +5,14 @@ namespace App\Tests\Entity\ClubDependent\Plugin\Presence;
 use App\Entity\ClubDependent\Plugin\Presence\MemberPresence;
 use App\Enum\ClubRole;
 use App\Message\CerberePresencesDateMessage;
-use App\Message\ItacSecondaryClubMembersMessage;
 use App\Tests\Entity\Abstract\AbstractEntityClubLinkedTestCase;
 use App\Tests\Enum\ResponseCodeEnum;
-use App\Tests\Factory\ActivityFactory;
 use App\Tests\Factory\ExternalPresenceFactory;
 use App\Tests\Factory\MemberFactory;
 use App\Tests\Factory\MemberPresenceFactory;
+use App\Tests\FixtureFileManager;
 use App\Tests\Story\_InitStory;
 use App\Tests\Story\ActivityStory;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Zenstruck\Messenger\Test\InteractsWithMessenger;
 use function Zenstruck\Foundry\faker;
 
@@ -161,11 +159,14 @@ class MemberPresenceTest extends AbstractEntityClubLinkedTestCase {
     $transport = $this->transport('async_low');
     $transport->queue()->assertEmpty();
 
-    $file = new UploadedFile(__DIR__ . '/../../../../fixtures/presence-cerbere.xls', 'presence-cerbere.xls');
+    $file = FixtureFileManager::getUploadedFile(FixtureFileManager::PRESENCES_CERBERE);
 
     $this->loggedAsAdminClub1();
     $response = $this->makeGetRequest($this->getRootWClubUrl($club));
     $this->assertCount($this->TOTAL_ADMIN_CLUB_1, $response->toArray()['member']);
+
+    $response = $this->makeGetRequest($this->getIriFromResource($club) . '/external-presences');
+    $this->assertCount(0, $response->toArray()['member']);
 
     $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/from-cerbere", [
       '_not_json' => true,
@@ -186,9 +187,11 @@ class MemberPresenceTest extends AbstractEntityClubLinkedTestCase {
     $transport->process();
     $transport->queue()->assertEmpty();
 
-    // 2 new presences (and 1 external but will be tested in ExternalPresenceTest)
+    // 2 new presences and 1 external
     $response = $this->makeGetRequest($this->getRootWClubUrl($club));
     $this->assertCount($this->TOTAL_ADMIN_CLUB_1 + 2, $response->toArray()['member']);
+    $response = $this->makeGetRequest($this->getIriFromResource($club) . '/external-presences');
+    $this->assertCount(1, $response->toArray()['member']);
 
     // Running the import a second time should not change the count
     $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/from-cerbere", [
@@ -207,15 +210,18 @@ class MemberPresenceTest extends AbstractEntityClubLinkedTestCase {
     $transport->process();
     $transport->queue()->assertEmpty();
 
-    // 2 new presences (and 1 external but will be tested in ExternalPresenceTest)
+    // 2 new presences and 1 external
     $response = $this->makeGetRequest($this->getRootWClubUrl($club));
     $this->assertCount($this->TOTAL_ADMIN_CLUB_1 + 2, $response->toArray()['member']);
+    $response = $this->makeGetRequest($this->getIriFromResource($club) . '/external-presences');
+    $this->assertCount(1, $response->toArray()['member']);
+
   }
 
   public function testImportPresencesFromCSV(): void {
     $club = _InitStory::club_1();
 
-    $file = new UploadedFile(__DIR__ . '/../../../../fixtures/narvik-presences.csv', 'narvik-presences.csv');
+    $file = FixtureFileManager::getUploadedFile(FixtureFileManager::PRESENCES_NARVIK);
 
     $this->loggedAsAdminClub1();
     $response = $this->makeGetRequest($this->getRootWClubUrl($club));

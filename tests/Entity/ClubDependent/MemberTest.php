@@ -8,6 +8,7 @@ use App\Message\ItacSecondaryClubMembersMessage;
 use App\Tests\Entity\Abstract\AbstractEntityClubLinkedTestCase;
 use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Factory\MemberFactory;
+use App\Tests\FixtureFileManager;
 use App\Tests\Story\_InitStory;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Zenstruck\Messenger\Test\InteractsWithMessenger;
@@ -115,7 +116,7 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
 
     $this->transport('async_medium')->queue()->assertEmpty();
 
-    $file = new UploadedFile(__DIR__ . '/../../fixtures/itac-members.csv', 'itac-members.csv');
+    $file = FixtureFileManager::getUploadedFile(FixtureFileManager::ITAC_MEMBERS);
 
     $this->loggedAsAdminClub1();
     $response = $this->makeGetRequest($this->getRootWClubUrl($club));
@@ -172,7 +173,7 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
     $transport = $this->transport('async_low');
     $transport->queue()->assertEmpty();
 
-    $file = new UploadedFile(__DIR__ . '/../../fixtures/itac-secondary-members.csv', 'itac-secondary-members.csv');
+    $file = FixtureFileManager::getUploadedFile(FixtureFileManager::ITAC_SECONDARY_MEMBERS);
 
     $this->loggedAsAdminClub1();
     $response = $this->makeGetRequest($this->getRootWClubUrl($club));
@@ -238,7 +239,7 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
     $this->assertJsonContains(["licence" => "01234321"]);
 
     // We upload the zip
-    $file = new UploadedFile(__DIR__ . '/../../fixtures/profile-pictures.zip', 'profile-pictures.zip');
+    $file = FixtureFileManager::getUploadedFile(FixtureFileManager::PROFILE_PICTURES);
     $this->makePostRequest($this->getRootWClubUrl($club) . "/-/photos-from-itac", [
       '_not_json' => true,
       'headers' => ['Content-Type' => 'multipart/form-data'],

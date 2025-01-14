@@ -11,11 +11,16 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Entity\Abstract\UuidEntity;
+use App\Entity\Club;
+use App\Entity\Interface\ClubLinkedEntityInterface;
 use App\Entity\Interface\TimestampEntityInterface;
+use App\Entity\Trait\SelfClubLinkedEntityTrait;
 use App\Entity\Trait\TimestampTrait;
+use App\Enum\ClubRole;
 use App\Filter\MultipleFilter;
 use App\Repository\ClubDependent\Plugin\Sale\InventoryItemRepository;
 use App\Service\UtilsService;
@@ -26,20 +31,39 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: InventoryItemRepository::class)]
-#[UniqueEntity(fields: ['name', 'category'], message: 'An item with the same name is already defined' )]
+#[UniqueEntity(fields: ['name', 'category', 'club'], message: 'An item with the same name is already defined' )]
 #[ApiResource(
+  uriTemplate: '/clubs/{clubUuid}/inventory-items/{uuid}',
   operations: [
-    new GetCollection(),
-    new Get(),
+    new GetCollection(
+      uriTemplate: '/clubs/{clubUuid}/inventory-items.{_format}',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
+      security: "is_granted('".ClubRole::supervisor->value."', request)",
+    ),
     new Post(
-      security: "is_granted('ROLE_ADMIN')"
+      uriTemplate: '/clubs/{clubUuid}/inventory-items.{_format}',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
+      security: "is_granted('".ClubRole::admin->value."', request)",
+      read: false
+    ),
+
+    new Get(
+      security: "is_granted('".ClubRole::supervisor->value."', object)",
     ),
     new Patch(
-      security: "is_granted('ROLE_ADMIN')"
+      security: "is_granted('".ClubRole::admin->value."', object)",
     ),
     new Delete(
-      security: "is_granted('ROLE_ADMIN')"
+      security: "is_granted('".ClubRole::admin->value."', object)",
     ),
+  ],
+  uriVariables: [
+    'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+    'uuid' => new Link(fromClass: self::class),
   ],
   normalizationContext: [
     'groups' => ['inventory-item', 'inventory-item-read']
@@ -54,8 +78,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(SearchFilter::class, properties: ['category.uuid' => 'exact'])]
 #[ApiFilter(BooleanFilter::class, properties: ['canBeSold'])]
 #[ApiFilter(ExistsFilter::class, properties: ['sellingPrice'])]
-class InventoryItem extends UuidEntity implements TimestampEntityInterface {
+class InventoryItem extends UuidEntity implements TimestampEntityInterface, ClubLinkedEntityInterface {
   use TimestampTrait;
+  use SelfClubLinkedEntityTrait;
 
   #[ORM\Column(length: 255)]
   #[Groups(['inventory-item', 'sale-read'])]
@@ -70,9 +95,9 @@ class InventoryItem extends UuidEntity implements TimestampEntityInterface {
   #[Groups(['inventory-item'])]
   private ?string $purchasePrice = null;
 
-  #[ORM\Column]
+  #[ORM\Column(type: 'boolean', options: ["default" => 0])]
   #[Groups(['inventory-item'])]
-  private ?bool $canBeSold = null;
+  private bool $canBeSold = false;
 
   #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2)]
   #[Groups(['inventory-item'])]
@@ -97,7 +122,8 @@ class InventoryItem extends UuidEntity implements TimestampEntityInterface {
   #[Groups(['inventory-item'])]
   private ?string $barcode = null;
 
-  #[ORM\ManyToOne(inversedBy: 'items')]
+  #[ORM\ManyToOne(targetEntity: InventoryCategory::class, inversedBy: 'items')]
+  #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
   #[Groups(['inventory-item'])]
   private ?InventoryCategory $category = null;
 
@@ -128,7 +154,7 @@ class InventoryItem extends UuidEntity implements TimestampEntityInterface {
     return $this;
   }
 
-  public function getCanBeSold(): ?bool {
+  public function getCanBeSold(): bool {
     return $this->canBeSold;
   }
 

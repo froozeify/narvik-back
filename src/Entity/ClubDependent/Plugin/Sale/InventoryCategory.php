@@ -30,10 +30,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 
 #[ORM\Entity(repositoryClass: InventoryCategoryRepository::class)]
-#[UniqueEntity(fields: ['club', 'weight'], ignoreNull: true)]
-#[UniqueEntity(fields: ['club', 'name'], ignoreNull: true)]
+#[UniqueEntity(fields: ['weight', 'club'], ignoreNull: true)]
+#[UniqueEntity(fields: ['name', 'club'], ignoreNull: true)]
 #[ApiResource(
-  uriTemplate: '/clubs/{clubUuid}/inventory-categories/{uuid}.{_format}',
+  uriTemplate: '/clubs/{clubUuid}/inventory-categories/{uuid}',
   operations: [
     new GetCollection(
       uriTemplate: '/clubs/{clubUuid}/inventory-categories.{_format}',

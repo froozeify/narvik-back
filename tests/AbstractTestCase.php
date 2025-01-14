@@ -11,6 +11,7 @@ use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Story\_InitStory;
 use Doctrine\DBAL\Connection;
 use JetBrains\PhpStorm\NoReturn;
+use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -130,13 +131,17 @@ abstract class AbstractTestCase extends ApiTestCase {
     $this->selectedMember = $uuid;
   }
 
-  private function checkRequestResponse(ResponseCodeEnum $responseCode, ?array $payloadToValidate): void {
-    $this->assertResponseStatusCodeSame($responseCode->value);
+  private function checkRequestResponse(ResponseCodeEnum $responseCode, ?array $payloadToValidate, string $context): void {
+    try {
+      $this->assertResponseStatusCodeSame($responseCode->value);
 
-    if ($responseCode->isSuccess()) {
-      if ($payloadToValidate) {
-        $this->assertJsonContains($payloadToValidate);
+      if ($responseCode->isSuccess()) {
+        if ($payloadToValidate) {
+          $this->assertJsonContains($payloadToValidate);
+        }
       }
+    } catch (ExpectationFailedException $exception) {
+      throw new ExpectationFailedException("CheckRequestResponse context: " . $context . "\n" . $exception->getMessage(), $exception->getComparisonFailure(), $exception->getPrevious());
     }
   }
 
@@ -154,39 +159,39 @@ abstract class AbstractTestCase extends ApiTestCase {
     // Super admin
     $this->loggedAsSuperAdmin();
     if ($requestFunction) $requestFunction(UserRole::super_admin->value, null);
-    $this->checkRequestResponse($superAdminCode, $payloadToValidate);
+    $this->checkRequestResponse($superAdminCode, $payloadToValidate, "Super admin");
 
     // Admin club 1
     $this->loggedAsAdminClub1();
     if ($requestFunction) $requestFunction(ClubRole::admin->value, 1);
-    $this->checkRequestResponse($adminClub1Code, $payloadToValidate);
+    $this->checkRequestResponse($adminClub1Code, $payloadToValidate, "Admin club 1");
 
     // Supervisor club 1
     $this->loggedAsSupervisorClub1();
     if ($requestFunction) $requestFunction(ClubRole::supervisor->value, 1);
-    $this->checkRequestResponse($supervisorClub1Code, $payloadToValidate);
+    $this->checkRequestResponse($supervisorClub1Code, $payloadToValidate, "Supervisor club 1");
 
     // member club 1
     $this->loggedAsMemberClub1();
     if ($requestFunction) $requestFunction(ClubRole::member->value, 1);
-    $this->checkRequestResponse($memberClub1Code, $payloadToValidate);
+    $this->checkRequestResponse($memberClub1Code, $payloadToValidate, "Member club 1");
 
     // Badger club 1
     $this->loggedAsBadgerClub1();
     if ($requestFunction) $requestFunction(ClubRole::badger->value, 1);
-    $this->checkRequestResponse($badgerClub1Code, $payloadToValidate);
+    $this->checkRequestResponse($badgerClub1Code, $payloadToValidate, "Badger club 1");
 
     // Club 2
     if ($adminClub2Code) {
       // Admin club 2
       $this->loggedAsAdminClub2();
       if ($requestFunction) $requestFunction(ClubRole::admin->value, 2);
-      $this->checkRequestResponse($adminClub2Code, $payloadToValidate);
+      $this->checkRequestResponse($adminClub2Code, $payloadToValidate, "Admin club 2");
 
       // Badger club 2
       $this->loggedAsBadgerClub2();
       if ($requestFunction) $requestFunction(ClubRole::badger->value, 2);
-      $this->checkRequestResponse($badgerClub2Code, $payloadToValidate);
+      $this->checkRequestResponse($badgerClub2Code, $payloadToValidate, "Badger club 2");
     }
   }
 

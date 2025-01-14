@@ -2,8 +2,8 @@
 
 namespace App\EventSubscriber\Doctrine;
 
-use App\Entity\InventoryItem;
-use App\Entity\InventoryItemHistory;
+use App\Entity\ClubDependent\Plugin\Sale\InventoryItem;
+use App\Entity\ClubDependent\Plugin\Sale\InventoryItemHistory;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\Event\PostUpdateEventArgs;
 

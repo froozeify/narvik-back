@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\InventoryItem;
+use App\Entity\ClubDependent\Plugin\Sale\InventoryItem;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

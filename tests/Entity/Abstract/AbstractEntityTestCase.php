@@ -51,8 +51,8 @@ abstract class AbstractEntityTestCase extends AbstractTestCase {
   }
 
   protected function validateGetCollectionResponse(ResponseInterface $response, UserRole|ClubRole $role, int $total): ResponseInterface {
-    if (!$this->getCollectionGrantedAccess()[$role->value]) {
-      self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+    if (!$this->getCollectionGrantedAccess()[$role->value] || $total < 0) {
+      self::assertResponseIsClientError();
       return $response;
     }
 

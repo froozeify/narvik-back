@@ -3,8 +3,7 @@
 namespace App\Command;
 
 use App\Enum\ClubRole;
-use App\Enum\GlobalSetting;
-use App\Repository\MemberRepository;
+use App\Repository\ClubDependent\MemberRepository;
 use App\Service\GlobalSettingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;

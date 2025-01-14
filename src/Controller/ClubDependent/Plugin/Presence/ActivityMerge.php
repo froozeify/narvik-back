@@ -4,7 +4,7 @@ namespace App\Controller\ClubDependent\Plugin\Presence;
 
 use App\Controller\Abstract\AbstractClubDependentController;
 use App\Entity\ClubDependent\Plugin\Presence\Activity;
-use App\Repository\ActivityRepository;
+use App\Repository\ClubDependent\Plugin\Presence\ActivityRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;

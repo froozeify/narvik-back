@@ -18,7 +18,7 @@ use App\Entity\Club;
 use App\Entity\Interface\ClubLinkedEntityInterface;
 use App\Entity\Trait\SelfClubLinkedEntityTrait;
 use App\Enum\ClubRole;
-use App\Repository\ActivityRepository;
+use App\Repository\ClubDependent\Plugin\Presence\ActivityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;

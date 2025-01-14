@@ -3,7 +3,7 @@
 namespace App\Tests\Factory;
 
 use App\Entity\ClubDependent\MemberSeason;
-use App\Repository\MemberSeasonRepository;
+use App\Repository\ClubDependent\MemberSeasonRepository;
 use App\Tests\Story\AgeCategoryStory;
 use App\Tests\Story\SeasonStory;
 use Zenstruck\Foundry\FactoryCollection;

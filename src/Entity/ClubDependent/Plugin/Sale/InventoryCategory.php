@@ -20,7 +20,7 @@ use App\Entity\Interface\ClubLinkedEntityInterface;
 use App\Entity\Interface\SortableEntityInterface;
 use App\Entity\Trait\SelfClubLinkedEntityTrait;
 use App\Enum\ClubRole;
-use App\Repository\InventoryCategoryRepository;
+use App\Repository\ClubDependent\Plugin\Sale\InventoryCategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;

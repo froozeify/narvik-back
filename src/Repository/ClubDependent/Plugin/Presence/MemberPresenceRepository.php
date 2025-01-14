@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\ClubDependent\Plugin\Presence;
 
 use App\Entity\ClubDependent\Member;
 use App\Entity\ClubDependent\Plugin\Presence\Activity;

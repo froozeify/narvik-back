@@ -3,9 +3,8 @@
 namespace App\Controller\ClubDependent\Plugin\Sale;
 
 use App\Controller\Abstract\SortableController;
-use App\Entity\Club;
 use App\Entity\ClubDependent\Plugin\Sale\InventoryCategory;
-use App\Repository\InventoryCategoryRepository;
+use App\Repository\ClubDependent\Plugin\Sale\InventoryCategoryRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 

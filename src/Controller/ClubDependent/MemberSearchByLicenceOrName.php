@@ -3,7 +3,7 @@
 namespace App\Controller\ClubDependent;
 
 use App\Controller\Abstract\AbstractClubDependentController;
-use App\Repository\MemberRepository;
+use App\Repository\ClubDependent\MemberRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\SerializerInterface;

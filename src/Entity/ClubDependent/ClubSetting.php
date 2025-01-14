@@ -11,7 +11,7 @@ use App\Entity\Club;
 use App\Entity\ClubDependent\Plugin\Presence\Activity;
 use App\Entity\Interface\ClubLinkedEntityInterface;
 use App\Enum\ClubRole;
-use App\Repository\SettingRepository;
+use App\Repository\ClubDependent\ClubSettingRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 
-#[ORM\Entity(repositoryClass: SettingRepository::class)]
+#[ORM\Entity(repositoryClass: ClubSettingRepository::class)]
 #[UniqueEntity(fields: ['club'])]
 #[ApiResource(uriTemplate: '/clubs/{clubUuid}/settings/{uuid}.{_format}', operations: [
     new Get(),

@@ -4,7 +4,7 @@ namespace App\Controller\ClubDependent\Plugin\Sale;
 
 use App\Controller\Abstract\SortableController;
 use App\Entity\ClubDependent\Plugin\Sale\SalePaymentMode;
-use App\Repository\SalePaymentModeRepository;
+use App\Repository\ClubDependent\Plugin\Sale\SalePaymentModeRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 

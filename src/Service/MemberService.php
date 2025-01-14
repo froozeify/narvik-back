@@ -4,9 +4,8 @@ namespace App\Service;
 
 use App\Entity\ClubDependent\Member;
 use App\Entity\ClubDependent\Plugin\Presence\Activity;
-use App\Enum\GlobalSetting;
-use App\Repository\ActivityRepository;
-use App\Repository\MemberPresenceRepository;
+use App\Repository\ClubDependent\Plugin\Presence\ActivityRepository;
+use App\Repository\ClubDependent\Plugin\Presence\MemberPresenceRepository;
 use App\Repository\SeasonRepository;
 
 class MemberService {

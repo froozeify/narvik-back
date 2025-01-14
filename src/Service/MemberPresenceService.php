@@ -5,9 +5,9 @@ namespace App\Service;
 use App\Entity\Club;
 use App\Entity\ClubDependent\Plugin\Presence\ExternalPresence;
 use App\Entity\ClubDependent\Plugin\Presence\MemberPresence;
-use App\Repository\ExternalPresenceRepository;
-use App\Repository\MemberPresenceRepository;
-use App\Repository\MemberRepository;
+use App\Repository\ClubDependent\MemberRepository;
+use App\Repository\ClubDependent\Plugin\Presence\ExternalPresenceRepository;
+use App\Repository\ClubDependent\Plugin\Presence\MemberPresenceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class MemberPresenceService {

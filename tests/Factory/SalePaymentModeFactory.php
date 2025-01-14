@@ -3,7 +3,7 @@
 namespace App\Tests\Factory;
 
 use App\Entity\ClubDependent\Plugin\Sale\SalePaymentMode;
-use App\Repository\SalePaymentModeRepository;
+use App\Repository\ClubDependent\Plugin\Sale\SalePaymentModeRepository;
 use App\Tests\Story\_InitStory;
 use Doctrine\ORM\EntityRepository;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;

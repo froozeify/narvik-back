@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\ClubDependent\Plugin\Sale;
 
 use App\Entity\ClubDependent\Plugin\Sale\InventoryCategory;
 use App\Repository\Interface\ClubLinkedInterface;

@@ -16,7 +16,7 @@ use App\Entity\Abstract\UuidEntity;
 use App\Entity\ClubDependent\Member;
 use App\Entity\Interface\TimestampEntityInterface;
 use App\Entity\Trait\TimestampTrait;
-use App\Repository\SaleRepository;
+use App\Repository\ClubDependent\Plugin\Sale\SaleRepository;
 use App\Service\UtilsService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;

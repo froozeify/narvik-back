@@ -1,27 +1,21 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\ClubDependent\Plugin\Sale;
 
-use App\Entity\ClubDependent\Plugin\Sale\InventoryItem;
+use App\Entity\ClubDependent\Plugin\Sale\InventoryItemHistory;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<InventoryItem>
- *
- * @method InventoryItem|null find($id, $lockMode = null, $lockVersion = null)
- * @method InventoryItem|null findOneBy(array $criteria, array $orderBy = null)
- * @method InventoryItem[]    findAll()
- * @method InventoryItem[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<InventoryItemHistory>
  */
-class InventoryItemRepository extends ServiceEntityRepository {
-
+class InventoryItemHistoryRepository extends ServiceEntityRepository {
   public function __construct(ManagerRegistry $registry) {
-    parent::__construct($registry, InventoryItem::class);
+    parent::__construct($registry, InventoryItemHistory::class);
   }
 
   //    /**
-  //     * @return InventoryItem[] Returns an array of InventoryItem objects
+  //     * @return InventoryItemHistory[] Returns an array of InventoryItemHistory objects
   //     */
   //    public function findByExampleField($value): array
   //    {
@@ -35,7 +29,7 @@ class InventoryItemRepository extends ServiceEntityRepository {
   //        ;
   //    }
 
-  //    public function findOneBySomeField($value): ?InventoryItem
+  //    public function findOneBySomeField($value): ?InventoryItemHistory
   //    {
   //        return $this->createQueryBuilder('i')
   //            ->andWhere('i.exampleField = :val')

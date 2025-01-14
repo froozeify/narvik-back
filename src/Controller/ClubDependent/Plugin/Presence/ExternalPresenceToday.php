@@ -3,7 +3,7 @@
 namespace App\Controller\ClubDependent\Plugin\Presence;
 
 use App\Controller\Abstract\AbstractClubDependentController;
-use App\Repository\ExternalPresenceRepository;
+use App\Repository\ClubDependent\Plugin\Presence\ExternalPresenceRepository;
 
 class ExternalPresenceToday extends AbstractClubDependentController {
 

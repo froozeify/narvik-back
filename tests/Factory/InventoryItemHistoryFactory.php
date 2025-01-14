@@ -3,7 +3,7 @@
 namespace App\Tests\Factory;
 
 use App\Entity\ClubDependent\Plugin\Sale\InventoryItemHistory;
-use App\Repository\InventoryItemHistoryRepository;
+use App\Repository\ClubDependent\Plugin\Sale\InventoryItemHistoryRepository;
 use Doctrine\ORM\EntityRepository;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;

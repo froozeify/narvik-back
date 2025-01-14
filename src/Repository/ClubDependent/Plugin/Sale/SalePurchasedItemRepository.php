@@ -1,24 +1,21 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\ClubDependent\Plugin\Sale;
 
-use App\Entity\ClubDependent\ClubSetting;
-use App\Repository\Trait\UuidEntityRepositoryTrait;
+use App\Entity\ClubDependent\Plugin\Sale\SalePurchasedItem;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<ClubSetting>
+ * @extends ServiceEntityRepository<SalePurchasedItem>
  */
-class SettingRepository extends ServiceEntityRepository {
-  use UuidEntityRepositoryTrait;
-
+class SalePurchasedItemRepository extends ServiceEntityRepository {
   public function __construct(ManagerRegistry $registry) {
-    parent::__construct($registry, ClubSetting::class);
+    parent::__construct($registry, SalePurchasedItem::class);
   }
 
 //    /**
-//     * @return Setting[] Returns an array of Setting objects
+//     * @return SalePurchasedItem[] Returns an array of SalePurchasedItem objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -32,7 +29,7 @@ class SettingRepository extends ServiceEntityRepository {
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Setting
+//    public function findOneBySomeField($value): ?SalePurchasedItem
 //    {
 //        return $this->createQueryBuilder('s')
 //            ->andWhere('s.exampleField = :val')

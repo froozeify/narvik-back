@@ -22,7 +22,7 @@ use App\Entity\Trait\SelfClubLinkedEntityTrait;
 use App\Entity\Trait\TimestampTrait;
 use App\Enum\ClubRole;
 use App\Filter\MultipleFilter;
-use App\Repository\ExternalPresenceRepository;
+use App\Repository\ClubDependent\Plugin\Presence\ExternalPresenceRepository;
 use App\Validator\Constraints\ActivityMustBeEnabled;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;

@@ -6,11 +6,11 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\Metric;
-use App\Repository\ExternalPresenceRepository;
+use App\Repository\ClubDependent\MemberRepository;
+use App\Repository\ClubDependent\MemberSeasonRepository;
+use App\Repository\ClubDependent\Plugin\Presence\ExternalPresenceRepository;
+use App\Repository\ClubDependent\Plugin\Presence\MemberPresenceRepository;
 use App\Repository\Interface\PresenceRepositoryInterface;
-use App\Repository\MemberPresenceRepository;
-use App\Repository\MemberRepository;
-use App\Repository\MemberSeasonRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class MetricProvider implements ProviderInterface {

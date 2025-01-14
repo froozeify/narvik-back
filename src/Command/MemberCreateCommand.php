@@ -4,7 +4,7 @@ namespace App\Command;
 
 use App\Entity\ClubDependent\Member;
 use App\Enum\ClubRole;
-use App\Repository\MemberRepository;
+use App\Repository\ClubDependent\MemberRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;

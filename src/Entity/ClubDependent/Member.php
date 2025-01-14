@@ -28,7 +28,7 @@ use App\Entity\Trait\SelfClubLinkedEntityTrait;
 use App\Enum\ClubRole;
 use App\Filter\CurrentSeasonFilter;
 use App\Filter\MultipleFilter;
-use App\Repository\MemberRepository;
+use App\Repository\ClubDependent\MemberRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;

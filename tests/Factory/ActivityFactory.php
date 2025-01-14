@@ -3,7 +3,7 @@
 namespace App\Tests\Factory;
 
 use App\Entity\ClubDependent\Plugin\Presence\Activity;
-use App\Repository\ActivityRepository;
+use App\Repository\ClubDependent\Plugin\Presence\ActivityRepository;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;

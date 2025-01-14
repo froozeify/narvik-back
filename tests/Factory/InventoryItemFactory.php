@@ -3,7 +3,7 @@
 namespace App\Tests\Factory;
 
 use App\Entity\ClubDependent\Plugin\Sale\InventoryItem;
-use App\Repository\InventoryItemRepository;
+use App\Repository\ClubDependent\Plugin\Sale\InventoryItemRepository;
 use App\Tests\Story\InventoryCategoryStory;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;

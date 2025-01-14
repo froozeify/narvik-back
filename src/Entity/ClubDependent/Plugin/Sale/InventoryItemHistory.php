@@ -10,7 +10,7 @@ use ApiPlatform\Metadata\Link;
 use App\Entity\Abstract\UuidEntity;
 use App\Entity\Interface\TimestampEntityInterface;
 use App\Entity\Trait\TimestampTrait;
-use App\Repository\InventoryItemHistoryRepository;
+use App\Repository\ClubDependent\Plugin\Sale\InventoryItemHistoryRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;

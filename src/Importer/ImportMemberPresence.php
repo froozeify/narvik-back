@@ -8,9 +8,9 @@ use App\Importer\Model\AbstractImportedItemResult;
 use App\Importer\Model\ErrorImportedItem;
 use App\Importer\Model\SuccessImportedItem;
 use App\Importer\Model\WarningImportedItem;
-use App\Repository\ActivityRepository;
-use App\Repository\MemberPresenceRepository;
-use App\Repository\MemberRepository;
+use App\Repository\ClubDependent\MemberRepository;
+use App\Repository\ClubDependent\Plugin\Presence\ActivityRepository;
+use App\Repository\ClubDependent\Plugin\Presence\MemberPresenceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 

@@ -3,7 +3,7 @@
 namespace App\Tests\Factory;
 
 use App\Entity\ClubDependent\Plugin\Presence\ExternalPresence;
-use App\Repository\ExternalPresenceRepository;
+use App\Repository\ClubDependent\Plugin\Presence\ExternalPresenceRepository;
 use App\Tests\Story\_InitStory;
 use App\Tests\Story\ActivityStory;
 use DateTimeImmutable;

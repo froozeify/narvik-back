@@ -5,17 +5,8 @@ namespace App\State;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\Entity\Image;
-use App\Entity\Metric;
-use App\Repository\MemberPresenceRepository;
-use App\Repository\MemberRepository;
-use App\Repository\MemberSeasonRepository;
 use App\Service\ImageService;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\Response;
 
 class ImageProvider implements ProviderInterface {
 

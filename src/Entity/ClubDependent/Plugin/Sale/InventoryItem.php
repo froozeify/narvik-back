@@ -17,7 +17,7 @@ use App\Entity\Abstract\UuidEntity;
 use App\Entity\Interface\TimestampEntityInterface;
 use App\Entity\Trait\TimestampTrait;
 use App\Filter\MultipleFilter;
-use App\Repository\InventoryItemRepository;
+use App\Repository\ClubDependent\Plugin\Sale\InventoryItemRepository;
 use App\Service\UtilsService;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\ClubDependent;
 
 use App\DQL\CustomExpr;
 use App\Entity\Club;

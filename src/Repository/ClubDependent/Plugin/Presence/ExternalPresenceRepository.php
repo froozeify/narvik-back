@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\ClubDependent\Plugin\Presence;
 
 use App\Entity\Club;
 use App\Entity\ClubDependent\Plugin\Presence\ExternalPresence;
 use App\Repository\Interface\ClubLinkedInterface;
 use App\Repository\Interface\PresenceRepositoryInterface;
 use App\Repository\Trait\PresenceRepositoryTrait;
-use App\Service\GlobalSettingService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

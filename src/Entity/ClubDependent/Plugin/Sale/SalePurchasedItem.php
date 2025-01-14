@@ -5,7 +5,7 @@ namespace App\Entity\ClubDependent\Plugin\Sale;
 use App\Entity\Abstract\UuidEntity;
 use App\Entity\Interface\TimestampEntityInterface;
 use App\Entity\Trait\TimestampTrait;
-use App\Repository\SalePurchasedItemRepository;
+use App\Repository\ClubDependent\Plugin\Sale\SalePurchasedItemRepository;
 use App\Service\UtilsService;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;

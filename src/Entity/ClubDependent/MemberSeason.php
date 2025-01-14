@@ -14,7 +14,7 @@ use App\Entity\Club;
 use App\Entity\Interface\ClubLinkedEntityInterface;
 use App\Entity\Season;
 use App\Enum\ClubRole;
-use App\Repository\MemberSeasonRepository;
+use App\Repository\ClubDependent\MemberSeasonRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;

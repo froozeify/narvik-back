@@ -3,7 +3,7 @@
 namespace App\Tests\Factory;
 
 use App\Entity\ClubDependent\Plugin\Presence\MemberPresence;
-use App\Repository\MemberPresenceRepository;
+use App\Repository\ClubDependent\Plugin\Presence\MemberPresenceRepository;
 use App\Tests\Story\ActivityStory;
 use DateTimeImmutable;
 use Zenstruck\Foundry\FactoryCollection;

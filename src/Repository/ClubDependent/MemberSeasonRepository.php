@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\ClubDependent;
 
 use App\Entity\ClubDependent\Member;
 use App\Entity\ClubDependent\MemberSeason;
 use App\Entity\Season;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**

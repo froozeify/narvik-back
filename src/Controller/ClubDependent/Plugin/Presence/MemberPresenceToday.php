@@ -3,7 +3,7 @@
 namespace App\Controller\ClubDependent\Plugin\Presence;
 
 use App\Controller\Abstract\AbstractClubDependentController;
-use App\Repository\MemberPresenceRepository;
+use App\Repository\ClubDependent\Plugin\Presence\MemberPresenceRepository;
 use App\Service\GlobalSettingService;
 use App\Service\MemberService;
 

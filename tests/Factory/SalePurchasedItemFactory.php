@@ -3,7 +3,7 @@
 namespace App\Tests\Factory;
 
 use App\Entity\ClubDependent\Plugin\Sale\SalePurchasedItem;
-use App\Repository\SalePurchasedItemRepository;
+use App\Repository\ClubDependent\Plugin\Sale\SalePurchasedItemRepository;
 use Doctrine\ORM\EntityRepository;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;

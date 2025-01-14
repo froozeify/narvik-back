@@ -21,7 +21,7 @@ class SalePurchasedItem extends UuidEntity implements TimestampEntityInterface {
   #[Assert\NotBlank(allowNull: true)]
   private ?InventoryItem $item = null;
 
-  #[ORM\ManyToOne(inversedBy: 'salePurchasedItems')]
+  #[ORM\ManyToOne(targetEntity: Sale::class, inversedBy: 'salePurchasedItems')]
   #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
   #[Assert\NotNull]
   private ?Sale $sale = null;

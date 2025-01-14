@@ -42,7 +42,7 @@ class MemberPresenceTest extends AbstractEntityClubLinkedTestCase {
 
   public function initDefaultFixtures(): void {
     MemberPresenceFactory::new([
-      'date'       => \DateTimeImmutable::createFromMutable(faker()->dateTimeBetween('now', 'now')),
+      'date'       => new \DateTimeImmutable(),
       'member' => _InitStory::MEMBER_member_club_1(),
     ])->many(5)->create();
     MemberPresenceFactory::new([

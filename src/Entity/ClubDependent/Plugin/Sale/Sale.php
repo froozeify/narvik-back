@@ -10,13 +10,19 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Entity\Abstract\UuidEntity;
+use App\Entity\Club;
 use App\Entity\ClubDependent\Member;
+use App\Entity\Interface\ClubLinkedEntityInterface;
 use App\Entity\Interface\TimestampEntityInterface;
+use App\Entity\Trait\SelfClubLinkedEntityTrait;
 use App\Entity\Trait\TimestampTrait;
+use App\Enum\ClubRole;
 use App\Repository\ClubDependent\Plugin\Sale\SaleRepository;
+use App\Security\Voter\SaleVoter;
 use App\Service\UtilsService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -25,19 +31,38 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-
 #[ORM\Entity(repositoryClass: SaleRepository::class)]
 #[ApiResource(
+  uriTemplate: '/clubs/{clubUuid}/sales/{uuid}',
   operations: [
-    new GetCollection(),
-    new Get(),
-    new Post(),
+    new GetCollection(
+      uriTemplate: '/clubs/{clubUuid}/sales.{_format}',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
+      security: "is_granted('".ClubRole::supervisor->value."', request)",
+    ),
+    new Post(
+      uriTemplate: '/clubs/{clubUuid}/sales.{_format}',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
+      security: "is_granted('".ClubRole::supervisor->value."', request)",
+      read: false
+    ),
+    new Get(
+      security: "is_granted('".ClubRole::supervisor->value."', object)",
+    ),
     new Patch(
-      security: "is_granted('ROLE_ADMIN') || is_granted('SALE_UPDATE', object)",
+      security: "is_granted('".ClubRole::admin->value."', object)  || is_granted('".SaleVoter::UPDATE."', object)",
     ),
     new Delete(
-      security: "is_granted('ROLE_ADMIN') || is_granted('SALE_DELETE', object)",
+      security: "is_granted('".ClubRole::admin->value."', object)  || is_granted('".SaleVoter::DELETE."', object)",
     ),
+  ],
+  uriVariables: [
+    'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+    'uuid' => new Link(fromClass: self::class),
   ],
   normalizationContext: [
     'groups' => ['sale', 'sale-read']
@@ -51,8 +76,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(OrderFilter::class, properties: ['createdAt' => 'DESC'])]
 #[ApiFilter(SearchFilter::class, properties: ['seller.uuid' => 'exact'])]
 #[ApiFilter(DateFilter::class, properties: ['createdAt' => DateFilter::EXCLUDE_NULL])]
-class Sale extends UuidEntity implements TimestampEntityInterface {
+class Sale extends UuidEntity implements TimestampEntityInterface, ClubLinkedEntityInterface {
+  // TODO: Add check item can be sold and paymentMode is available
   use TimestampTrait;
+  use SelfClubLinkedEntityTrait;
 
   #[ORM\ManyToOne(inversedBy: 'sales')]
   #[Groups(['sale'])]

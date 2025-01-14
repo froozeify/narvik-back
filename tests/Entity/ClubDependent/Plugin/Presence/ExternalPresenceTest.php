@@ -40,7 +40,7 @@ class ExternalPresenceTest extends AbstractEntityClubLinkedTestCase {
 
   public function initDefaultFixtures(): void {
     ExternalPresenceFactory::new([
-      'date'       => \DateTimeImmutable::createFromMutable(faker()->dateTimeBetween('now', 'now')),
+      'date'       => new \DateTimeImmutable(),
     ])->many(5)->create();
     ExternalPresenceFactory::new([
       'date'       => \DateTimeImmutable::createFromMutable(faker()->dateTimeBetween('-10 days', '-2 days')),

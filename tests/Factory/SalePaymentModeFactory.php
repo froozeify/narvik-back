@@ -63,9 +63,10 @@ final class SalePaymentModeFactory extends PersistentProxyObjectFactory {
    */
   protected function defaults(): array|callable {
     return [
-      'available' => self::faker()->boolean(75),
-      'name'      => self::faker()->text(12),
       'club'      => _InitStory::club_1(),
+      'icon'      => 'banknotes',
+      'name'      => self::faker()->text(12),
+      'available' => self::faker()->boolean(75),
     ];
   }
 

@@ -2,8 +2,10 @@
 
 namespace App\Tests\Factory;
 
+use App\Entity\Club;
 use App\Entity\ClubDependent\Plugin\Sale\Sale;
 use App\Repository\ClubDependent\Plugin\Sale\SaleRepository;
+use App\Tests\Story\_InitStory;
 use Doctrine\ORM\EntityRepository;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
@@ -61,8 +63,9 @@ final class SaleFactory extends PersistentProxyObjectFactory {
   protected function defaults(): array|callable {
     return [
       // 'price' => self::faker()->randomFloat(2, 20, 80),
+      'club' => _InitStory::club_1(),
       'salePurchasedItems'  => SalePurchasedItemFactory::createMany(self::faker()->numberBetween(1, 6)),
-      'paymentMode' => SalePaymentModeFactory::random(),
+      'paymentMode' => SalePaymentModeFactory::randomOrCreate(),
       'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTimeBetween('-1 years')),
     ];
   }

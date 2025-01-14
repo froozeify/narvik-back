@@ -60,7 +60,7 @@ final class SalePurchasedItemFactory extends PersistentProxyObjectFactory {
    */
   protected function defaults(): array|callable {
     return [
-      'item' => InventoryItemFactory::random(),
+      'item' => InventoryItemFactory::randomOrCreate(),
       'quantity' => self::faker()->numberBetween(1, 10),
     ];
   }

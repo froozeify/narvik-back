@@ -18,6 +18,8 @@ use App\Entity\Abstract\UuidEntity;
 use App\Entity\Club;
 use App\Entity\Interface\ClubLinkedEntityInterface;
 use App\Entity\Interface\SortableEntityInterface;
+use App\Entity\Trait\SelfClubLinkedEntityTrait;
+use App\Enum\ClubRole;
 use App\Repository\InventoryCategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -31,31 +33,33 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[UniqueEntity(fields: ['club', 'weight'], ignoreNull: true)]
 #[UniqueEntity(fields: ['club', 'name'], ignoreNull: true)]
 #[ApiResource(
+  uriTemplate: '/clubs/{clubUuid}/inventory-categories/{uuid}.{_format}',
   operations: [
-    new GetCollection(),
-    new Get(),
+    new GetCollection(
+      uriTemplate: '/clubs/{clubUuid}/inventory-categories.{_format}',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
+      security: "is_granted('".ClubRole::supervisor->value."', request)",
+    ),
     new Post(
-      security: "is_granted('ROLE_ADMIN')"
+      uriTemplate: '/clubs/{clubUuid}/inventory-categories.{_format}',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
+      security: "is_granted('".ClubRole::admin->value."', request)",
+      read: false
+    ),
+
+    new Get(
+      security: "is_granted('".ClubRole::supervisor->value."', object)"
     ),
     new Patch(
-      security: "is_granted('ROLE_ADMIN')"
+      security: "is_granted('".ClubRole::admin->value."', object)",
     ),
     new Delete(
-      security: "is_granted('ROLE_ADMIN')"
-    )
-  ],
-  normalizationContext: [
-    'groups' => ['inventory-category', 'inventory-category-read']
-  ],
-  denormalizationContext: [
-    'groups' => ['inventory-category', 'inventory-category-write']
-  ],
-  order: ['weight' => 'asc'],
-)]
-#[ApiResource(
-  uriTemplate: '/clubs/{clubUuid}/inventory-categories.{_format}',
-  operations: [
-    new GetCollection(),
+      security: "is_granted('".ClubRole::admin->value."', object)",
+    ),
 
     new Put(
       uriTemplate: '/clubs/{clubUuid}/inventory-categories/{uuid}/move',
@@ -75,30 +79,24 @@ use Symfony\Component\Validator\Constraints as Assert;
           ])
         )
       ),
-
-      security: "is_granted('ROLE_ADMIN')",
-      read: false,
-      write: false,
+      security: "is_granted('".ClubRole::admin->value."', object)",
     )
   ],
   uriVariables: [
     'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+    'uuid' => new Link(fromClass: self::class),
   ],
   normalizationContext: [
     'groups' => ['inventory-category', 'inventory-category-read']
+  ],
+  denormalizationContext: [
+    'groups' => ['inventory-category', 'inventory-category-write']
   ],
   order: ['weight' => 'asc'],
 )]
 #[ApiFilter(OrderFilter::class, properties: ['weight' => 'ASC', 'name' => 'ASC'])]
 class InventoryCategory extends UuidEntity implements ClubLinkedEntityInterface, SortableEntityInterface {
-  public static function getClubSqlPath(): string {
-    return "club";
-  }
-
-  #[ORM\ManyToOne(cascade: ['remove'])]
-  #[ORM\JoinColumn(nullable: false)]
-  #[Groups(['inventory-category-write'])]
-  private ?Club $club = null;
+  use SelfClubLinkedEntityTrait;
 
   #[ORM\Column(length: 255)]
   #[Groups(['inventory-category', 'inventory-item-read'])]
@@ -159,14 +157,5 @@ class InventoryCategory extends UuidEntity implements ClubLinkedEntityInterface,
           }
       }
       return $this;
-  }
-
-  public function getClub(): ?Club {
-    return $this->club;
-  }
-
-  public function setClub(?Club $club): static {
-    $this->club = $club;
-    return $this;
   }
 }

@@ -2,6 +2,7 @@
 
 namespace App\EventSubscriber\Doctrine;
 
+use App\Entity\Interface\ClubLinkedEntityInterface;
 use App\Entity\Interface\SortableEntityInterface;
 use App\Repository\Interface\SortableRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
@@ -12,7 +13,7 @@ use Doctrine\ORM\Events;
 class SortableEntitySubscriber extends AbstractEventSubscriber {
   public function prePersist(PrePersistEventArgs $args): void {
     $entity = $args->getObject();
-    if (!$entity instanceof SortableEntityInterface) {
+    if (!$entity instanceof SortableEntityInterface && !$entity instanceof ClubLinkedEntityInterface) {
       return;
     }
 
@@ -23,7 +24,7 @@ class SortableEntitySubscriber extends AbstractEventSubscriber {
 
     // We auto set the weight to the last one
     if (!$entity->getWeight()) {
-      $entity->setWeight($repository->getLatestAvailableWeight());
+      $entity->setWeight($repository->getLatestAvailableWeight($entity->getClub()));
     }
   }
 }

@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class InventoryCategoryMove extends SortableController {
 
-  public function __invoke(Request $request, Club $club, InventoryCategory $inventoryCategory, InventoryCategoryRepository $inventoryCategoryRepository): JsonResponse {
+  public function __invoke(Request $request, InventoryCategory $inventoryCategory, InventoryCategoryRepository $inventoryCategoryRepository): JsonResponse {
     return $this->move($request, $inventoryCategory, $inventoryCategoryRepository);
   }
 

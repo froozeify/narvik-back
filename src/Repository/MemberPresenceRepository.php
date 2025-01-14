@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\ClubDependent\Member;
 use App\Entity\ClubDependent\Plugin\Presence\Activity;
 use App\Entity\ClubDependent\Plugin\Presence\MemberPresence;
+use App\Repository\Interface\ClubLinkedInterface;
 use App\Repository\Interface\PresenceRepositoryInterface;
 use App\Repository\Trait\PresenceRepositoryTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -19,7 +20,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method MemberPresence[]    findAll()
  * @method MemberPresence[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class MemberPresenceRepository extends ServiceEntityRepository implements PresenceRepositoryInterface {
+class MemberPresenceRepository extends ServiceEntityRepository implements PresenceRepositoryInterface, ClubLinkedInterface {
   use PresenceRepositoryTrait;
 
   public function __construct(ManagerRegistry $registry) {

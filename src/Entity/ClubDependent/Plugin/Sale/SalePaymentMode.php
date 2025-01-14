@@ -15,7 +15,10 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\ClubDependent\Plugin\Sale\SalePaymentModeMove;
 use App\Entity\Abstract\UuidEntity;
+use App\Entity\Club;
+use App\Entity\Interface\ClubLinkedEntityInterface;
 use App\Entity\Interface\SortableEntityInterface;
+use App\Entity\Trait\SelfClubLinkedEntityTrait;
 use App\Repository\SalePaymentModeRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -73,7 +76,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[ApiFilter(OrderFilter::class, properties: ['weight' => 'ASC'])]
 #[ApiFilter(BooleanFilter::class, properties: ['available'])]
-class SalePaymentMode extends UuidEntity implements SortableEntityInterface {
+class SalePaymentMode extends UuidEntity implements SortableEntityInterface, ClubLinkedEntityInterface {
+  use SelfClubLinkedEntityTrait;
 
   #[ORM\Column(length: 255)]
   #[Groups(['sale-payment-mode', 'sale-read'])]

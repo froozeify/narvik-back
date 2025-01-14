@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Club;
 use App\Entity\ClubDependent\Plugin\Presence\ExternalPresence;
+use App\Repository\Interface\ClubLinkedInterface;
 use App\Repository\Interface\PresenceRepositoryInterface;
 use App\Repository\Trait\PresenceRepositoryTrait;
 use App\Service\GlobalSettingService;
@@ -18,7 +19,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method ExternalPresence[]    findAll()
  * @method ExternalPresence[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ExternalPresenceRepository extends ServiceEntityRepository implements PresenceRepositoryInterface {
+class ExternalPresenceRepository extends ServiceEntityRepository implements PresenceRepositoryInterface, ClubLinkedInterface {
   use PresenceRepositoryTrait;
 
   public function __construct(ManagerRegistry $registry) {

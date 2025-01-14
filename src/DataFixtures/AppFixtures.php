@@ -32,7 +32,7 @@ class AppFixtures extends Fixture {
      *                    INVENTORY                        *
      ******************************************************/
 
-    // We create the default season
+    // We create the default categories
     $defaultCategoriesPool = InventoryCategoryStory::load();
 
     $itemsMapping = [

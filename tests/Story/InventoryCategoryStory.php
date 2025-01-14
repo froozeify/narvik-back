@@ -10,8 +10,8 @@ final class InventoryCategoryStory extends Story {
   public const CATEGORIES = [
     "Cibles",
     "Munitions",
-    "Administratif",
     "Droit de tir",
+    "Administratif",
     "Concours",
     "Autres",
   ];
@@ -20,7 +20,6 @@ final class InventoryCategoryStory extends Story {
     foreach (self::CATEGORIES as $category) {
       $this->addToPool('default', InventoryCategoryFactory::createOne([
         'name' => $category,
-        'club' => ClubFactory::random(),
       ]));
     }
   }

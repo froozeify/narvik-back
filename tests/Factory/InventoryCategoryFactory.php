@@ -4,6 +4,7 @@ namespace App\Tests\Factory;
 
 use App\Entity\ClubDependent\Plugin\Sale\InventoryCategory;
 use App\Repository\InventoryCategoryRepository;
+use App\Tests\Story\_InitStory;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
@@ -61,6 +62,7 @@ final class InventoryCategoryFactory extends PersistentProxyObjectFactory {
   protected function defaults(): array {
     return [
       'name'   => self::faker()->text(10),
+      'club'   => _InitStory::club_1(),
     ];
   }
 

@@ -4,6 +4,7 @@ namespace App\Tests\Factory;
 
 use App\Entity\ClubDependent\Plugin\Sale\SalePaymentMode;
 use App\Repository\SalePaymentModeRepository;
+use App\Tests\Story\_InitStory;
 use Doctrine\ORM\EntityRepository;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
@@ -64,6 +65,7 @@ final class SalePaymentModeFactory extends PersistentProxyObjectFactory {
     return [
       'available' => self::faker()->boolean(75),
       'name'      => self::faker()->text(12),
+      'club'      => _InitStory::club_1(),
     ];
   }
 

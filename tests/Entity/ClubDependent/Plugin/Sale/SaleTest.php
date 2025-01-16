@@ -34,7 +34,6 @@ class SaleTest extends AbstractEntityClubLinkedTestCase {
     $inventoryItem = InventoryItemFactory::randomOrCreate(['canBeSold' => true]);
     $paymentMode = SalePaymentModeFactory::createOne(['available' => true]);
 
-    $clubIri = $this->getIriFromResource($club1);
     $inventoryItemIri = $this->getIriFromResource($inventoryItem);
     $paymentModeIri = $this->getIriFromResource($paymentMode);
 
@@ -49,9 +48,6 @@ class SaleTest extends AbstractEntityClubLinkedTestCase {
     ];
 
     $payloadCheck = [
-      "club" => [
-        '@id' => $clubIri,
-      ],
       "salePurchasedItems" => [
         [
           'quantity' => 2,

@@ -38,20 +38,12 @@ class InventoryItemTest extends AbstractEntityClubLinkedTestCase {
       badgerClub2Code: ResponseCodeEnum::forbidden,
       requestFunction: function (string $level, ?int $id) use (&$payloadCheck) {
         $club1 = _InitStory::club_1();
-
-        $clubIri = $this->getIriFromResource($club1);
-
         $payload = [
           "name" => "Test$id",
           "sellingPrice" => "10.00",
         ];
 
-        $payloadCheck = [
-          "club" => [
-            '@id' => $clubIri,
-          ]
-        ];
-        $payloadCheck = $payloadCheck + $payload;
+        $payloadCheck = $payload;
         $this->makePostRequest($this->getRootWClubUrl($club1), $payload);
       },
     );

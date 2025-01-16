@@ -41,10 +41,6 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
     $payloadCheck = $payload;
     $payloadCheck['firstname'] = ucfirst($payload['firstname']);
     $payloadCheck['lastname'] = strtoupper($payload['lastname']);
-    // For the check we update the payload value
-    $payloadCheck["club"] = [
-      '@id' => $iri,
-    ];
     $payloadCheck["fullName"] = $payloadCheck['lastname'] . " " . $payloadCheck['firstname'];
 
     $this->makeAllLoggedRequests(

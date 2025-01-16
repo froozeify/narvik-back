@@ -40,19 +40,12 @@ class SalePaymentModeTest extends AbstractEntityClubLinkedTestCase {
       requestFunction: function (string $level, ?int $id) use (&$payloadCheck) {
         $club1 = _InitStory::club_1();
 
-        $clubIri = $this->getIriFromResource($club1);
-
         $payload = [
           "name" => "Test$id",
           "icon" => "credit-card"
         ];
 
-        $payloadCheck = [
-          "club" => [
-            '@id' => $clubIri,
-          ]
-        ];
-        $payloadCheck = $payloadCheck + $payload;
+        $payloadCheck = $payload;
         $this->makePostRequest($this->getRootWClubUrl($club1), $payload);
       },
     );

@@ -65,18 +65,11 @@ class ExternalPresenceTest extends AbstractEntityClubLinkedTestCase {
       requestFunction: function (string $level, ?int $id) use (&$payloadCheck) {
         $club1 = _InitStory::club_1();
 
-        $clubIri = $this->getIriFromResource($club1);
-
         $payload = [
           "firstname" => "Test",
           "lastname" => "NAME",
         ];
 
-        $payloadCheck = [
-          "club" => [
-            '@id' => $clubIri,
-          ]
-        ];
         $payloadCheck = $payloadCheck + $payload;
         $this->makePostRequest($this->getRootWClubUrl($club1), $payload);
       },

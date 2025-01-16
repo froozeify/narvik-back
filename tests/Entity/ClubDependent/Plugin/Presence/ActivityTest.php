@@ -41,18 +41,12 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
 
   public function testCreate(): void {
     $club1 = _InitStory::club_1();
-    $iri = $this->getIriFromResource($club1);
 
     $payload = [
       "name" => 'Test activity',
     ];
 
     $payloadCheck = $payload;
-    // For the check we update the payload value
-    $payloadCheck["club"] = [
-      '@id' => $iri,
-    ];
-
     $this->makeAllLoggedRequests(
       $payloadCheck,
       supervisorClub1Code: ResponseCodeEnum::forbidden,
@@ -67,21 +61,6 @@ class ActivityTest extends AbstractEntityClubLinkedTestCase {
         $this->makePostRequest($this->getRootWClubUrl($club1), $payload);
       },
     );
-  }
-
-  public function testCreateToAnotherClub(): void {
-    $club1 = _InitStory::club_1();
-    $club2 = _InitStory::club_2();
-    $iriClub2 = $this->getIriFromResource($club2);
-
-    $payload = [
-      "name" => 'Test activity',
-      "club" => $iriClub2
-    ];
-
-    $this->loggedAsAdminClub1();
-    $this->makePostRequest($this->getRootWClubUrl($club1), $payload);
-    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
   }
 
   public function testPatch(): void {

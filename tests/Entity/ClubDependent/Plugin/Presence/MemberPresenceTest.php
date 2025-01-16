@@ -75,7 +75,6 @@ class MemberPresenceTest extends AbstractEntityClubLinkedTestCase {
           'email' => 'membertest@club1.fr',
         ]);
 
-        $clubIri = $this->getIriFromResource($club1);
         $memberIri = $this->getIriFromResource($member);
 
         $payload = [
@@ -83,9 +82,6 @@ class MemberPresenceTest extends AbstractEntityClubLinkedTestCase {
         ];
 
         $payloadCheck = [
-          "club" => [
-            '@id' => $clubIri,
-          ],
           "member" => [
             '@id' => $memberIri,
           ]

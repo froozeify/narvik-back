@@ -23,6 +23,7 @@ trait PresenceRepositoryTrait {
   }
 
   private function applyActivityExclusionConstraint(QueryBuilder $qb): void {
+    // FIXME: Change it to get the value from clubsettings
     $ignoredActivities = $this->globalSettingService->getSettingValue(GlobalSetting::IGNORED_ACTIVITIES_OPENING_STATS);
     if ($ignoredActivities) {
       $ids = array_values(json_decode($ignoredActivities, true));

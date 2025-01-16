@@ -12,6 +12,8 @@ use App\Entity\ClubDependent\Plugin\Presence\Activity;
 use App\Entity\Interface\ClubLinkedEntityInterface;
 use App\Enum\ClubRole;
 use App\Repository\ClubDependent\ClubSettingRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -43,7 +45,18 @@ class ClubSetting extends UuidEntity implements ClubLinkedEntityInterface {
 
   #[ORM\OneToOne(targetEntity: Activity::class)]
   #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+  #[Groups(['club-setting'])]
   private ?Activity $controlShootingActivity = null;
+
+  /**
+   * @var Collection<int, Activity>
+   */
+  #[ORM\ManyToMany(targetEntity: Activity::class)]
+  #[ORM\JoinTable(
+    name: 'club_setting_exclude_activities_od',
+  )]
+  #[Groups(['club-setting'])]
+  private Collection $excludedActivitiesFromOpeningDays;
 
   #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
   #[Groups(['club-setting-read'])]
@@ -67,6 +80,11 @@ class ClubSetting extends UuidEntity implements ClubLinkedEntityInterface {
   #[Groups(['club-setting-read'])]
   #[Assert\NotBlank]
   private int $cerbereImportRemaining = 0;
+
+  public function __construct() {
+    parent::__construct();
+    $this->excludedActivitiesFromOpeningDays = new ArrayCollection();
+  }
 
   public function getClub(): ?Club {
     return $this->club;
@@ -138,5 +156,24 @@ class ClubSetting extends UuidEntity implements ClubLinkedEntityInterface {
     }
     $this->cerbereImportRemaining = $cerbereImportRemaining;
     return $this;
+  }
+
+  /**
+   * @return Collection<int, Activity>
+   */
+  public function getExcludedActivitiesFromOpeningDays(): Collection {
+      return $this->excludedActivitiesFromOpeningDays;
+  }
+
+  public function addExcludedActivitiesFromOpeningDay(Activity $excludedActivitiesFromOpeningDay): ClubSetting {
+      if (!$this->excludedActivitiesFromOpeningDays->contains($excludedActivitiesFromOpeningDay)) {
+          $this->excludedActivitiesFromOpeningDays->add($excludedActivitiesFromOpeningDay);
+      }
+      return $this;
+  }
+
+  public function removeExcludedActivitiesFromOpeningDay(Activity $excludedActivitiesFromOpeningDay): ClubSetting {
+      $this->excludedActivitiesFromOpeningDays->removeElement($excludedActivitiesFromOpeningDay);
+      return $this;
   }
 }

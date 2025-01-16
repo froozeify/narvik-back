@@ -6,7 +6,7 @@ use App\Tests\Factory\SalePaymentModeFactory;
 use Zenstruck\Foundry\Story;
 
 final class SalePaymentModeStory extends Story {
-  public const PAYMENTS = [
+  public const array PAYMENTS = [
     'Espèces' => 'banknotes',
     'Chèque' => 'ticket',
     'Carte' => 'credit-card'

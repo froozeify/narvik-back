@@ -2,14 +2,12 @@
 
 namespace App\Tests\Entity\ClubDependent\Plugin\Sale;
 
-use App\Entity\ClubDependent\Plugin\Sale\InventoryItem;
 use App\Entity\ClubDependent\Plugin\Sale\Sale;
 use App\Tests\Entity\Abstract\AbstractEntityClubLinkedTestCase;
 use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Factory\InventoryItemFactory;
 use App\Tests\Factory\SaleFactory;
 use App\Tests\Factory\SalePaymentModeFactory;
-use App\Tests\Factory\SalePurchasedItemFactory;
 use App\Tests\Story\_InitStory;
 use function Zenstruck\Foundry\faker;
 

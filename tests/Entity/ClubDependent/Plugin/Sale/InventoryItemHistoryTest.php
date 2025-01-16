@@ -5,7 +5,6 @@ namespace App\Tests\Entity\ClubDependent\Plugin\Sale;
 use App\Entity\Club;
 use App\Entity\ClubDependent\Plugin\Sale\InventoryItem;
 use App\Entity\ClubDependent\Plugin\Sale\InventoryItemHistory;
-use App\Enum\ClubRole;
 use App\Tests\Entity\Abstract\AbstractEntityClubLinkedTestCase;
 use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Factory\InventoryItemFactory;

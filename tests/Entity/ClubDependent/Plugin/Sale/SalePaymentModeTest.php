@@ -2,29 +2,29 @@
 
 namespace App\Tests\Entity\ClubDependent\Plugin\Sale;
 
-use App\Entity\ClubDependent\Plugin\Sale\InventoryCategory;
+use App\Entity\ClubDependent\Plugin\Sale\SalePaymentMode;
 use App\Tests\Entity\Abstract\AbstractEntityClubLinkedTestCase;
 use App\Tests\Enum\ResponseCodeEnum;
-use App\Tests\Factory\InventoryCategoryFactory;
+use App\Tests\Factory\SalePaymentModeFactory;
 use App\Tests\Story\_InitStory;
-use App\Tests\Story\InventoryCategoryStory;
+use App\Tests\Story\SalePaymentModeStory;
 
-class InventoryCategoryTest extends AbstractEntityClubLinkedTestCase {
-  protected int $TOTAL_SUPER_ADMIN = 6;
-  protected int $TOTAL_ADMIN_CLUB_1 = 6;
+class SalePaymentModeTest extends AbstractEntityClubLinkedTestCase {
+  protected int $TOTAL_SUPER_ADMIN = 3;
+  protected int $TOTAL_ADMIN_CLUB_1 = 3;
   protected int $TOTAL_ADMIN_CLUB_2 = 0;
-  protected int $TOTAL_SUPERVISOR_CLUB_1 = 6;
+  protected int $TOTAL_SUPERVISOR_CLUB_1 = 3;
 
   protected function getClassname(): string {
-    return InventoryCategory::class;
+    return SalePaymentMode::class;
   }
 
   protected function getRootUrl(): string {
-    return "/inventory-categories";
+    return "/sale-payment-modes";
   }
 
   public function initDefaultFixtures(): void {
-    InventoryCategoryStory::load();
+    SalePaymentModeStory::load();
   }
 
   public function testCreate(): void {
@@ -44,6 +44,7 @@ class InventoryCategoryTest extends AbstractEntityClubLinkedTestCase {
 
         $payload = [
           "name" => "Test$id",
+          "icon" => "credit-card"
         ];
 
         $payloadCheck = [
@@ -63,7 +64,7 @@ class InventoryCategoryTest extends AbstractEntityClubLinkedTestCase {
       $payloadCheck,
       supervisorClub1Code: ResponseCodeEnum::forbidden,
       requestFunction: function (string $level, ?int $id) use (&$payloadCheck) {
-        $item = InventoryCategoryFactory::createOne();
+        $item = SalePaymentModeFactory::createOne();
 
         $payloadCheck = [
           "name" => "My new name$id"
@@ -83,7 +84,7 @@ class InventoryCategoryTest extends AbstractEntityClubLinkedTestCase {
       badgerClub1Code: ResponseCodeEnum::forbidden,
       badgerClub2Code: ResponseCodeEnum::not_found,
       requestFunction: function (string $level, ?int $id) {
-        $item = InventoryCategoryFactory::createOne();
+        $item = SalePaymentModeFactory::createOne();
         $this->makeDeleteRequest($this->getIriFromResource($item));
       },
     );

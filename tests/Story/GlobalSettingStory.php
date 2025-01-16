@@ -11,6 +11,11 @@ final class GlobalSettingStory extends Story {
 
   public function build(): void {
     $this->addToPool('required_settings', GlobalSettingFactory::createOne([
+      'name'  => GlobalSetting::LOGO->name,
+      'value' => null,
+    ]));
+
+    $this->addToPool('required_settings', GlobalSettingFactory::createOne([
       'name'  => GlobalSetting::SMTP_ON->name,
       'value' => '1',
     ]));

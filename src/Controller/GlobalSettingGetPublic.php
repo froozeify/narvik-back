@@ -8,7 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class GlobalSettingGetPublic extends AbstractController {
-  public const AVAILABLE_PUBLICLY = [
+  public const array AVAILABLE_PUBLICLY = [
     GlobalSettingEnum::LOGO->name
   ];
 

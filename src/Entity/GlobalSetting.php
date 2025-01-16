@@ -13,6 +13,7 @@ use App\Controller\GlobalSettingGetPublic;
 use App\Controller\GlobalSettingImportLogo;
 use App\Controller\GlobalSettingSmtp;
 use App\Controller\GlobalSettingTestEmail;
+use App\Enum\UserRole;
 use App\Repository\GlobalSettingRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -49,7 +50,7 @@ use Doctrine\ORM\Mapping as ORM;
           ])
         )
       ),
-      security: "is_granted('ROLE_ADMIN')",
+      security: "is_granted('".UserRole::super_admin->value."')",
       deserialize: false,
     ),
 
@@ -70,7 +71,7 @@ use Doctrine\ORM\Mapping as ORM;
           ])
         )
       ),
-      security: "is_granted('ROLE_ADMIN')",
+      security: "is_granted('".UserRole::super_admin->value."')",
       deserialize: false,
     ),
 
@@ -97,7 +98,7 @@ use Doctrine\ORM\Mapping as ORM;
           ])
         )
       ),
-      security: "is_granted('ROLE_ADMIN')",
+      security: "is_granted('".UserRole::super_admin->value."')",
       deserialize: false,
     ),
   ]

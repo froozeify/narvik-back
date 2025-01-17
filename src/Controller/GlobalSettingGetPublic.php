@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class GlobalSettingGetPublic extends AbstractController {
   public const array AVAILABLE_PUBLICLY = [
-    GlobalSettingEnum::LOGO->name
+//    GlobalSettingEnum::LOGO->name
   ];
 
   public function __invoke(GlobalSetting $globalSetting): ?GlobalSetting {

@@ -43,28 +43,19 @@ class ImageService {
     }
   }
 
-  public function getLogo(): ?Image {
-    //FIXME: Deprecated
-    $publicFolder = $this->params->get('app.files');
-    return $this->loadImageFromFile('logo.png', "$publicFolder/logo.png", true);
-  }
+  public function getLogoFile(bool $white = false): ?File {
+    $path = $this->params->get('app.public_images') . '/public/images/';
+    if ($white) {
+      $path .= 'logo-narvik-white.png';
+    } else {
+      $path .= 'logo-narvik.png';
+    }
 
-  public function getLogoFile(): ?File {
-    //FIXME: Deprecated
-    $logo = $this->getLogo();
-    if (!$logo) {
+    if (!$this->fs->exists($path)) {
       return null;
     }
-    return new File($logo->getPath());
-  }
 
-  public function importLogo(UploadedFile $file): string {
-    //FIXME: Deprecated
-    $publicFolder = $this->params->get('app.files');
-    $this->createFolderIfNotExist($publicFolder);
-
-    $file->move($publicFolder, "logo.png");
-    return bin2hex("logo.png");
+    return new File($path);
   }
 
   public function importItacPhotos(Club $club, UploadedFile $file): void {

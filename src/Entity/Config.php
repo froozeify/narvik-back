@@ -33,6 +33,9 @@ class Config {
   private ?string $logo = null;
 
   #[Groups(['config'])]
+  private ?string $logoWhite = null;
+
+  #[Groups(['config'])]
   private ?array $modules = null;
 
   public function getId(): string {
@@ -59,6 +62,15 @@ class Config {
 
   public function setLogo(?string $logo): Config {
     $this->logo = $logo;
+    return $this;
+  }
+
+  public function getLogoWhite(): ?string {
+    return $this->logoWhite;
+  }
+
+  public function setLogoWhite(?string $logoWhite): Config {
+    $this->logoWhite = $logoWhite;
     return $this;
   }
 

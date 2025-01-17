@@ -31,30 +31,6 @@ use Doctrine\ORM\Mapping as ORM;
     ),
 
     new Post(
-      uriTemplate: '/global-settings/-/logo',
-      controller: GlobalSettingImportLogo::class,
-      openapi: new Model\Operation(
-        requestBody: new Model\RequestBody(
-          content: new \ArrayObject([
-            'multipart/form-data' => [
-              'schema' => [
-                'type' => 'object',
-                'properties' => [
-                  'file' => [
-                    'type' => 'string',
-                    'format' => 'binary'
-                  ]
-                ]
-              ]
-            ]
-          ])
-        )
-      ),
-      security: "is_granted('".UserRole::super_admin->value."')",
-      deserialize: false,
-    ),
-
-    new Post(
       uriTemplate: '/global-settings/-/test-email',
       controller: GlobalSettingTestEmail::class,
       openapi: new Model\Operation(

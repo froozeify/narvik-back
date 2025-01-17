@@ -45,10 +45,10 @@ class EmailService {
     $context['subject'] = $subject;
     $context['home_url'] = '';
 
-    $logo = $this->imageService->getLogo();
+    $logo = $this->imageService->getLogoFile();
     $context['logo'] = '';
     if ($logo) {
-      $logoPart = (new DataPart($this->imageService->getLogoFile(), 'logo', $logo->getMimeType()));
+      $logoPart = (new DataPart($logo, 'logo.png'));
       $context['logo'] = 'logo';
     }
 

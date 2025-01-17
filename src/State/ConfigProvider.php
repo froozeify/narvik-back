@@ -53,7 +53,8 @@ class ConfigProvider implements ProviderInterface {
       $config->setAppVersion(\Composer\InstalledVersions::getRootPackage()['pretty_version']);
     }
 
-    $config->setLogo($this->globalSettingService->getSettingValue(GlobalSetting::LOGO));
+    $config->setLogo("/images/logo-narvik.png");
+    $config->setLogoWhite("/images/logo-narvik-white.png");
 
     // Email notifications
     $config->addModule('notifications', [

@@ -9,7 +9,7 @@ use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Story\GlobalSettingStory;
 
 class GlobalSettingTest extends AbstractEntityTestCase {
-  protected int $TOTAL_SUPER_ADMIN = 5;
+  protected int $TOTAL_SUPER_ADMIN = 4;
 
   protected function getClassname(): string {
     return GlobalSetting::class;
@@ -74,25 +74,26 @@ class GlobalSettingTest extends AbstractEntityTestCase {
     );
   }
 
-  public function testPublicSettingsAreVisible(): void {
-    $this->makeAllLoggedRequests(
-      memberClub1Code: ResponseCodeEnum::ok,
-      supervisorClub1Code: ResponseCodeEnum::ok,
-      adminClub1Code: ResponseCodeEnum::ok,
-      adminClub2Code: ResponseCodeEnum::ok,
-      superAdminCode: ResponseCodeEnum::ok,
-      badgerClub1Code: ResponseCodeEnum::ok,
-      badgerClub2Code: ResponseCodeEnum::ok,
-      requestFunction: function (string $level, ?int $id) {
-        // A private one
-        $iri = "/public" . $this->getRootUrl() . "/SMTP_HOST";
-        $this->makeGetRequest($iri);
-        $this->assertResponseStatusCodeSame(ResponseCodeEnum::not_found->value);
-
-        foreach (GlobalSettingGetPublic::AVAILABLE_PUBLICLY as $item) {
-          $this->makeGetRequest("/public" . $this->getRootUrl() . "/$item");
-        }
-      },
-    );
-  }
+// No more exposed public settings for now
+//  public function testPublicSettingsAreVisible(): void {
+//    $this->makeAllLoggedRequests(
+//      memberClub1Code: ResponseCodeEnum::ok,
+//      supervisorClub1Code: ResponseCodeEnum::ok,
+//      adminClub1Code: ResponseCodeEnum::ok,
+//      adminClub2Code: ResponseCodeEnum::ok,
+//      superAdminCode: ResponseCodeEnum::ok,
+//      badgerClub1Code: ResponseCodeEnum::ok,
+//      badgerClub2Code: ResponseCodeEnum::ok,
+//      requestFunction: function (string $level, ?int $id) {
+//        // A private one
+//        $iri = "/public" . $this->getRootUrl() . "/SMTP_HOST";
+//        $this->makeGetRequest($iri);
+//        $this->assertResponseStatusCodeSame(ResponseCodeEnum::not_found->value);
+//
+//        foreach (GlobalSettingGetPublic::AVAILABLE_PUBLICLY as $item) {
+//          $this->makeGetRequest("/public" . $this->getRootUrl() . "/$item");
+//        }
+//      },
+//    );
+//  }
 }

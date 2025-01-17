@@ -44,11 +44,11 @@ class ImageService {
   }
 
   public function getLogoFile(bool $white = false): ?File {
-    $path = $this->params->get('app.public_images') . '/public/images/';
+    $path = $this->params->get('app.public_images');
     if ($white) {
-      $path .= 'logo-narvik-white.png';
+      $path .= '/logo-narvik-white.png';
     } else {
-      $path .= 'logo-narvik.png';
+      $path .= '/logo-narvik.png';
     }
 
     if (!$this->fs->exists($path)) {

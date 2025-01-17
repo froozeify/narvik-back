@@ -42,6 +42,8 @@ class EmailService {
       return null;
     }
 
+    $email = new TemplatedEmail();
+
     $context['subject'] = $subject;
     $context['home_url'] = '';
 
@@ -49,7 +51,8 @@ class EmailService {
     $context['logo'] = '';
     if ($logo) {
       $logoPart = (new DataPart($logo, 'logo.png'));
-      $context['logo'] = 'logo';
+      $context['logo'] = $logoPart->getFilename();
+      $email->addPart($logoPart->asInline());
     }
 
     // We render the html
@@ -59,16 +62,11 @@ class EmailService {
     $smtpSender = $this->globalSettingService->getSettingValue(GlobalSetting::SMTP_SENDER);
     $smtpSenderName = $this->globalSettingService->getSettingValue(GlobalSetting::SMTP_SENDER_NAME) ?? 'Narvik';
 
-    $email = new TemplatedEmail();
     $email
       ->from(new Address($smtpSender, $smtpSenderName))
       ->subject($subject)
       ->html($htmlBody)
       ->context($context);
-
-    if ($logo) {
-      $email->addPart($logoPart->asInline());
-    }
 
     return $email;
   }

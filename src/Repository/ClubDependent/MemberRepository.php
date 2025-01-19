@@ -138,6 +138,15 @@ class MemberRepository extends ServiceEntityRepository implements ClubLinkedInte
     return $qb->getQuery()->getResult();
   }
 
+  public function findAllByEmail(string $email): array {
+    $query = $this->createQueryBuilder('m')
+      ->andWhere('m.email = :email')
+      ->setParameter('email', $email)
+      ->getQuery();
+
+    return $query->getResult();
+  }
+
   public function countTotalClubMembers(Club $club): int {
     $qb = $this->createQueryBuilder("m");
     return $qb

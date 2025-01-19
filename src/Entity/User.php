@@ -136,6 +136,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUserInterface {
   // TODO: User Interface should move to User, also password fields && all, Member should be only member detail
   // A JOIN table should be create Between User <> Member, with in it also the role like that an user can be linked to multiple club and have different role
+  private bool $skipAutoSetUserMember = false;
 
   #[ORM\Column(type: "string", nullable: true)]
   #[Assert\NotBlank(allowNull: true)]
@@ -342,30 +343,34 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
   /**
    * @return Collection<int, UserMember>
    */
-  public function getMemberships(): Collection
-  {
+  public function getMemberships(): Collection {
       return $this->memberships;
   }
 
-  public function addMembership(UserMember $membership): static
-  {
+  public function addMembership(UserMember $membership): static {
       if (!$this->memberships->contains($membership)) {
           $this->memberships->add($membership);
           $membership->setUser($this);
       }
-
       return $this;
   }
 
-  public function removeMembership(UserMember $membership): static
-  {
+  public function removeMembership(UserMember $membership): static {
       if ($this->memberships->removeElement($membership)) {
           // set the owning side to null (unless already changed)
           if ($membership->getUser() === $this) {
               $membership->setUser(null);
           }
       }
-
       return $this;
+  }
+
+  public function isSkipAutoSetUserMember(): bool {
+    return $this->skipAutoSetUserMember;
+  }
+
+  public function setSkipAutoSetUserMember(bool $skipAutoSetUserMember): User {
+    $this->skipAutoSetUserMember = $skipAutoSetUserMember;
+    return $this;
   }
 }

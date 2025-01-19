@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\ClubDependent\Member;
 use App\Entity\UserMember;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -12,6 +13,20 @@ use Doctrine\Persistence\ManagerRegistry;
 class UserMemberRepository extends ServiceEntityRepository {
   public function __construct(ManagerRegistry $registry) {
     parent::__construct($registry, UserMember::class);
+  }
+
+  public function findOneByMember(Member $member): ?UserMember {
+    $query = $this->createQueryBuilder('u')
+      ->andWhere('u.member = :member')
+      ->setParameter('member', $member)
+      ->setMaxResults(1)
+      ->getQuery();
+
+    try {
+      return $query->getOneOrNullResult();
+    } catch (\Exception) {
+      return null;
+    }
   }
 
   //    /**
@@ -26,16 +41,6 @@ class UserMemberRepository extends ServiceEntityRepository {
   //            ->setMaxResults(10)
   //            ->getQuery()
   //            ->getResult()
-  //        ;
-  //    }
-
-  //    public function findOneBySomeField($value): ?UserClub
-  //    {
-  //        return $this->createQueryBuilder('u')
-  //            ->andWhere('u.exampleField = :val')
-  //            ->setParameter('val', $value)
-  //            ->getQuery()
-  //            ->getOneOrNullResult()
   //        ;
   //    }
 }

@@ -8,6 +8,7 @@ use App\Message\ItacSecondaryClubMembersMessage;
 use App\Tests\Entity\Abstract\AbstractEntityClubLinkedTestCase;
 use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Factory\MemberFactory;
+use App\Tests\Factory\UserFactory;
 use App\Tests\FixtureFileManager;
 use App\Tests\Story\_InitStory;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -31,7 +32,6 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
 
   public function testCreate(): void {
     $club1 = _InitStory::club_1();
-    $iri = $this->getIriFromResource($club1);
 
     $payload = [
       "firstname" => "firstname",
@@ -54,6 +54,38 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
         $this->makePostRequest($this->getRootWClubUrl($club1), $payload);
       },
     );
+  }
+
+  /**
+   * The user and newly created member should be linked automatically
+   */
+  public function testCreateWithActiveUserAccount(): void {
+    $user = _InitStory::USER_member_club_2();
+
+    $club1 = _InitStory::club_1();
+
+    $payload = [
+      "firstname" => "firstname",
+      "lastname" => "lastname",
+      "email" => $user->getEmail(),
+    ];
+
+    // We check not a member of this club
+    $this->loggedAsMemberClub2();
+    $response = $this->makeGetRequest("/self");
+    $this->assertCount(1, $response->toArray()['linkedProfiles']);
+    $this->assertEquals($response->toArray()['linkedProfiles'][0]['club']['name'], 'Club 2');
+
+    $this->loggedAsAdminClub1();
+    $this->makePostRequest($this->getRootWClubUrl($club1), $payload);
+
+    $this->loggedAsMemberClub2();
+    $response = $this->makeGetRequest("/self");
+    $this->assertCount(2, $response->toArray()['linkedProfiles']);
+
+    // They are sorted alphabetically
+    $this->assertEquals($response->toArray()['linkedProfiles'][0]['club']['name'], 'Club 1');
+    $this->assertEquals($response->toArray()['linkedProfiles'][1]['club']['name'], 'Club 2');
   }
 
   public function testPatch(): void {

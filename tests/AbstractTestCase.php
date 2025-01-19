@@ -214,8 +214,11 @@ abstract class AbstractTestCase extends ApiTestCase {
     return $this->loggedAs('member@club1.fr', 'member123');
   }
 
-  public function loggedAsBadgerClub1(): bool {
+  public function loggedAsMemberClub2(): bool {
+    return $this->loggedAs('member@club2.fr', 'member123');
+  }
 
+  public function loggedAsBadgerClub1(): bool {
     return $this->loggedAsBadger(_InitStory::club_1());
   }
 

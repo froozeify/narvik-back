@@ -194,6 +194,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Member extends UuidEntity implements ClubLinkedEntityInterface {
   use SelfClubLinkedEntityTrait;
 
+  private bool $skipAutoSetUserMember = false;
+
   /**
    * @var Collection<int, Sale>
    */
@@ -590,6 +592,15 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
         $sale->setSeller(null);
       }
     }
+    return $this;
+  }
+
+  public function isSkipAutoSetUserMember(): bool {
+    return $this->skipAutoSetUserMember;
+  }
+
+  public function setSkipAutoSetUserMember(bool $skipAutoSetUserMember): Member {
+    $this->skipAutoSetUserMember = $skipAutoSetUserMember;
     return $this;
   }
 }

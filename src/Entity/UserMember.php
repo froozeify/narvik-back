@@ -26,7 +26,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
   ], denormalizationContext: [
     'groups' => ['user-member', 'user-member-write']
   ],
-  processor: UserMemberProcessor::class,
 )]
 class UserMember {
   #[ORM\Id]

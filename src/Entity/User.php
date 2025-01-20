@@ -22,6 +22,7 @@ use App\Enum\UserRole;
 use App\Filter\MultipleFilter;
 use App\Repository\UserRepository;
 use App\State\UserMemberProcessor;
+use App\State\UserProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -37,9 +38,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[UniqueEntity(fields: ['email'])]
 #[ApiResource(operations: [
   new GetCollection(),
+  new Post(),
   new Get(),
   new Patch(),
-  // TODO: Create a register endpoint and a delete one (/users/-/register, /self/delete-account)
+  new Delete(),
+  // TODO: Create a public register endpoint and a delete one (/users/-/register, /self/delete-account)
 
   new Get(
     uriTemplate: '/self',
@@ -123,19 +126,18 @@ use Symfony\Component\Validator\Constraints as Assert;
     read: false,
     deserialize: false,
     write: false,
-    serialize: false),
-
-], normalizationContext: [
-  'groups' => ['user', 'user-read'],
-], denormalizationContext: [
-  'groups' => ['user', 'user-write'],
-], processor: UserMemberProcessor::class,)]
+    serialize: false
+  )], normalizationContext: [
+    'groups' => ['user', 'user-read'],
+  ], denormalizationContext: [
+    'groups' => ['user', 'user-write'],
+  ],
+  processor: UserProcessor::class,
+)]
 #[ApiFilter(SearchFilter::class, properties: ['role' => 'exact'])]
 #[ApiFilter(OrderFilter::class, properties: ['lastname' => 'ASC', 'firstname' => 'ASC'])]
 #[ApiFilter(MultipleFilter::class, properties: ['firstname', 'lastname'])]
 class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUserInterface {
-  // TODO: User Interface should move to User, also password fields && all, Member should be only member detail
-  // A JOIN table should be create Between User <> Member, with in it also the role like that an user can be linked to multiple club and have different role
   private bool $skipAutoSetUserMember = false;
 
   #[ORM\Column(type: "string", nullable: true)]

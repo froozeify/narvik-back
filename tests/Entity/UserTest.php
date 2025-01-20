@@ -1,0 +1,230 @@
+<?php
+
+namespace App\Tests\Entity;
+
+use App\Entity\Season;
+use App\Entity\User;
+use App\Enum\UserRole;
+use App\Tests\Entity\Abstract\AbstractEntityTestCase;
+use App\Tests\Enum\ResponseCodeEnum;
+use App\Tests\Factory\MemberFactory;
+use App\Tests\Factory\SeasonFactory;
+use App\Tests\Factory\UserFactory;
+use App\Tests\Story\_InitStory;
+use App\Tests\Story\SeasonStory;
+
+class UserTest extends AbstractEntityTestCase {
+  protected int $TOTAL_SUPER_ADMIN = 11;
+
+  protected function getClassname(): string {
+    return User::class;
+  }
+
+  protected function getRootUrl(): string {
+    return '/users';
+  }
+
+
+  public function testCreate(): void {
+    $payload = [
+      "email" => "uesrtest@test.fr",
+      "firstname" => "Firstname",
+      "lastname" => "LASTNAME",
+    ];
+
+    // Only super admin can create
+    $this->makeAllLoggedRequests(
+      memberClub1Code: ResponseCodeEnum::forbidden,
+      supervisorClub1Code: ResponseCodeEnum::forbidden,
+      adminClub1Code: ResponseCodeEnum::forbidden,
+      adminClub2Code: ResponseCodeEnum::forbidden,
+      superAdminCode: ResponseCodeEnum::created,
+      badgerClub2Code: ResponseCodeEnum::forbidden,
+      requestFunction: function (string $level, ?int $id) use ($payload) {
+        $this->makePostRequest($this->getRootUrl(), $payload);
+      }
+    );
+  }
+
+  /**
+   * The member and newly created user should be linked automatically
+   */
+  public function testCreateWithExistingMember(): void {
+    $member = MemberFactory::createOne();
+
+    $payload = [
+      "firstname" => "firstname",
+      "lastname" => "lastname",
+      "email" => $member->getEmail(),
+      "plainPassword" => "p@ssword1234",
+      "accountActivated" => true
+    ];
+
+    // We check not a member of this club
+    $this->loggedAsSuperAdmin();
+    $this->makePostRequest($this->getRootUrl(), $payload);
+
+    $logged = $this->loggedAs($member->getEmail(), "p@ssword1234");
+    $this->assertTrue($logged);
+
+    $response = $this->makeGetRequest("/self");
+    $this->assertCount(1, $response->toArray()['linkedProfiles']);
+
+    // They are sorted alphabetically
+    $this->assertEquals($response->toArray()['linkedProfiles'][0]['club']['name'], 'Club 1');
+  }
+
+  public function testPatch(): void {
+    // Only super admin can update
+    $this->makeAllLoggedRequests(
+      $payload,
+      ResponseCodeEnum::forbidden,
+      ResponseCodeEnum::forbidden,
+      ResponseCodeEnum::forbidden,
+      ResponseCodeEnum::forbidden,
+      badgerClub2Code: ResponseCodeEnum::forbidden,
+      requestFunction: function (string $level, ?int $id) {
+        $item = UserFactory::createOne();
+        $payload = [
+          "lastname" => 'lastname updated',
+        ];
+
+        $this->makePatchRequest($this->getIriFromResource($item), $payload);
+      }
+    );
+  }
+
+  public function testDelete(): void {
+    // Only super admin can delete
+    $this->makeAllLoggedRequests(
+      memberClub1Code: ResponseCodeEnum::forbidden,
+      supervisorClub1Code: ResponseCodeEnum::forbidden,
+      adminClub1Code: ResponseCodeEnum::forbidden,
+      adminClub2Code: ResponseCodeEnum::forbidden,
+      superAdminCode: ResponseCodeEnum::no_content,
+      badgerClub2Code: ResponseCodeEnum::forbidden,
+      requestFunction: function (string $level, ?int $id) {
+        $item = UserFactory::createOne();
+        $iri = $this->getIriFromResource($item);
+        $this->makeDeleteRequest($iri);
+      }
+    );
+  }
+
+  public function testDeleteSuperAdminAccount(): void {
+    $superAdmin = UserFactory::new()->superAdmin("testsuperadmin@admin.com")->create();
+
+    $this->loggedAsSuperAdmin();
+    $this->makeDeleteRequest($this->getIriFromResource($superAdmin));
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::forbidden->value);
+    $this->assertJsonContains([
+      "detail" => "You can't delete an administrator account",
+    ]);
+  }
+
+  public function testSuperAdminCantChangeOtherSuperAdminPassword(): void {
+    $superAdmin = UserFactory::new()->superAdmin("testsuperadmin@admin.com")->create();
+
+    $this->loggedAsSuperAdmin();
+    $this->makePatchRequest($this->getIriFromResource($superAdmin), ["plainPassword" => "p@ssword1234"]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::forbidden->value);
+    $this->assertJsonContains([
+      "detail" => "You can't change the password of an administrator",
+    ]);
+
+    // Changing a regular user work
+    $user = _InitStory::USER_member_club_1();
+    $this->makePatchRequest($this->getIriFromResource($user), ["plainPassword" => "p@ssword1234"]);
+    $this->assertResponseIsSuccessful();
+    $logged = $this->loggedAsMemberClub1();
+    $this->assertFalse($logged);
+    $logged = $this->loggedAs($user->getEmail(), "p@ssword1234");
+    $this->assertTrue($logged);
+    $this->makeGetRequest("/self");
+    $this->assertResponseIsSuccessful();
+  }
+
+  public function testSelf(): void {
+    $this->makeAllLoggedRequests(
+      memberClub1Code: ResponseCodeEnum::ok,
+      adminClub2Code: ResponseCodeEnum::ok,
+      badgerClub1Code: ResponseCodeEnum::ok,
+      badgerClub2Code: ResponseCodeEnum::ok,
+      requestFunction: function (string $level, ?int $id = null) {
+        $this->makeGetRequest("/self");
+      }
+    );
+  }
+
+  public function testSelfUpdatePassword(): void {
+    // Badger is denied
+    $this->loggedAsBadgerClub1();
+    $this->makePutRequest("/self/update-password", [
+      "current" => "none",
+      "new" => "P@ssword1234",
+    ]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+
+    // Member
+    $user = _InitStory::USER_member_club_1();
+    $this->loggedAsMemberClub1();
+    $this->makePutRequest("/self/update-password", [
+      "current" => "member123",
+      "new" => "P@ssword1234",
+    ]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::ok->value);
+    $logged = $this->loggedAsMemberClub1();
+    $this->assertFalse($logged);
+    $logged = $this->loggedAs($user->getEmail(), "P@ssword1234");
+    $this->assertTrue($logged);
+
+    // Supervisor
+    $user = _InitStory::USER_supervisor_club_1();
+    $this->loggedAsSupervisorClub1();
+    $this->makePutRequest("/self/update-password", [
+      "current" => "admin123",
+      "new" => "P@ssword1234",
+    ]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::ok->value);
+    $logged = $this->loggedAsSupervisorClub1();
+    $this->assertFalse($logged);
+    $logged = $this->loggedAs($user->getEmail(), "P@ssword1234");
+    $this->assertTrue($logged);
+
+    // Admin
+    $user = _InitStory::USER_admin_club_1();
+    $this->loggedAsAdminClub1();
+    $this->makePutRequest("/self/update-password", [
+      "current" => "admin123",
+      "new" => "P@ssword1234",
+    ]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::ok->value);
+    $logged = $this->loggedAsAdminClub1();
+    $this->assertFalse($logged);
+    $logged = $this->loggedAs($user->getEmail(), "P@ssword1234");
+    $this->assertTrue($logged);
+
+    // Super Admin
+    $user = _InitStory::USER_super_admin();
+    $this->loggedAsSuperAdmin();
+    $this->makePutRequest("/self/update-password", [
+      "current" => "admin123",
+      "new" => "P@ssword1234",
+    ]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::ok->value);
+    $logged = $this->loggedAsSuperAdmin();
+    $this->assertFalse($logged);
+    $logged = $this->loggedAs($user->getEmail(), "P@ssword1234");
+    $this->assertTrue($logged);
+
+    // We test invalid current password
+    $this->makePutRequest("/self/update-password", [
+      "current" => "admin123",
+      "new" => "P@ssword1234",
+    ]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+    $this->assertJsonContains([
+      "detail" => "Invalid password",
+    ]);
+  }
+}

@@ -5,16 +5,15 @@ namespace App\State;
 use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\Entity\ClubDependent\Member;
-use App\Entity\UserMember;
-use App\Enum\ClubRole;
+use App\Entity\User;
+use App\Enum\UserRole;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class UserMemberProcessor implements ProcessorInterface {
+class UserProcessor implements ProcessorInterface {
   public function __construct(
     #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
     private readonly ProcessorInterface $persistProcessor,
@@ -25,34 +24,30 @@ class UserMemberProcessor implements ProcessorInterface {
   ) {
   }
 
-  // TODO: Migrate to UserMemberProcessor
-  public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Member|null {
+  public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): User|null {
     if ($operation instanceof DeleteOperationInterface) {
+      if (in_array(UserRole::super_admin->value, $data->getRoles())) {
+        throw new HttpException(Response::HTTP_FORBIDDEN, "You can't delete an administrator account");
+      }
+
       return $this->removeProcessor->process($data, $operation, $uriVariables, $context);
     }
 
     // Custom input, for the moment not supported
-    if (!$data instanceof UserMember) {
+    if (!$data instanceof User) {
       return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
     }
 
-//    // Can't deactivate another admin
-//    if (in_array(ClubRole::admin->value, $data->getRoles())) {
-//      if (!$data->isAccountActivated()) {
-//        throw new HttpException(Response::HTTP_FORBIDDEN, "You can't deactivate an administrator account");
-//      }
-//    }
-
-    // Admin can change the password (no requirements for super admin)
-//    if ($this->authorizationChecker->isGranted(ClubRole::admin->value)) {
-//      if ($data->getPlainPassword()) {
-//        // Admin can't change other admin
-//        if (in_array(ClubRole::admin->value, $data->getRoles())) {
-//          throw new HttpException(Response::HTTP_FORBIDDEN, "You can't change the password of an administrator");
-//        }
-//        $data->setPassword($this->passwordHasher->hashPassword($data, $data->getPlainPassword()));
-//      }
-//    }
+    // Admin can change the password
+    if ($this->authorizationChecker->isGranted(UserRole::super_admin->value)) {
+      if ($data->getPlainPassword()) {
+        // Admin can't change other admin
+        if (in_array(UserRole::super_admin->value, $data->getRoles())) {
+          throw new HttpException(Response::HTTP_FORBIDDEN, "You can't change the password of an administrator");
+        }
+        $data->setPassword($this->passwordHasher->hashPassword($data, $data->getPlainPassword()));
+      }
+    }
 
     return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
   }

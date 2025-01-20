@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Controller\Abstract\AbstractController;
 use App\Entity\User;
+use App\Enum\UserRole;
 use App\Service\UserService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,7 +16,7 @@ class UserSelfUpdatePassword extends AbstractController {
 
   public function __invoke(Request $request, UserPasswordHasherInterface $passwordHasher, UserService $userService): JsonResponse {
     $user = $this->getUser();
-    if (!$user instanceof User) {
+    if (!$user instanceof User || $user->getRole() === UserRole::badger) {
       throw new HttpException(Response::HTTP_BAD_REQUEST);
     }
 

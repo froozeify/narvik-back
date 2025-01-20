@@ -28,7 +28,7 @@ class UserService {
    */
   public function changeUserPassword(User $user, string $password, bool $flush = true): ?string {
     if (empty($password) || strlen($password) < 8) {
-      return 'Password must be at least 8 letters long';
+      return 'Password must be at least 8 letters long.';
     }
 
     $this->userRepository->upgradePassword($user, $this->passwordHasher->hashPassword($user, $password), $flush);

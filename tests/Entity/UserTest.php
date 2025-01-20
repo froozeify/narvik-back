@@ -2,18 +2,17 @@
 
 namespace App\Tests\Entity;
 
-use App\Entity\Season;
 use App\Entity\User;
-use App\Enum\UserRole;
+use App\Entity\UserSecurityCode;
 use App\Tests\Entity\Abstract\AbstractEntityTestCase;
 use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Factory\MemberFactory;
-use App\Tests\Factory\SeasonFactory;
 use App\Tests\Factory\UserFactory;
 use App\Tests\Story\_InitStory;
-use App\Tests\Story\SeasonStory;
+use App\Tests\Story\GlobalSettingStory;
 
 class UserTest extends AbstractEntityTestCase {
+
   protected int $TOTAL_SUPER_ADMIN = 11;
 
   protected function getClassname(): string {
@@ -225,6 +224,38 @@ class UserTest extends AbstractEntityTestCase {
     $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
     $this->assertJsonContains([
       "detail" => "Invalid password",
+    ]);
+  }
+
+  public function testPasswordResetRequest(): void {
+    GlobalSettingStory::load(); // We load the default settings so we can send email
+
+    $user = _InitStory::USER_member_club_1();
+    $this->makePostRequest($this->getRootUrl() . "/-/initiate-reset-password", [
+      "email" => $user->getEmail(),
+    ]);
+    $this->assertResponseIsSuccessful();
+  }
+
+  public function testPasswordReset(): void {
+    $user = _InitStory::USER_member_club_1();
+
+    $this->makePostRequest($this->getRootUrl() . "/-/reset-password", [
+      "email" => $user->getEmail(),
+    ]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+    $this->assertJsonContains([
+      "detail" => "Missing required field: 'password'",
+    ]);
+
+    $this->makePostRequest($this->getRootUrl() . "/-/reset-password", [
+      "email" => $user->getEmail(),
+      "password" => "p@ssword1234",
+      "securityCode" => "invalid"
+    ]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+    $this->assertJsonContains([
+      "detail" => "A new security code has been sent.",
     ]);
   }
 }

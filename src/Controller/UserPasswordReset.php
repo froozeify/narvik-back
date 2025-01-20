@@ -27,13 +27,13 @@ class UserPasswordReset extends AbstractController {
     $validated = $userService->validateSecurityCode($user, UserSecurityCodeTrigger::resetPassword, $securityCode);
     if (!$validated) {
       $userService->initiateResetPassword($user); // We trigger a new password query
-      throw new HttpException(Response::HTTP_BAD_REQUEST);
+      throw new HttpException(Response::HTTP_BAD_REQUEST, "A new security code has been sent.");
     }
 
     $changeError = $userService->changeUserPassword($user, $password);
     if ($changeError) {
       $userService->initiateResetPassword($user); // We trigger a new password query
-      throw new HttpException(Response::HTTP_BAD_REQUEST, $changeError);
+      throw new HttpException(Response::HTTP_BAD_REQUEST, $changeError . " A new security code has been sent.");
     }
 
     return new JsonResponse();

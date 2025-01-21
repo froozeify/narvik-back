@@ -286,4 +286,16 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
     $r = $this->makeGetRequest($response->toArray(false)['profileImage']['privateUrl']);
     $this->assertResponseIsSuccessful();
   }
+
+  public function testDeleteUserShouldNotCascade(): void {
+    $club = _InitStory::club_1();
+
+    $this->loggedAsSuperAdmin();
+    $this->makeDeleteRequest($this->getIriFromResource(_InitStory::USER_member_club_1()));
+    $this->assertResponseIsSuccessful();
+
+    // Count should not change since we don't delete a member
+    $response = $this->makeGetRequest($this->getRootWClubUrl($club));
+    $this->assertCount($this->TOTAL_ADMIN_CLUB_1, $response->toArray()['member']);
+  }
 }

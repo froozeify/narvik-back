@@ -25,6 +25,7 @@ class UserSecurityCodeRepository extends ServiceEntityRepository {
                 ->setParameter('trigger', $trigger)
                 ->setParameter('expire_at', new \DateTimeImmutable())
                 ->orderBy('m.createdAt', 'DESC')
+                ->orderBy('m.id', 'DESC')
                 ->setMaxResults(1)
                 ->getQuery()
                 ->getOneOrNullResult();

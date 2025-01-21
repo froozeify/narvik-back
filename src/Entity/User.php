@@ -15,7 +15,10 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\UserPasswordReset;
 use App\Controller\UserPasswordResetInitiate;
+use App\Controller\UserRegister;
+use App\Controller\UserValidateAccount;
 use App\Controller\UserSelf;
+use App\Controller\UserSelfDeleteAccount;
 use App\Controller\UserSelfUpdatePassword;
 use App\Entity\Abstract\UuidEntity;
 use App\Enum\UserRole;
@@ -42,13 +45,18 @@ use Symfony\Component\Validator\Constraints as Assert;
   new Get(),
   new Patch(),
   new Delete(),
-  // TODO: Create a public register endpoint and a delete one (/users/-/register, /self/delete-account)
 
   new Get(
     uriTemplate: '/self',
     controller: UserSelf::class,
     openapi: new Model\Operation(summary: 'Return current logged user information',),
     normalizationContext: ['groups' => ['self-read', 'user-read', 'user']],
+    read: false,
+  ),
+  new Delete(
+    uriTemplate: '/self',
+    controller: UserSelfDeleteAccount::class,
+    openapi: new Model\Operation(summary: 'Delete the logged user account. This action is permanent. It won\'t delete the data registered by each club the user was member. User must do a request to his club for them to remove the data linked to his licence/email.',),
     read: false,
   ),
   new Put(
@@ -74,6 +82,62 @@ use Symfony\Component\Validator\Constraints as Assert;
       ),
     read: false,
     write: false),
+
+  new Post(
+    uriTemplate: '/users/-/register',
+    controller: UserRegister::class,
+    openapi:
+    new Model\Operation(
+      summary: 'Trigger the user account creation logic. Will send an email with a securityCode. Email must be enabled for this to work',
+      requestBody:
+      new Model\RequestBody(
+        content: new \ArrayObject([
+          'application/json' => [
+            'schema' => [
+              'type'       => 'object',
+              'properties' => [
+                'email' => ['type' => 'string'],
+                'firstname' => ['type' => 'string'],
+                'lastname' => ['type' => 'string'],
+                'password' => ['type' => 'string'],
+              ],
+            ],
+          ],
+        ]),
+      )
+      ,
+    ),
+    read: false,
+    deserialize: false,
+    write: false,
+    serialize: false,
+  ),
+  new Post(
+    uriTemplate: '/users/-/validate-account',
+    controller: UserValidateAccount::class,
+    openapi:
+    new Model\Operation(
+      summary: 'Validate the user account creation. If securityCode is invalid a new one will be sent.',
+      requestBody:
+      new Model\RequestBody(
+        content: new \ArrayObject([
+          'application/json' => [
+            'schema' => [
+              'type'       => 'object',
+              'properties' => [
+                'email'        => ['type' => 'string'],
+                'securityCode' => ['type' => 'string'],
+              ],
+            ],
+          ],
+        ]),
+      ),
+    ),
+    read: false,
+    deserialize: false,
+    write: false,
+    serialize: false
+  ),
 
   new Post(
     uriTemplate: '/users/-/initiate-reset-password',
@@ -281,7 +345,6 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
   }
 
   public function setRoles(array $roles): static {
-    // We only save the first role passed
     $this->roles = $roles;
     return $this;
   }

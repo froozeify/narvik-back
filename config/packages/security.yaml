@@ -55,6 +55,8 @@ security:
         - { route: ^/auth, roles: PUBLIC_ACCESS }
         - { route: 'auth_bdg', roles: PUBLIC_ACCESS }
         - { path: ^/public, roles: PUBLIC_ACCESS }
+        - { path: ^/users/-/register, roles: PUBLIC_ACCESS }
+        - { path: ^/users/-/validate-account, roles: PUBLIC_ACCESS }
         - { path: ^/users/-/initiate-reset-password, roles: PUBLIC_ACCESS }
         - { path: ^/users/-/reset-password, roles: PUBLIC_ACCESS }
 

@@ -21,6 +21,36 @@ class UserService {
   ) {
   }
 
+  public function initiateAccountValidation(User $user): bool {
+    if ($user->isAccountActivated() || !$this->emailService->canSendEmail()) {
+      return false;
+    }
+
+    // We verify that we don't have more than 4 in progress reset for this user
+    $validationInProgress = $this->userSecurityCodeRepository->findAllByTrigger($user, UserSecurityCodeTrigger::accountValidation);
+    if (count($validationInProgress) > 3) {
+      return false;
+    }
+
+    $securityCode = new UserSecurityCode();
+    $securityCode->setTrigger(UserSecurityCodeTrigger::accountValidation)->setUser($user);
+
+    $this->em->persist($securityCode);
+    $this->em->flush();
+
+    // We send the security code
+    $email = $this->emailService->getEmail('security-code.html.twig', 'Validation du compte', ['security_code' => $securityCode->getCode()]);
+    $this->emailService->sendEmail($email, $user->getEmail());
+
+    return true;
+  }
+
+  public function activateAccount(User $user): void {
+    $user->setAccountActivated(true);
+    $this->em->persist($user);
+    $this->em->flush();
+  }
+
   /**
    * @param User $user
    * @param string $password

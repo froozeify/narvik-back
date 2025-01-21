@@ -5,6 +5,7 @@
     .security-code {
         text-align: center;
         padding-top: 24px;
+        padding-bottom: 24px;
     }
 
     .security-code > span {
@@ -21,4 +22,5 @@
 {% block content %}
     <div>Votre code de sécurité est :</div>
     <div class="security-code">{% for code in security_code|split('') %}<span>{{ code }}</span>{% endfor %}</div>
+    <div>Le code est valable 10 minutes.</div>
 {% endblock %}

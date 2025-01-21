@@ -3,11 +3,12 @@
 namespace App\Tests\Entity;
 
 use App\Entity\User;
-use App\Entity\UserSecurityCode;
+use App\Enum\UserSecurityCodeTrigger;
 use App\Tests\Entity\Abstract\AbstractEntityTestCase;
 use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Factory\MemberFactory;
 use App\Tests\Factory\UserFactory;
+use App\Tests\Factory\UserSecurityCodeFactory;
 use App\Tests\Story\_InitStory;
 use App\Tests\Story\GlobalSettingStory;
 
@@ -22,7 +23,6 @@ class UserTest extends AbstractEntityTestCase {
   protected function getRootUrl(): string {
     return '/users';
   }
-
 
   public function testCreate(): void {
     $payload = [
@@ -257,5 +257,85 @@ class UserTest extends AbstractEntityTestCase {
     $this->assertJsonContains([
       "detail" => "A new security code has been sent.",
     ]);
+  }
+
+  public function testDeleteSelf(): void {
+    $this->makeAllLoggedRequests(
+      memberClub1Code: ResponseCodeEnum::ok,
+      adminClub2Code: ResponseCodeEnum::ok,
+      badgerClub1Code: ResponseCodeEnum::ok,
+      badgerClub2Code: ResponseCodeEnum::ok,
+      requestFunction: function (string $level, ?int $id = null) {
+        $this->makeDeleteRequest("/self");
+      }
+    );
+  }
+
+  public function testUserRegister(): void {
+    GlobalSettingStory::load(); // We load the default settings so we can send email
+
+    $this->makePostRequest($this->getRootUrl() . "/-/register", []);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+
+    $this->makePostRequest($this->getRootUrl() . "/-/register", [
+      "email" => "newaccount@example.com",
+      "password" => "short",
+      "firstname" => "John",
+      "lastname" => "Doe",
+    ]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+    $this->assertJsonContains([
+      "detail" => "Password must be at least 8 letters long.",
+    ]);
+
+    $this->makePostRequest($this->getRootUrl() . "/-/register", [
+      "email" => "admin@admin.com",
+      "password" => "p@ssword1234",
+      "firstname" => "John",
+      "lastname" => "Doe",
+    ]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+    $this->assertJsonContains([
+      "detail" => "User already registered.",
+    ]);
+
+    $this->makePostRequest($this->getRootUrl() . "/-/register", [
+      "email" => "newaccount@example.com",
+      "password" => "p@ssword1234",
+      "firstname" => "John",
+      "lastname" => "Doe",
+    ]);
+    $this->assertResponseIsSuccessful();
+  }
+
+  public function testAccountValidation(): void {
+    GlobalSettingStory::load(); // We load the default settings so we can send email
+    $user = UserFactory::createOne(["accountActivated" => false]);
+
+    $this->makePostRequest($this->getRootUrl() . "/-/validate-account", [
+      "email" => "invalidemail",
+      "securityCode" => "nop",
+    ]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+
+    $this->makePostRequest($this->getRootUrl() . "/-/validate-account", [
+      "email" => $user->getEmail(),
+      "securityCode" => "wrong code",
+    ]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+    $this->assertJsonContains([
+      "detail" => "A new security code has been sent.",
+    ]);
+
+    // We create our security code
+    $userSecurityCode = UserSecurityCodeFactory::createOne([
+      "user" => $user,
+      "trigger" => UserSecurityCodeTrigger::accountValidation
+    ]);
+    $this->makePostRequest($this->getRootUrl() . "/-/validate-account", [
+      "email" => $user->getEmail(),
+      "securityCode" => $userSecurityCode->getCode(),
+    ]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::ok->value);
   }
 }

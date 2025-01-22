@@ -21,6 +21,7 @@ use App\Controller\UserSelfDeleteAccount;
 use App\Controller\UserSelfUpdatePassword;
 use App\Controller\UserValidateAccount;
 use App\Entity\Abstract\UuidEntity;
+use App\Entity\ClubDependent\Member;
 use App\Enum\UserRole;
 use App\Filter\MultipleFilter;
 use App\Repository\UserRepository;
@@ -262,6 +263,9 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
 
   // Custom calculated fields
 
+  /**
+   * @return array{id: string, displayName: string, club: Club, role: string, member: ?Member}[]
+   */
   public function getLinkedProfiles(): array {
     $userClubs = [];
     $multipleClubs = $this->getMemberships()->count() > 1;
@@ -274,14 +278,17 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
           'role' => $membership->getRole(),
         ];
         $displayName = $club->getName();
+        $id = "c-" . $club->getUuid()->toString();
 
         if ($membership->getMember()) {
           $userClub['member'] = $membership->getMember()->getUuid()->toString();
+          $id = "m-" . $userClub['member'];
           if ($multipleClubs) {
             $displayName .= " - " . $membership->getMember()->getFullName();
           }
         }
 
+        $userClub['id'] = $id;
         $userClub['displayName'] = $displayName;
         $userClubs[] = $userClub;
       }

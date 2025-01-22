@@ -46,7 +46,7 @@ class Club extends UuidEntity implements TimestampEntityInterface {
   // TODO: Add club logo field
 
   #[ORM\Column(options: ['default' => false])]
-  #[Groups(['club-read', 'self-read', 'super-admin-write'])]
+  #[Groups(['club-read', 'super-admin-write'])]
   #[ApiProperty(security: "is_granted('".ClubRole::supervisor->value."', object)")] // Property can be read by club admin/supervisor
   private bool $salesEnabled = false;
 
@@ -56,7 +56,7 @@ class Club extends UuidEntity implements TimestampEntityInterface {
   private ?string $badgerToken = null;
 
   #[ORM\OneToOne(mappedBy: 'club', targetEntity: ClubSetting::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
-  #[Groups(['club-read', 'self-read'])]
+  #[Groups(['club-read'])]
   #[ApiProperty(security: "is_granted('".ClubRole::supervisor->value."', object)")] // Property can be read by club admin/supervisor
   private ?ClubSetting $settings = null;
 

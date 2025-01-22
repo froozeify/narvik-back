@@ -5,6 +5,7 @@ namespace App\State;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
+use App\Entity\Club;
 use App\Entity\Config;
 use App\Entity\User;
 use App\Enum\ClubRole;
@@ -61,15 +62,35 @@ class ConfigProvider implements ProviderInterface {
 
   public function getUserConfig(Config $config, User $user): void {
     $config->setId('user');
+
+    foreach ($user->getLinkedProfiles() as $profile) {
+      $id = $profile["id"];
+      /** @var Club $club */
+      $club = $profile["club"];
+
+      if ($this->authorizationChecker->isGranted(ClubRole::supervisor->value, $club) || $this->authorizationChecker->isGranted(ClubRole::badger->value, $club)) {
+      $config->addProfileModule($id, 'presences', [
+        'enabled' => true,
+      ]);
+    }
+
+    // User a supervisor, he can have access to the sale management
+    if ($this->authorizationChecker->isGranted(ClubRole::supervisor->value, $club)) {
+      $config->addProfileModule($id, 'sales', [
+        'enabled' => $club->getSalesEnabled(),
+      ]);
+    }
+  }
+
 //    if ($this->authorizationChecker->isGranted(ClubRole::supervisor->value) || $this->authorizationChecker->isGranted(ClubRole::badger->value)) {
-//      $config->addModule('presences', [
+//      $config->addProfileModule('presences', [
 //        'enabled' => true,
 //      ]);
 //    }
 //
 //    // User a supervisor, he can have access to the sale management
 //    if ($this->authorizationChecker->isGranted(ClubRole::supervisor->value)) {
-//      $config->addModule('sales', [
+//      $config->addProfileModule('sales', [
 //        'enabled' => true,
 //      ]);
 //    }

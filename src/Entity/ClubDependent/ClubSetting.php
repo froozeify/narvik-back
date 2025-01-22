@@ -46,7 +46,7 @@ class ClubSetting extends UuidEntity implements ClubLinkedEntityInterface {
 
   #[ORM\OneToOne(targetEntity: Activity::class)]
   #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
-  #[Groups(['club-setting', 'self-read'])]
+  #[Groups(['club-setting'])]
   private ?Activity $controlShootingActivity = null;
 
   /**
@@ -56,7 +56,7 @@ class ClubSetting extends UuidEntity implements ClubLinkedEntityInterface {
   #[ORM\JoinTable(
     name: 'club_setting_exclude_activities_od',
   )]
-  #[Groups(['club-setting', 'self-read'])]
+  #[Groups(['club-setting'])]
   private Collection $excludedActivitiesFromOpeningDays;
 
   #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]

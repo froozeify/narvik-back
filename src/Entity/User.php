@@ -16,20 +16,18 @@ use ApiPlatform\OpenApi\Model;
 use App\Controller\UserPasswordReset;
 use App\Controller\UserPasswordResetInitiate;
 use App\Controller\UserRegister;
-use App\Controller\UserValidateAccount;
 use App\Controller\UserSelf;
 use App\Controller\UserSelfDeleteAccount;
 use App\Controller\UserSelfUpdatePassword;
+use App\Controller\UserValidateAccount;
 use App\Entity\Abstract\UuidEntity;
 use App\Enum\UserRole;
 use App\Filter\MultipleFilter;
 use App\Repository\UserRepository;
-use App\State\UserMemberProcessor;
 use App\State\UserProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use phpDocumentor\Reflection\Types\This;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -96,10 +94,10 @@ use Symfony\Component\Validator\Constraints as Assert;
             'schema' => [
               'type'       => 'object',
               'properties' => [
-                'email' => ['type' => 'string'],
+                'email'     => ['type' => 'string'],
                 'firstname' => ['type' => 'string'],
-                'lastname' => ['type' => 'string'],
-                'password' => ['type' => 'string'],
+                'lastname'  => ['type' => 'string'],
+                'password'  => ['type' => 'string'],
               ],
             ],
           ],
@@ -258,8 +256,8 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
   private Collection $memberships;
 
   public function __construct() {
-      parent::__construct();
-      $this->memberships = new ArrayCollection();
+    parent::__construct();
+    $this->memberships = new ArrayCollection();
   }
 
   // Custom calculated fields

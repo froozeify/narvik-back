@@ -32,8 +32,8 @@ class UserSecurityCode implements TimestampEntityInterface {
   private \DateTimeImmutable $expireAt;
 
   public function __construct() {
-    $this->code = substr(str_shuffle(strtoupper(bin2hex(random_bytes(10)))), 0, 6);
-    $this->expireAt = new \DateTimeImmutable('+ 10 minutes');
+    $this->setCode(substr(str_shuffle(strtoupper(bin2hex(random_bytes(10)))), 0, 6));
+    $this->setExpireAt(new \DateTimeImmutable('+ 10 minutes'));
   }
 
   public function getId(): ?int {

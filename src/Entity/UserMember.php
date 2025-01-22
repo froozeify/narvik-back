@@ -2,31 +2,14 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\Patch;
 use App\Entity\ClubDependent\Member;
 use App\Enum\ClubRole;
 use App\Repository\UserMemberRepository;
-use App\State\UserMemberProcessor;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: UserMemberRepository::class)]
 #[UniqueEntity(fields: ['member'], message: 'Member already linked')]
-#[ApiResource(
-  operations: [
-    new Get(),
-    new Patch(),
-    new Delete(),
-  ], normalizationContext: [
-    'groups' => ['user-member', 'user-member-read']
-  ], denormalizationContext: [
-    'groups' => ['user-member', 'user-member-write']
-  ],
-)]
 class UserMember {
   #[ORM\Id]
   #[ORM\GeneratedValue]
@@ -35,12 +18,10 @@ class UserMember {
 
   #[ORM\ManyToOne(inversedBy: 'memberships')]
   #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-  #[Groups(['user-member-read', 'club-admin-write'])]
   private ?User $user = null;
 
   #[ORM\OneToOne()]
   #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
-  #[Groups(['user-member-read', 'club-admin-write'])]
   private ?Member $member = null;
 
   #[ORM\ManyToOne(targetEntity: Club::class)]
@@ -48,7 +29,6 @@ class UserMember {
   private ?Club $badgerClub = null;
 
   #[ORM\Column(type: "string", enumType: ClubRole::class)]
-  #[Groups(['user-member-read', 'club-admin-write'])]
   private ClubRole $role = ClubRole::member;
 
   public function getId(): ?int {

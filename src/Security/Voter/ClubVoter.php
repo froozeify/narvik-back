@@ -77,7 +77,7 @@ class ClubVoter extends Voter {
 
     foreach ($linkedProfiles as $linkedProfile) {
       if ($requestMemberUuid) {
-        if (!$linkedProfile['member'] || $linkedProfile['member'] !== $requestMemberUuid) {
+        if (!$linkedProfile['member'] || $linkedProfile['member']->getUuid()->toString() !== $requestMemberUuid) {
           continue;
         }
       }

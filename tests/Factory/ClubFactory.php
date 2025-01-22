@@ -63,7 +63,6 @@ final class ClubFactory extends PersistentProxyObjectFactory {
     return [
       'name'         => self::faker()->company(),
       'salesEnabled' => self::faker()->boolean(),
-      'smtpEnabled'  => self::faker()->boolean(),
     ];
   }
 

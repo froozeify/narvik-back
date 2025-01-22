@@ -73,7 +73,6 @@ class ClubTest extends AbstractEntityTestCase {
         $club = ClubFactory::createOne([
           'name' => 'Club to delete',
           'salesEnabled' => true,
-          'smtpEnabled' => true,
           'badgerToken' => 'clubbadger',
         ]);
         $iri = $this->getIriFromResource($club);

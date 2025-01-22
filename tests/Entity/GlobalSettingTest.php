@@ -2,7 +2,6 @@
 
 namespace App\Tests\Entity;
 
-use App\Controller\GlobalSettingGetPublic;
 use App\Entity\GlobalSetting;
 use App\Tests\Entity\Abstract\AbstractEntityTestCase;
 use App\Tests\Enum\ResponseCodeEnum;

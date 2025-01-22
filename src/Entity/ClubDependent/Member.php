@@ -204,7 +204,7 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
 
   #[ORM\OneToOne(targetEntity: File::class)]
   #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
-  #[Groups(['member-read', 'member-presence-read'])]
+  #[Groups(['member-read', 'self-read', 'member-presence-read'])]
   private ?File $profileImage = null;
 
   #[Groups(['member-read', 'member-presence-read'])]
@@ -213,7 +213,7 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
   #[Groups(['member-read', 'member-presence-read'])]
   private ?MemberSeason $currentSeason = null;
 
-  #[Groups(['autocomplete', 'member-read', 'member-presence-read', 'sale-read'])]
+  #[Groups(['autocomplete', 'self-read', 'member-read', 'member-presence-read', 'sale-read'])]
   private ?string $fullName = null;
 
   #[ORM\OneToMany(mappedBy: 'member', targetEntity: MemberPresence::class, orphanRemoval: true)]

@@ -285,6 +285,8 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
           $id = "m-" . $membership->getMember()->getUuid()->toString();
           if ($multipleClubs) {
             $displayName .= " - " . $membership->getMember()->getFullName();
+          } else {
+            $displayName = $membership->getMember()->getFullName();
           }
         }
 

@@ -8,6 +8,10 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 		composer install --prefer-dist --no-progress --no-interaction
 	fi
 
+	# Display information about the current project
+	# Or about an error in project initialization
+	php bin/console -V
+
 	if grep -q ^DATABASE_URL= .env; then
 		echo 'Waiting for database to be ready...'
 		ATTEMPTS_LEFT_TO_REACH_DATABASE=60
@@ -52,6 +56,8 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 
 	echo "Starting supervisord with messenger-worker conf file"
 	/usr/bin/supervisord -c /etc/supervisor/conf.d/messenger-worker.ini
+
+	echo 'PHP app ready!'
 fi
 
 exec docker-php-entrypoint "$@"

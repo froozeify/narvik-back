@@ -27,7 +27,7 @@ abstract class AbstractTestCase extends ApiTestCase {
 
   private ?string $accessToken = null;
   private ?string $refreshToken = null;
-  private ?string $selectedMember = null;
+  private ?string $selectedProfile = null;
 
   public function setUp(): void {
     parent::setUp();
@@ -65,8 +65,8 @@ abstract class AbstractTestCase extends ApiTestCase {
     $headers = [
       'Authorization' => 'Bearer ' . $token,
     ];
-    if ($this->selectedMember) {
-      $headers['Member'] = $this->selectedMember;
+    if ($this->selectedProfile) {
+      $headers['Profile'] = $this->selectedProfile;
     }
 
     return static::createClient([], [
@@ -77,7 +77,7 @@ abstract class AbstractTestCase extends ApiTestCase {
   protected function logout(): void {
     $this->accessToken = null;
     $this->refreshToken = null;
-    $this->selectedMember = null;
+    $this->selectedProfile = null;
   }
 
   protected function loggedAs(string $email, string $password): bool {
@@ -123,12 +123,12 @@ abstract class AbstractTestCase extends ApiTestCase {
    * Possibility to define in the query headers the selectedProfile.
    * Required when the user have multiple profile
    *
-   * @param string|null $uuid
+   * @param string|null $id
    *
    * @return void
    */
-  public function selectedMember(?string $uuid): void {
-    $this->selectedMember = $uuid;
+  public function selectedProfile(?string $id): void {
+    $this->selectedProfile = $id;
   }
 
   private function checkRequestResponse(ResponseCodeEnum $responseCode, ?array $payloadToValidate, string $context): void {

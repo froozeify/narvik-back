@@ -98,10 +98,3 @@ db-dump: ## Dump the current database
 db-restore: ## Restore a database dump. The file must be called './dump/dump.sql.gz'
 	docker compose exec database sh -c 'psql -d $$POSTGRES_DB -U $$POSTGRES_USER -c "DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public;"'
 	gunzip < ./dump/dump.sql.gz | docker compose exec -T database sh -c 'psql -d $$POSTGRES_DB -U $$POSTGRES_USER'
-
-## —— Cloudflared 🕸️ ——————————————————————————————————————————————————————————————
-cloudflared-tunnel: ## Expose local env through cloudflared tunnel (url must be set to host.docker.internal:3000 on cloudflare tunnel setting)
-	docker run --rm -it cloudflare/cloudflared:latest tunnel --no-autoupdate run --token $$CLOUDFLARED_TUNNEL
-
-cloudflared-tunnel-free: ## Expose local env through cloudflared tunnel (free version is limited to 200 in-flight request)
-	docker run --rm -it cloudflare/cloudflared:latest tunnel --no-autoupdate --url http://host.docker.internal:3000

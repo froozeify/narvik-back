@@ -77,7 +77,7 @@ class LoginTest extends AbstractTestCase {
     $this->assertResponseIsSuccessful();
 
     // We linked the admin club 1 with another account
-    $member = MemberFactory::createOne();
+    $member = MemberFactory::createOne(['lastname' => 'Zebre']);
     $userMember = UserMemberFactory::createOne([
       "member" => $member,
       "user" => _InitStory::USER_admin_club_1(),
@@ -86,21 +86,28 @@ class LoginTest extends AbstractTestCase {
 
     $response = $this->makeGetRequest('/self');
     $this->assertCount(2, $response->toArray()['linkedProfiles']);
+    $linkedProfiles = $response->toArray()['linkedProfiles'];
 
+    $memberProfile = $linkedProfiles[1];
+    $this->assertEquals($member->getUuid()->toString(), $memberProfile['member']['uuid']);
+    $this->assertEquals(ClubRole::member->value, $memberProfile['role']);
+
+    $adminProfile = $linkedProfiles[0];
+    $this->assertEquals(ClubRole::admin->value, $adminProfile['role']);
 
     $this->makeGetRequest($this->getIriFromResource($club1) . '/members');
     $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
     $this->assertJsonContains([
-      "detail" => "Missing required 'Member' header.",
+      "detail" => "Missing required 'Profile' header.",
     ]);
 
     // We try getting as regular member, access should be denied
-    $this->selectedMember($member->getUuid()->toString());
+    $this->selectedProfile($memberProfile['id']);
     $this->makeGetRequest($this->getIriFromResource($club1) . '/members');
     $this->assertResponseStatusCodeSame(ResponseCodeEnum::forbidden->value);
 
     // As admin club no problem
-    $this->selectedMember(_InitStory::MEMBER_admin_club_1()->getUuid()->toString());
+    $this->selectedProfile($adminProfile['id']);
     $this->makeGetRequest($this->getIriFromResource($club1) . '/members');
     $this->assertResponseIsSuccessful();
   }

@@ -37,9 +37,9 @@ class ClubVoter extends Voter {
   }
 
   protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool {
-    $requestMemberUuid = null;
+    $selectedProfile = null;
     if ($subject instanceof Request) {
-      $requestMemberUuid = $this->requestService->getMemberUuidFromRequest($subject);
+      $selectedProfile = $this->requestService->getSelectedProfileFromRequest($subject);
       $subject = $this->requestService->getClubFromRequest($subject);
     }
 
@@ -71,13 +71,13 @@ class ClubVoter extends Voter {
 
     $linkedProfiles = $user->getLinkedProfiles();
     // When user have multiple profiles linked, the member header must be specified
-    if (!$requestMemberUuid && count($linkedProfiles) > 1) {
-      throw new HttpException(Response::HTTP_BAD_REQUEST, "Missing required 'Member' header.");
+    if (!$selectedProfile && count($linkedProfiles) > 1) {
+      throw new HttpException(Response::HTTP_BAD_REQUEST, "Missing required 'Profile' header.");
     }
 
     foreach ($linkedProfiles as $linkedProfile) {
-      if ($requestMemberUuid) {
-        if (!$linkedProfile['member'] || $linkedProfile['member']->getUuid()->toString() !== $requestMemberUuid) {
+      if ($selectedProfile) {
+        if (!$linkedProfile['id'] || $linkedProfile['id'] !== $selectedProfile) {
           continue;
         }
       }

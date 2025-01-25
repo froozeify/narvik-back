@@ -158,17 +158,20 @@ use Symfony\Component\Serializer\Attribute\Groups;
   ],
   paginationClientEnabled: true,
 )]
-//#[ApiResource(
-//  uriTemplate: '/members/{memberId}/presences.{_format}',
-//  operations: [
-//    new GetCollection(),
-//  ], uriVariables: [
-//  'memberId' => new Link(toProperty: 'member', fromClass: Member::class),
-//], normalizationContext: [
-//  'groups' => ['member-presence', 'member-presence-read']
-//],
-//  paginationClientEnabled: true,
-//)]
+#[ApiResource(
+  uriTemplate: '/clubs/{clubUuid}/members/{memberUuid}/presences.{_format}',
+  operations: [
+    new GetCollection(
+      security: "is_granted('".ClubRole::member->value."', request) || is_granted('".ClubRole::badger->value."', request)",
+    ),
+  ], uriVariables: [
+  'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+  'memberUuid' => new Link(toProperty: 'member', fromClass: Member::class),
+], normalizationContext: [
+  'groups' => ['member-presence', 'member-presence-read']
+],
+  paginationClientEnabled: true,
+)]
 #[ApiFilter(DateFilter::class, properties: ['date' => DateFilter::EXCLUDE_NULL])]
 #[ApiFilter(OrderFilter::class, properties: ['date' => 'DESC', 'createdAt' => 'DESC'])]
 #[ApiFilter(MultipleFilter::class, properties: ['member.firstname', 'member.lastname', 'member.licence'])]

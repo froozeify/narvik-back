@@ -2,6 +2,7 @@
 
 namespace App\Tests\Entity\ClubDependent\Plugin\Presence;
 
+use App\Entity\ClubDependent\Member;
 use App\Entity\ClubDependent\Plugin\Presence\MemberPresence;
 use App\Enum\ClubRole;
 use App\Message\CerberePresencesDateMessage;
@@ -25,6 +26,13 @@ class MemberPresenceTest extends AbstractEntityClubLinkedTestCase {
   protected int $TOTAL_SUPERVISOR_CLUB_1 = 10;
   protected int $TOTAL_BADGER_CLUB_1 = 10;
   protected int $TOTAL_BADGER_CLUB_2 = 5;
+
+  private Member $selectedMember;
+
+  public function setUp(): void {
+    parent::setUp();
+    $this->selectedMember = _InitStory::MEMBER_member_club_1();
+  }
 
   protected function getClassname(): string {
     return MemberPresence::class;
@@ -286,5 +294,19 @@ class MemberPresenceTest extends AbstractEntityClubLinkedTestCase {
 
     $response = $this->makeGetRequest($this->getRootWClubUrl($club));
     $this->assertCount($this->TOTAL_ADMIN_CLUB_1 + 1, $response->toArray()['member']);
+  }
+
+  public function testGetMemberPresences(): void {
+    $this->loggedAsMemberClub1();
+    $this->makeAllLoggedRequests(
+      memberClub1Code: ResponseCodeEnum::ok,
+      badgerClub1Code: ResponseCodeEnum::ok,
+
+      adminClub2Code: ResponseCodeEnum::forbidden,
+      badgerClub2Code: ResponseCodeEnum::forbidden,
+      requestFunction: function (string $level, ?int $id) {
+        $this->makeGetRequest($this->getIriFromResource($this->selectedMember) . "/presences");
+      }
+    );
   }
 }

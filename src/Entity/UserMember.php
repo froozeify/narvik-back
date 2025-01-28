@@ -20,7 +20,7 @@ class UserMember {
   #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
   private ?User $user = null;
 
-  #[ORM\OneToOne()]
+  #[ORM\OneToOne(inversedBy: 'userMember', targetEntity: Member::class)]
   #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
   private ?Member $member = null;
 

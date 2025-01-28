@@ -3,6 +3,7 @@
 namespace App\Tests\Entity\ClubDependent;
 
 use App\Entity\ClubDependent\Member;
+use App\Enum\ClubRole;
 use App\Message\ItacMembersMessage;
 use App\Message\ItacSecondaryClubMembersMessage;
 use App\Tests\Entity\Abstract\AbstractEntityClubLinkedTestCase;
@@ -297,5 +298,71 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
     // Count should not change since we don't delete a member
     $response = $this->makeGetRequest($this->getRootWClubUrl($club));
     $this->assertCount($this->TOTAL_ADMIN_CLUB_1, $response->toArray()['member']);
+  }
+
+  public function testUpdateMemberRole(): void {
+    $member = _InitStory::MEMBER_member_club_1();
+    $iri = $this->getIriFromResource($member);
+    $url = $iri . "/role";
+    $payload = [
+      "role" => ClubRole::admin->value
+    ];
+
+    $this->loggedAsMemberClub1();
+    $this->makePatchRequest($url, $payload);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::forbidden->value);
+
+    $this->loggedAsSupervisorClub1();
+    $this->makePatchRequest($url, $payload);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::forbidden->value);
+
+    $this->loggedAsAdminClub1();
+    $this->makePatchRequest($url, ["role" => "toto"]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+    $this->assertJsonContains(["detail" => "Invalid role."]);
+
+    $this->makePatchRequest($url, $payload);
+    $this->assertResponseIsSuccessful();
+    $this->assertJsonContains($payload);
+
+
+  }
+
+  /**
+   * We set a role on a member that don't have a user account (it will be created in that case but not activated)
+   */
+  public function testUpdateMemberRoleNoUserAccount(): void {
+    $member = MemberFactory::createOne(['club' => _InitStory::club_1()]);
+    $iri = $this->getIriFromResource($member);
+    $url = $iri . "/role";
+    $payload = [
+      "role" => ClubRole::admin->value
+    ];
+
+    $this->loggedAsAdminClub1();
+    $response = $this->makeGetRequest($iri);
+    $this->assertJsonNotHasKey("role", $response); // No role in response since not linked with an user
+
+    $this->makePatchRequest($url, $payload);
+    $this->assertResponseIsSuccessful();
+    $this->assertJsonContains($payload);
+
+    $this->makeGetRequest($iri);
+    $this->assertJsonContains($payload);
+  }
+
+  public function testUpdateMemberRoleNoEmail(): void {
+    $member = MemberFactory::createOne(['club' => _InitStory::club_1(), 'email' => null]);
+    $iri = $this->getIriFromResource($member);
+    $url = $iri . "/role";
+    $payload = [
+      "role" => ClubRole::admin->value
+    ];
+
+    $this->loggedAsAdminClub1();
+    $this->makePatchRequest($url, $payload);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+    $this->assertJsonContains(["detail" => "Member must have an email address."]);
+
   }
 }

@@ -49,7 +49,7 @@ class MemberService {
     }
   }
 
-  public function autolinkMemberWithUser(Member $member): void {
+  public function autolinkMemberWithUser(Member $member, ClubRole $role = ClubRole::member): void {
     if ($member->isSkipAutoSetUserMember()) return;
 
     $email = $member->getEmail();
@@ -67,7 +67,7 @@ class MemberService {
     $userMember = new UserMember()
       ->setUser($user)
       ->setMember($member)
-      ->setRole(ClubRole::member);
+      ->setRole($role);
 
     $this->entityManager->persist($userMember);
     $this->entityManager->flush();

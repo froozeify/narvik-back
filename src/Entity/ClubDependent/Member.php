@@ -14,6 +14,7 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
+use App\Controller\ClubDependent\MemberChangeRole;
 use App\Controller\ClubDependent\MemberImportFromItac;
 use App\Controller\ClubDependent\MemberImportSecondaryClubFromItac;
 use App\Controller\ClubDependent\MemberPhotosImportFromItac;
@@ -25,6 +26,7 @@ use App\Entity\ClubDependent\Plugin\Sale\Sale;
 use App\Entity\File;
 use App\Entity\Interface\ClubLinkedEntityInterface;
 use App\Entity\Trait\SelfClubLinkedEntityTrait;
+use App\Entity\UserMember;
 use App\Enum\ClubRole;
 use App\Filter\CurrentSeasonFilter;
 use App\Filter\MultipleFilter;
@@ -65,6 +67,11 @@ use Symfony\Component\Validator\Constraints as Assert;
     ),
     new Delete(
       security: "is_granted('".ClubRole::admin->value."', object)"
+    ),
+    new Patch(
+      uriTemplate: '/clubs/{clubUuid}/members/{uuid}/role',
+      controller: MemberChangeRole::class,
+      security: "is_granted('".ClubRole::admin->value."', object)",
     ),
 
     new Post(
@@ -213,8 +220,14 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
   #[Groups(['member-read', 'member-presence-read'])]
   private ?MemberSeason $currentSeason = null;
 
+  #[Groups(['member-read', 'member-presence-read'])]
+  private ClubRole|null $role = null;
+
   #[Groups(['autocomplete', 'self-read', 'member-read', 'member-presence-read', 'sale-read'])]
   private ?string $fullName = null;
+
+  #[ORM\OneToOne(mappedBy: 'member', targetEntity: UserMember::class)]
+  private ?UserMember $userMember = null;
 
   #[ORM\OneToMany(mappedBy: 'member', targetEntity: MemberPresence::class, orphanRemoval: true)]
   private Collection $memberPresences;
@@ -326,7 +339,7 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
     return $this->email;
   }
 
-  public function setEmail(string $email): static {
+  public function setEmail(?string $email): static {
     if (empty($email)) {
       $email = null;
     }
@@ -593,6 +606,19 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
       }
     }
     return $this;
+  }
+
+  public function getUserMember(): ?UserMember {
+    return $this->userMember;
+  }
+
+  public function setUserMember(?UserMember $userMember): Member {
+    $this->userMember = $userMember;
+    return $this;
+  }
+
+  public function getRole(): ?ClubRole {
+    return $this->getUserMember()?->getRole();
   }
 
   public function isSkipAutoSetUserMember(): bool {

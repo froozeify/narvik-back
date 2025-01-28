@@ -2,8 +2,10 @@
 
 namespace App\Service;
 
+use App\Entity\ClubDependent\Member;
 use App\Entity\User;
 use App\Entity\UserSecurityCode;
+use App\Enum\ClubRole;
 use App\Enum\UserSecurityCodeTrigger;
 use App\Mailer\EmailService;
 use App\Repository\UserRepository;
@@ -104,5 +106,25 @@ class UserService {
     $this->em->flush();
 
     return true;
+  }
+
+  public function createOrGetFromMember(Member $member): ?User {
+    if (!$member->getEmail()) {
+      return null;
+    }
+
+    $user = $this->userRepository->findOneByEmail($member->getEmail());
+    if (!$user) {
+      $user = new User();
+      $user
+        ->setEmail($member->getEmail())
+        ->setFirstname($member->getFirstname())
+        ->setLastname($member->getLastname())
+        ->setAccountActivated(false);
+      $this->em->persist($user);
+      $this->em->flush();
+    }
+
+    return $user;
   }
 }

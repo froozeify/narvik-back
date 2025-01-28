@@ -25,24 +25,26 @@ class UserRegister extends AbstractController {
 
     $user = $userRepository->findOneByEmail($email);
     if ($user) {
-      throw new HttpException(Response::HTTP_BAD_REQUEST, 'User already registered.');
+      if ($user->isAccountActivated()) {
+        throw new HttpException(Response::HTTP_BAD_REQUEST, 'User already registered.');
+      }
+    } else {
+      $user = new User();
+      $user
+        ->setRole(UserRole::user)
+        ->setEmail($email)
+        ->setFirstname($firstname)
+        ->setlastname($lastname)
+        ->setPlainPassword($password);
+
+      $errors = $validator->validate($user);
+      if (count($errors) > 0) {
+        throw new HttpException(Response::HTTP_BAD_REQUEST, $errors);
+      }
+
+      $em->persist($user);
+      $em->flush();
     }
-
-    $user = new User();
-    $user
-      ->setRole(UserRole::user)
-      ->setEmail($email)
-      ->setFirstname($firstname)
-      ->setlastname($lastname)
-      ->setPlainPassword($password);
-
-    $errors = $validator->validate($user);
-    if (count($errors) > 0) {
-      throw new HttpException(Response::HTTP_BAD_REQUEST, $errors);
-    }
-
-    $em->persist($user);
-    $em->flush();
 
     $initialised = $userService->initiateAccountValidation($user);
     if (!$initialised) {

@@ -245,23 +245,27 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
 
   #[ORM\Column(length: 180, nullable: true)]
   #[Groups(['member-read', 'club-supervisor-write'])]
+  #[Assert\NotBlank()]
   private ?string $email = null;
 
   #[ORM\Column(length: 10, unique: true, nullable: true)]
-  #[Assert\Regex(pattern: '/\d{8,10}/')]
   #[Groups(['autocomplete', 'member-read', 'club-supervisor-write', 'member-presence-read'])]
+  #[Assert\Regex(pattern: '/\d{8,10}/')]
   private ?string $licence = null;
 
   #[ORM\Column(length: 255)]
   #[Groups(['autocomplete', 'member-read', 'club-supervisor-write'])]
+  #[Assert\NotBlank()]
   private ?string $firstname = null;
 
   #[ORM\Column(length: 255)]
   #[Groups(['autocomplete', 'member-read', 'club-supervisor-write'])]
+  #[Assert\NotBlank()]
   private ?string $lastname = null;
 
   #[ORM\Column(length: 1)]
   #[Groups(['member-read', 'club-supervisor-write'])]
+  #[Assert\Choice(['M', 'F'])]
   private string $gender = "M";
 
   #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]

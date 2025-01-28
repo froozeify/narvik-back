@@ -37,6 +37,7 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
     $payload = [
       "firstname" => "firstname",
       "lastname" => "lastname",
+      "email" => "email@email.com", // Multiple member can have same email (i.e: Children with no email, parent email so)
     ];
 
     $payloadCheck = $payload;

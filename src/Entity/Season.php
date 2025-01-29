@@ -3,7 +3,13 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Entity\ClubDependent\MemberSeason;
+use App\Enum\UserRole;
 use App\Repository\SeasonRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -12,6 +18,13 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: SeasonRepository::class)]
 #[ApiResource(
+  operations: [
+    new GetCollection(),
+    new Get(),
+    new Post(security: "is_granted('".UserRole::super_admin->value."')"),
+    new Patch(security: "is_granted('".UserRole::super_admin->value."')",),
+    new Delete(security: "is_granted('".UserRole::super_admin->value."')",),
+  ],
   normalizationContext: [
     'groups' => ['season', 'season-read']
   ],

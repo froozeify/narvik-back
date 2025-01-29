@@ -91,7 +91,6 @@ class ItacMembersMessageHandler implements ResetInterface {
         ->setFirstname($record[ItacCsvHeaderMapping::FIRSTNAME->value])
         ->setBirthday(\DateTime::createFromFormat("d/m/Y", $record[ItacCsvHeaderMapping::BIRTHDAY->value]))
         ->setHandisport($this->toBoolean($record[ItacCsvHeaderMapping::HANDISPORT->value]))
-        ->setDeceased($this->toBoolean($record[ItacCsvHeaderMapping::DECEASED->value]))
 
         ->setPostal1($record[ItacCsvHeaderMapping::POSTAL_1->value])
         ->setPostal2($record[ItacCsvHeaderMapping::POSTAL_2->value])
@@ -99,9 +98,7 @@ class ItacMembersMessageHandler implements ResetInterface {
         ->setCity($record[ItacCsvHeaderMapping::CITY->value])
         ->setCountry($record[ItacCsvHeaderMapping::COUNTRY->value])
 
-        ->setBlacklisted($record[ItacCsvHeaderMapping::BLACKLISTED->value] !== 'Autorisé')
-        ->setLicenceState($record[ItacCsvHeaderMapping::LICENCE_STATE->value])
-        ->setLicenceType($record[ItacCsvHeaderMapping::LICENCE_TYPE->value]);
+        ->setBlacklisted($record[ItacCsvHeaderMapping::BLACKLISTED->value] !== 'Autorisé');
 
       if (is_numeric($record[ItacCsvHeaderMapping::ZIP_CODE->value])) {
         $member

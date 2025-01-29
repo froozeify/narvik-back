@@ -15,7 +15,6 @@ class ImportItacCsvService {
 
   public function __construct(
     private readonly MessageBusInterface $bus,
-    private readonly GlobalSettingService $globalSettingService,
     private readonly ClubService $clubService,
   ) {
   }

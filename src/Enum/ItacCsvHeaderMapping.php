@@ -10,7 +10,6 @@ enum ItacCsvHeaderMapping: string {
   case FIRSTNAME = 'Prénom';
   case BIRTHDAY = 'Date de naissance';
   case HANDISPORT = 'Handisport';
-  case DECEASED = 'Décédé';
 
 
   case POSTAL_1 = 'Adresse 1';
@@ -27,8 +26,6 @@ enum ItacCsvHeaderMapping: string {
 
 
   case BLACKLISTED = 'Etat (Blacklistage)'; // Autorisé
-  case LICENCE_STATE = 'Etat de la licence'; // ?
-  case LICENCE_TYPE = 'Type de licence'; // R
   case SEASON = 'Saison';
   case AGE_CODE = 'Code catégorie d\'âge'; // S3
   case AGE_CATEGORY = 'Catégorie d\'âge'; // Senior 3

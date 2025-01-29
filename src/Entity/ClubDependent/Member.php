@@ -276,10 +276,6 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
   #[Groups(['member-read', 'club-admin-write'])]
   private bool $handisport = false;
 
-  #[ORM\Column]
-  #[Groups(['member-read', 'club-admin-write'])]
-  private bool $deceased = false;
-
   #[ORM\Column(length: 255, nullable: true)]
   #[Groups(['member-read', 'club-supervisor-write'])]
   private ?string $postal1 = null;
@@ -315,13 +311,6 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
   #[ORM\Column]
   #[Groups(['club-admin-read', 'club-admin-write'])]
   private bool $blacklisted = false;
-
-  #[ORM\Column(length: 255, nullable: true)]
-  #[Groups(['club-admin-read', 'club-admin-write'])]
-  private ?string $licenceState = null;
-
-  #[ORM\Column(length: 1)]
-  private string $licenceType = "C";
 
   public function __construct() {
     parent::__construct();
@@ -435,15 +424,6 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
     return $this;
   }
 
-  public function isDeceased(): bool {
-    return $this->deceased;
-  }
-
-  public function setDeceased(bool $deceased): Member {
-    $this->deceased = $deceased;
-    return $this;
-  }
-
   public function getPostal1(): ?string {
     return $this->postal1;
   }
@@ -522,24 +502,6 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
 
   public function setBlacklisted(bool $blacklisted): Member {
     $this->blacklisted = $blacklisted;
-    return $this;
-  }
-
-  public function getLicenceState(): ?string {
-    return $this->licenceState;
-  }
-
-  public function setLicenceState(?string $licenceState): Member {
-    $this->licenceState = $licenceState;
-    return $this;
-  }
-
-  public function getLicenceType(): string {
-    return $this->licenceType;
-  }
-
-  public function setLicenceType(string $licenceType): Member {
-    $this->licenceType = $licenceType;
     return $this;
   }
 

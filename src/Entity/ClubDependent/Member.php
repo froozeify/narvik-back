@@ -245,7 +245,7 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
 
   #[ORM\Column(length: 180, nullable: true)]
   #[Groups(['member-read', 'club-supervisor-write'])]
-  #[Assert\NotBlank()]
+  #[Assert\NotBlank(allowNull: false)]
   private ?string $email = null;
 
   #[ORM\Column(length: 10, unique: true, nullable: true)]
@@ -255,12 +255,12 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
 
   #[ORM\Column(length: 255)]
   #[Groups(['autocomplete', 'member-read', 'club-supervisor-write'])]
-  #[Assert\NotBlank()]
+  #[Assert\NotBlank(allowNull: false)]
   private ?string $firstname = null;
 
   #[ORM\Column(length: 255)]
   #[Groups(['autocomplete', 'member-read', 'club-supervisor-write'])]
-  #[Assert\NotBlank()]
+  #[Assert\NotBlank(allowNull: false)]
   private ?string $lastname = null;
 
   #[ORM\Column(length: 1)]

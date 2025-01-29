@@ -20,7 +20,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: MemberSeasonRepository::class)]
-#[UniqueEntity(fields: ['season', 'member'], message: 'Season already registered for that member')]
+#[UniqueEntity(fields: ['season', 'member'], message: 'Season already registered for that member.')]
 #[ApiResource(
   uriTemplate: '/clubs/{clubUuid}/members/{memberUuid}/seasons/{uuid}',
   operations: [

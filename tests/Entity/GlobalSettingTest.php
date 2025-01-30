@@ -8,7 +8,7 @@ use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Story\GlobalSettingStory;
 
 class GlobalSettingTest extends AbstractEntityTestCase {
-  protected int $TOTAL_SUPER_ADMIN = 4;
+  protected int $TOTAL_SUPER_ADMIN = 7;
 
   protected function getClassname(): string {
     return GlobalSetting::class;

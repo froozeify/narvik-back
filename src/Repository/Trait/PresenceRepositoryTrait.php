@@ -22,19 +22,23 @@ trait PresenceRepositoryTrait {
     return $qb;
   }
 
-  private function applyActivityExclusionConstraint(QueryBuilder $qb): void {
-    // FIXME: Change it to get the value from clubsettings
-    $ignoredActivities = $this->globalSettingService->getSettingValue(GlobalSetting::IGNORED_ACTIVITIES_OPENING_STATS);
-    if ($ignoredActivities) {
-      $ids = array_values(json_decode($ignoredActivities, true));
-      if (empty($ids)) {
-        return;
-      }
+  private function applyActivityExclusionConstraint(?Club $club, QueryBuilder $qb): void {
+    if ($club) {
+      $this->applyClubRestriction($qb, $club);
 
-      $qb->leftJoin('m.activities', 'mpa')
-         ->andWhere($qb->expr()->notIn("mpa.id", ":ids"))
-         ->setParameter("ids", $ids)
-      ;
+      // FIXME: Change it to get the value from clubsettings
+      $ignoredActivities = $this->globalSettingService->getSettingValue(GlobalSetting::IGNORED_ACTIVITIES_OPENING_STATS);
+      if ($ignoredActivities) {
+        $ids = array_values(json_decode($ignoredActivities, true));
+        if (empty($ids)) {
+          return;
+        }
+
+        $qb->leftJoin('m.activities', 'mpa')
+           ->andWhere($qb->expr()->notIn("mpa.id", ":ids"))
+           ->setParameter("ids", $ids)
+        ;
+      }
     }
   }
 
@@ -67,12 +71,15 @@ trait PresenceRepositoryTrait {
    *                        METRICS
    *********************************************************/
 
-  public function countTotalPresencesYearlyUntilDate(\DateTime $maxDate): int {
+  public function countTotalPresencesYearlyUntilDate(?Club $club,\DateTime $maxDate): int {
     $startYear = (new \DateTime())
       ->setDate((int) $maxDate->format("Y"), 1, 1)
       ->setTime(0, 0, 0);
 
     $qb = $this->createQueryBuilder("m");
+    if ($club) {
+      $this->applyClubRestriction($qb, $club);
+    }
     return $qb
       ->select($qb->expr()->count("m.id"))
       ->andWhere($qb->expr()->between("m.date", ":from", ":to"))
@@ -81,13 +88,13 @@ trait PresenceRepositoryTrait {
       ->getQuery()->getSingleScalarResult();
   }
 
-  public function countNumberOfPresenceDaysYearlyUntilDate(\DateTime $maxDate): int {
+  public function countNumberOfPresenceDaysYearlyUntilDate(?Club $club, \DateTime $maxDate): int {
     $startYear = (new \DateTime())
       ->setDate((int) $maxDate->format("Y"), 1, 1)
       ->setTime(0, 0, 0);
 
     $qb = $this->createQueryBuilder("m");
-    $this->applyActivityExclusionConstraint($qb);
+    $this->applyActivityExclusionConstraint($club, $qb);
 
     return $qb
       ->select($qb->expr()->countDistinct("m.date"))
@@ -97,41 +104,47 @@ trait PresenceRepositoryTrait {
       ->getQuery()->getSingleScalarResult();
   }
 
-  public function countTotalPresencesYearlyUntilToday(): int {
-    return $this->countTotalPresencesYearlyUntilDate(new \DateTime());
+  public function countTotalPresencesYearlyUntilToday(?Club $club): int {
+    return $this->countTotalPresencesYearlyUntilDate($club, new \DateTime());
   }
 
-  public function countTotalPresencesYearlyForPreviousYear(): int {
+  public function countTotalPresencesYearlyForPreviousYear(?Club $club): int {
     $lastYear = new \DateTime();
     $lastYear->setDate((int) $lastYear->format("Y") - 1, $lastYear->format("m"), $lastYear->format("d"));
 
-    return $this->countTotalPresencesYearlyUntilDate($lastYear);
+    return $this->countTotalPresencesYearlyUntilDate($club, $lastYear);
   }
 
-  public function countTotalPresences(): int {
+  public function countTotalPresences(?Club $club): int {
     $qb = $this->createQueryBuilder("m");
+    if ($club) {
+      $this->applyClubRestriction($qb, $club);
+    }
     return $qb
       ->select($qb->expr()->count("m.id"))
       ->getQuery()->getSingleScalarResult();
   }
 
-  public function countNumberOfPresenceDaysYearlyUntilToday(): int {
-    return $this->countNumberOfPresenceDaysYearlyUntilDate(new \DateTime());
+  public function countNumberOfPresenceDaysYearlyUntilToday(?Club $club): int {
+    return $this->countNumberOfPresenceDaysYearlyUntilDate($club, new \DateTime());
   }
 
-  public function countNumberOfPresenceDaysYearlyForPreviousYear(): int {
+  public function countNumberOfPresenceDaysYearlyForPreviousYear(?Club $club): int {
     $lastYear = new \DateTime();
     $lastYear->setDate((int) $lastYear->format("Y") - 1, $lastYear->format("m"), $lastYear->format("d"));
 
-    return $this->countNumberOfPresenceDaysYearlyUntilDate($lastYear);
+    return $this->countNumberOfPresenceDaysYearlyUntilDate($club, $lastYear);
   }
 
-  public function countPresencesPerActivitiesYearlyUntilDate(\DateTime $maxDate) {
+  public function countPresencesPerActivitiesYearlyUntilDate(?Club $club, \DateTime $maxDate) {
     $startYear = (new \DateTime())
       ->setDate((int) $maxDate->format("Y"), 1, 1)
       ->setTime(0, 0, 0);
 
     $qb = $this->createQueryBuilder("m");
+    if ($club) {
+      $this->applyClubRestriction($qb, $club);
+    }
     return $qb
       ->select("a.name")
       ->addSelect($qb->expr()->count("a.name") . ' AS total')
@@ -145,13 +158,13 @@ trait PresenceRepositoryTrait {
       ->getQuery()->getResult();
   }
 
-  public function countPresencesPerActivitiesYearlyUntilToday() {
-    return $this->countPresencesPerActivitiesYearlyUntilDate(new \DateTime());
+  public function countPresencesPerActivitiesYearlyUntilToday(?Club $club) {
+    return $this->countPresencesPerActivitiesYearlyUntilDate($club, new \DateTime());
   }
 
-  public function countPresencesPerActivitiesYearlyForPreviousYear() {
+  public function countPresencesPerActivitiesYearlyForPreviousYear(?Club $club) {
     $lastYear = new \DateTime();
     $lastYear->setDate((int) $lastYear->format("Y") - 1, $lastYear->format("m"), $lastYear->format("d"));
-    return $this->countPresencesPerActivitiesYearlyUntilDate($lastYear);
+    return $this->countPresencesPerActivitiesYearlyUntilDate($club, $lastYear);
   }
 }

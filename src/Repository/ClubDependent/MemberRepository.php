@@ -147,13 +147,14 @@ class MemberRepository extends ServiceEntityRepository implements ClubLinkedInte
     return $query->getResult();
   }
 
-  public function countTotalClubMembers(Club $club): int {
+  public function countTotalClubMembers(?Club $club): int {
     $qb = $this->createQueryBuilder("m");
+    if ($club) {
+      $this->applyClubRestriction($qb, $club);
+    }
     return $qb
       ->select($qb->expr()->count("m.id"))
       ->andWhere($qb->expr()->isNotNull("m.licence"))
-      ->andWhere('m.club = :club')
-      ->setParameter('club', $club)
       ->getQuery()->getSingleScalarResult();
   }
 }

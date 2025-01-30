@@ -2,9 +2,11 @@
 
 namespace App\Repository\ClubDependent;
 
+use App\Entity\Club;
 use App\Entity\ClubDependent\Member;
 use App\Entity\ClubDependent\MemberSeason;
 use App\Entity\Season;
+use App\Repository\Trait\ClubLinkedTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -17,12 +19,17 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method MemberSeason[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class MemberSeasonRepository extends ServiceEntityRepository {
+  use ClubLinkedTrait;
+
   public function __construct(ManagerRegistry $registry) {
     parent::__construct($registry, MemberSeason::class);
   }
 
-  public function countTotalMembersForSeason(Season $season): int {
+  public function countTotalMembersForSeason(?Club $club, Season $season): int {
     $qb = $this->createQueryBuilder("m");
+    if ($club) {
+      $this->applyClubRestriction($qb, $club);
+    }
     return $qb
       ->select($qb->expr()->count("m.id"))
       ->andWhere("m.season = :season")
@@ -30,16 +37,16 @@ class MemberSeasonRepository extends ServiceEntityRepository {
       ->getQuery()->getSingleScalarResult();
   }
 
-  public function countTotalMembersForThisSeason(): int {
+  public function countTotalMembersForThisSeason(?Club $club): int {
     $currentSeason = $this->getEntityManager()->getRepository(Season::class)->findCurrentSeason();
     if (!$currentSeason) return 0;
-    return $this->countTotalMembersForSeason($currentSeason);
+    return $this->countTotalMembersForSeason($club, $currentSeason);
   }
 
-  public function countTotalMembersForPreviousSeason(): int {
+  public function countTotalMembersForPreviousSeason(?Club $club): int {
     $currentSeason = $this->getEntityManager()->getRepository(Season::class)->findPreviousSeason();
     if (!$currentSeason) return 0;
-    return $this->countTotalMembersForSeason($currentSeason);
+    return $this->countTotalMembersForSeason($club, $currentSeason);
   }
 
   public function findOneByMemberAndSeason(Member $member, Season $season): ?MemberSeason {

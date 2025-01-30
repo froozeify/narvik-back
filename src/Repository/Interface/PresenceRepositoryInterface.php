@@ -13,15 +13,15 @@ interface PresenceRepositoryInterface {
    *                        METRICS
    *********************************************************/
 
-  public function countTotalPresencesYearlyUntilDate(\DateTime $maxDate): int;
-  public function countNumberOfPresenceDaysYearlyUntilDate(\DateTime $maxDate): int;
-  public function countTotalPresencesYearlyUntilToday(): int;
-  public function countTotalPresencesYearlyForPreviousYear(): int;
-  public function countTotalPresences(): int;
-  public function countNumberOfPresenceDaysYearlyUntilToday(): int;
-  public function countNumberOfPresenceDaysYearlyForPreviousYear(): int;
-  public function countPresencesPerActivitiesYearlyUntilDate(\DateTime $maxDate);
-  public function countPresencesPerActivitiesYearlyUntilToday();
-  public function countPresencesPerActivitiesYearlyForPreviousYear();
+  public function countTotalPresencesYearlyUntilDate(?Club $club, \DateTime $maxDate): int;
+  public function countNumberOfPresenceDaysYearlyUntilDate(?Club $club, \DateTime $maxDate): int;
+  public function countTotalPresencesYearlyUntilToday(?Club $club): int;
+  public function countTotalPresencesYearlyForPreviousYear(?Club $club): int;
+  public function countTotalPresences(?Club $club): int;
+  public function countNumberOfPresenceDaysYearlyUntilToday(?Club $club): int;
+  public function countNumberOfPresenceDaysYearlyForPreviousYear(?Club $club): int;
+  public function countPresencesPerActivitiesYearlyUntilDate(?Club $club, \DateTime $maxDate);
+  public function countPresencesPerActivitiesYearlyUntilToday(?Club $club);
+  public function countPresencesPerActivitiesYearlyForPreviousYear(?Club $club);
 
 }

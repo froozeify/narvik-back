@@ -16,7 +16,6 @@ Badger login route `POST /auth/bdg/{token}` change for
 
 ```http
 POST /auth/bdg
-Content-Type: application/merge-patch+json
 
 {
   "token": "{token}",

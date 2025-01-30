@@ -60,7 +60,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     ),
 
     new Get(
-      security: "is_granted('".ClubRole::supervisor->value."', object)",
+      security: "is_granted('".ClubRole::supervisor->value."', object) || is_granted('".ClubRole::badger->value."', object)",
     ),
     new Patch(
       security: "is_granted('".ClubRole::supervisor->value."', object)",

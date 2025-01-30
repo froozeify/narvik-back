@@ -194,7 +194,7 @@ use Symfony\Component\Validator\Constraints as Assert;
   ],
 )]
 #[ApiFilter(ExistsFilter::class, properties: ['licence'])]
-#[ApiFilter(SearchFilter::class, properties: ['role' => 'exact'])]
+#[ApiFilter(SearchFilter::class, properties: ['userMember.role' => 'exact'])]
 #[ApiFilter(OrderFilter::class, properties: ['lastname' => 'ASC', 'firstname' => 'ASC'])]
 #[ApiFilter(MultipleFilter::class, properties: ['firstname', 'lastname', 'licence'])]
 #[ApiFilter(CurrentSeasonFilter::class, properties: ['memberSeasons.season'])]

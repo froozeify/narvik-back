@@ -7,9 +7,13 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\OpenApi\Model;
+use App\Controller\ClubDependent\ClubSettingImportLogo;
 use App\Entity\Abstract\UuidEntity;
 use App\Entity\Club;
 use App\Entity\ClubDependent\Plugin\Presence\Activity;
+use App\Entity\File;
 use App\Entity\Interface\ClubLinkedEntityInterface;
 use App\Enum\ClubRole;
 use App\Repository\ClubDependent\ClubSettingRepository;
@@ -26,7 +30,33 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[UniqueEntity(fields: ['club'])]
 #[ApiResource(uriTemplate: '/clubs/{clubUuid}/settings/{uuid}.{_format}', operations: [
     new Get(),
-    new Patch(security: "is_granted('" . ClubRole::admin->value . "', object)",),
+    new Patch(security: "is_granted('" . ClubRole::admin->value . "', object)"),
+
+    new Post(
+      uriTemplate: '//clubs/{clubUuid}/settings/{uuid}/logo',
+      controller: ClubSettingImportLogo::class,
+      openapi: new Model\Operation(
+        requestBody: new Model\RequestBody(
+          content: new \ArrayObject([
+            'multipart/form-data' => [
+              'schema' => [
+                'type' => 'object',
+                'properties' => [
+                  'file' => [
+                    'type' => 'string',
+                    'format' => 'binary'
+                  ]
+                ]
+              ]
+            ]
+          ])
+        )
+      ),
+      securityPostDenormalize: "is_granted('".ClubRole::admin->value."', request)",
+      read: false,
+      deserialize: false,
+    )
+
   ], uriVariables: [
     'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
     'uuid'     => new Link(fromClass: self::class),
@@ -43,6 +73,11 @@ class ClubSetting extends UuidEntity implements ClubLinkedEntityInterface {
   #[ORM\OneToOne(inversedBy: 'settings', targetEntity: Club::class)]
   #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
   private ?Club $club = null;
+
+  #[ORM\OneToOne(targetEntity: File::class)]
+  #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+  #[Groups(['club-setting-read'])]
+  private ?File $logo = null;
 
   #[ORM\OneToOne(targetEntity: Activity::class)]
   #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
@@ -180,5 +215,14 @@ class ClubSetting extends UuidEntity implements ClubLinkedEntityInterface {
   public function removeExcludedActivitiesFromOpeningDay(Activity $excludedActivitiesFromOpeningDay): ClubSetting {
       $this->excludedActivitiesFromOpeningDays->removeElement($excludedActivitiesFromOpeningDay);
       return $this;
+  }
+
+  public function getLogo(): ?File {
+    return $this->logo;
+  }
+
+  public function setLogo(?File $logo): ClubSetting {
+    $this->logo = $logo;
+    return $this;
   }
 }

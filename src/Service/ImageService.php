@@ -9,6 +9,7 @@ use App\Enum\FileCategory;
 use App\Repository\ClubDependent\MemberRepository;
 use App\Repository\FileRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use phpDocumentor\Reflection\DocBlock\Tags\Example;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -56,6 +57,24 @@ class ImageService {
     }
 
     return new File($path);
+  }
+
+  public function importClubLogo(Club $club, UploadedFile $file): void {
+    $clubSettings = $club->getSettings();
+    if (!$clubSettings) return;
+
+    // We remove all old profile images
+    $oldPictures = $this->fileRepository->findByClubAndCategory($club, FileCategory::logo);
+    foreach ($oldPictures as $oldPicture) {
+      $this->entityManager->remove($oldPicture);
+    }
+
+    $dbFile = $this->fileService->importFile($file, $file->getFilename(), FileCategory::logo, isPublic: true, club: $club, flush: false);
+
+    $clubSettings->setLogo($dbFile);
+    $this->entityManager->persist($clubSettings);
+
+    $this->entityManager->flush();
   }
 
   public function importItacPhotos(Club $club, UploadedFile $file): void {

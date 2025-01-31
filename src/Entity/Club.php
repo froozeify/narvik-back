@@ -43,8 +43,6 @@ class Club extends UuidEntity implements TimestampEntityInterface {
   #[Assert\NotBlank]
   private ?string $name = null;
 
-  // TODO: Add club logo field
-
   #[ORM\Column(options: ['default' => false])]
   #[Groups(['club-read', 'super-admin-write'])]
   #[ApiProperty(security: "is_granted('".ClubRole::supervisor->value."', object)")] // Property can be read by club admin/supervisor

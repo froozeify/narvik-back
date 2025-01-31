@@ -8,6 +8,7 @@ use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Factory\ClubFactory;
 use App\Tests\Story\_InitStory;
 use App\Tests\Story\ActivityStory;
+use App\Tests\Story\SalePaymentModeStory;
 use Zenstruck\Foundry\Persistence\Proxy;
 
 class ClubTest extends AbstractEntityTestCase {
@@ -150,4 +151,81 @@ class ClubTest extends AbstractEntityTestCase {
       $this->assertJsonNotHasKey('badgerToken', $response);
     }
   }
+
+  public function testClubDisabledReadOnly(): void {
+    $club1 = _InitStory::club_1();
+    $clubSettingIri = $this->getIriFromResource($club1->getSettings());
+
+    $iris = [];
+    foreach (ActivityStory::getRandomRange('activities_club1', 1, 5) as $actvt) {
+      $iris[] = $this->getIriFromResource($actvt);
+    }
+    $payload = [
+      'excludedActivitiesFromOpeningDays' => $iris,
+    ];
+
+    $this->loggedAsAdminClub1();
+    $this->makePatchRequest($clubSettingIri, $payload);
+    $this->assertResponseIsSuccessful();
+
+    // We disable the club, the patch should be denied
+    $this->loggedAsSuperAdmin();
+    $this->makePatchRequest($this->getIriFromResource($club1), ['isActivated' => false]);
+    $this->assertResponseIsSuccessful();
+    $this->assertJsonContains([
+      "isActivated" => false,
+    ]);
+
+    $this->loggedAsAdminClub1();
+    $this->makeGetRequest($clubSettingIri);
+    $this->assertResponseIsSuccessful(); // Read only
+
+    $this->makePatchRequest($clubSettingIri, $payload);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::locked->value);
+    $this->assertJsonContains([
+      "detail" => "Club not activated.",
+    ]);
+
+    // Super admin can still do whatever he wants
+    $this->loggedAsSuperAdmin();
+    $this->makePatchRequest($clubSettingIri, $payload);
+    $this->assertResponseIsSuccessful();
+  }
+
+  public function testClubSalesDisabled(): void {
+    $club1 = _InitStory::club_1();
+    $paymentMode = $this->getIriFromResource(SalePaymentModeStory::getRandom('default'));
+
+    $payload = [
+      'name' => 'test',
+    ];
+
+    $this->loggedAsAdminClub1();
+    $this->makePatchRequest($paymentMode, $payload);
+    $this->assertResponseIsSuccessful();
+
+    // We disable the club, the patch should be denied
+    $this->loggedAsSuperAdmin();
+    $this->makePatchRequest($this->getIriFromResource($club1), ['salesEnabled' => false]);
+    $this->assertResponseIsSuccessful();
+    $this->assertJsonContains([
+      "salesEnabled" => false,
+    ]);
+
+    $this->loggedAsAdminClub1();
+    $this->makeGetRequest($paymentMode);
+    $this->assertResponseIsSuccessful(); // Read only
+
+    $this->makePatchRequest($paymentMode, $payload);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::locked->value);
+    $this->assertJsonContains([
+      "detail" => "Sales plugin not activated.",
+    ]);
+
+    // Super admin can still do whatever he wants
+    $this->loggedAsSuperAdmin();
+    $this->makePatchRequest($paymentMode, $payload);
+    $this->assertResponseIsSuccessful();
+  }
+
 }

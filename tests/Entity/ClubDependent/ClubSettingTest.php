@@ -27,7 +27,7 @@ class ClubSettingTest extends AbstractTestCase {
     return $this->getIriFromResource($club->getSettings());
   }
 
-  public function testImportogo(): void {
+  public function testImportLogo(): void {
     $club = _InitStory::club_1();
 
     $this->loggedAsAdminClub1();
@@ -92,6 +92,5 @@ class ClubSettingTest extends AbstractTestCase {
     $this->assertResponseIsSuccessful();
     $responseArray = $response->toArray();
     $this->assertArrayNotHasKey("logo", $responseArray);
-
   }
 }

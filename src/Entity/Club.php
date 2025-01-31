@@ -57,7 +57,7 @@ class Club extends UuidEntity implements TimestampEntityInterface {
 
   #[ORM\Column(length: 255, nullable: true)]
   #[Groups(['club-read', 'club-admin-write'])]
-  #[ApiProperty(securityPostDenormalize: "is_granted('".ClubRole::admin->value."', object)")] // Property only viewable & writable by the club admin
+  #[ApiProperty(security: "is_granted('".ClubRole::admin->value."', object)")] // Property only viewable & writable by the club admin
   private ?string $badgerToken = null;
 
   #[ORM\OneToOne(mappedBy: 'club', targetEntity: ClubSetting::class, cascade: ['persist', 'remove'], orphanRemoval: true)]

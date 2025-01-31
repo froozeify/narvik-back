@@ -48,7 +48,7 @@ class Club extends UuidEntity implements TimestampEntityInterface {
   #[ORM\Column(options: ['default' => true])]
   #[Groups(['club-read', 'super-admin-write'])]
   #[ApiProperty(securityPostDenormalize: "is_granted('".ClubRole::supervisor->value."', object)")] // Property can be read by club admin/supervisor
-  private bool $isActivated = false;
+  private bool $isActivated = true;
 
   #[ORM\Column(options: ['default' => false])]
   #[Groups(['club-read', 'super-admin-write'])]

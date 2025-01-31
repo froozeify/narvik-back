@@ -203,11 +203,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUserInterface {
   private bool $skipAutoSetUserMember = false;
 
-  #[ORM\Column(type: "string", nullable: true)]
-  #[Assert\NotBlank(allowNull: true)]
-  #[Groups(['user'])]
-  private ?string $profileImage = null;
-
   #[Groups(['autocomplete', 'user-read', 'member-read'])]
   private ?string $fullName = null;
 

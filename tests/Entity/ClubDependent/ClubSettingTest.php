@@ -76,5 +76,22 @@ class ClubSettingTest extends AbstractTestCase {
     $this->logout();
     $this->makeGetRequest($responseArray["logo"]['publicUrl']);
     $this->assertResponseIsSuccessful();
+
+
+    // We remove the logo
+    $this->loggedAsAdminClub1();
+    $this->makePostRequest($this->getRootUrl($club) . "/logo", [
+      '_not_json' => true,
+      'headers' => ['Content-Type' => 'multipart/form-data'],
+      'extra' => [
+      ],
+    ]);
+    $this->assertResponseIsSuccessful();
+
+    $response = $this->makeGetRequest($this->getRootUrl($club));
+    $this->assertResponseIsSuccessful();
+    $responseArray = $response->toArray();
+    $this->assertArrayNotHasKey("logo", $responseArray);
+
   }
 }

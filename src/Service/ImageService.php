@@ -59,7 +59,7 @@ class ImageService {
     return new File($path);
   }
 
-  public function importClubLogo(Club $club, UploadedFile $file): void {
+  public function importClubLogo(Club $club, ?UploadedFile $file): void {
     $clubSettings = $club->getSettings();
     if (!$clubSettings) return;
 
@@ -69,7 +69,11 @@ class ImageService {
       $this->entityManager->remove($oldPicture);
     }
 
-    $dbFile = $this->fileService->importFile($file, $file->getFilename(), FileCategory::logo, isPublic: true, club: $club, flush: false);
+    if (!$file) {
+      $dbFile = null;
+    } else {
+      $dbFile = $this->fileService->importFile($file, $file->getFilename(), FileCategory::logo, isPublic: true, club: $club, flush: false);
+    }
 
     $clubSettings->setLogo($dbFile);
     $this->entityManager->persist($clubSettings);

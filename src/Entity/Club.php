@@ -45,6 +45,11 @@ class Club extends UuidEntity implements TimestampEntityInterface {
   #[Assert\NotBlank]
   private ?string $name = null;
 
+  #[ORM\Column(options: ['default' => true])]
+  #[Groups(['club-read', 'super-admin-write'])]
+  #[ApiProperty(securityPostDenormalize: "is_granted('".ClubRole::supervisor->value."', object)")] // Property can be read by club admin/supervisor
+  private bool $isActivated = false;
+
   #[ORM\Column(options: ['default' => false])]
   #[Groups(['club-read', 'super-admin-write'])]
   #[ApiProperty(securityPostDenormalize: "is_granted('".ClubRole::supervisor->value."', object)")] // Property can be read by club admin/supervisor
@@ -71,6 +76,15 @@ class Club extends UuidEntity implements TimestampEntityInterface {
 
   public function setName(string $name): static {
     $this->name = $name;
+    return $this;
+  }
+
+  public function getIsActivated(): bool {
+    return $this->isActivated;
+  }
+
+  public function setIsActivated(bool $isActivated): Club {
+    $this->isActivated = $isActivated;
     return $this;
   }
 

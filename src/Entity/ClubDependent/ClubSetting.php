@@ -101,24 +101,24 @@ class ClubSetting extends UuidEntity implements ClubLinkedEntityInterface {
   #[ORM\Column(options: ['default' => 0])]
   #[Groups(['club-setting-read'])]
   #[Assert\NotBlank]
-  #[ApiProperty(security: "is_granted('".ClubRole::admin->value."', object)")] // Property can be read by club admin
+  #[ApiProperty(securityPostDenormalize: "is_granted('".ClubRole::admin->value."', object)")] // Property can be read by club admin
   private int $itacImportRemaining = 0;
 
   #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
   #[Groups(['club-setting-read'])]
-  #[ApiProperty(security: "is_granted('".ClubRole::admin->value."', object)")] // Property can be read by club admin
+  #[ApiProperty(securityPostDenormalize: "is_granted('".ClubRole::admin->value."', object)")] // Property can be read by club admin
   private ?\DateTimeImmutable $itacSecondaryImportDate = null;
 
   #[ORM\Column(options: ['default' => 0])]
   #[Groups(['club-setting-read'])]
   #[Assert\NotBlank]
-  #[ApiProperty(security: "is_granted('".ClubRole::admin->value."', object)")] // Property can be read by club admin
+  #[ApiProperty(securityPostDenormalize: "is_granted('".ClubRole::admin->value."', object)")] // Property can be read by club admin
   private int $itacSecondaryImportRemaining = 0;
 
   #[ORM\Column(options: ['default' => 0])]
   #[Groups(['club-setting-read'])]
   #[Assert\NotBlank]
-  #[ApiProperty(security: "is_granted('".ClubRole::admin->value."', object)")] // Property can be read by club admin
+  #[ApiProperty(securityPostDenormalize: "is_granted('".ClubRole::admin->value."', object)")] // Property can be read by club admin
   private int $cerbereImportRemaining = 0;
 
   public function __construct() {

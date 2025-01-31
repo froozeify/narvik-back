@@ -17,6 +17,7 @@ use App\Entity\Interface\TimestampEntityInterface;
 use App\Entity\Trait\TimestampTrait;
 use App\Enum\ClubRole;
 use App\Enum\UserRole;
+use App\Filter\MultipleFilter;
 use App\Repository\ClubRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -35,6 +36,7 @@ use Symfony\Component\Validator\Constraints as Assert;
   'groups' => ['club', 'club-write'],
 ], order: ['name' => 'ASC'],)]
 #[ApiFilter(OrderFilter::class, properties: ['name' => 'ASC', 'createdAt' => 'DESC'])]
+#[ApiFilter(MultipleFilter::class, properties: ['name'])]
 class Club extends UuidEntity implements TimestampEntityInterface {
   use TimestampTrait;
 
@@ -45,12 +47,12 @@ class Club extends UuidEntity implements TimestampEntityInterface {
 
   #[ORM\Column(options: ['default' => false])]
   #[Groups(['club-read', 'super-admin-write'])]
-  #[ApiProperty(security: "is_granted('".ClubRole::supervisor->value."', object)")] // Property can be read by club admin/supervisor
+  #[ApiProperty(securityPostDenormalize: "is_granted('".ClubRole::supervisor->value."', object)")] // Property can be read by club admin/supervisor
   private bool $salesEnabled = false;
 
   #[ORM\Column(length: 255, nullable: true)]
   #[Groups(['club-read', 'club-admin-write'])]
-  #[ApiProperty(security: "is_granted('".ClubRole::admin->value."', object)")] // Property only viewable & writable by the club admin
+  #[ApiProperty(securityPostDenormalize: "is_granted('".ClubRole::admin->value."', object)")] // Property only viewable & writable by the club admin
   private ?string $badgerToken = null;
 
   #[ORM\OneToOne(mappedBy: 'club', targetEntity: ClubSetting::class, cascade: ['persist', 'remove'], orphanRemoval: true)]

@@ -60,6 +60,11 @@ class Club extends UuidEntity implements TimestampEntityInterface {
   #[ApiProperty(security: "is_granted('".ClubRole::admin->value."', object)")] // Property only viewable & writable by the club admin
   private ?string $badgerToken = null;
 
+  #[ORM\Column(length: 255, nullable: true)]
+  #[Groups(['super-admin-read', 'super-admin-write'])]
+  #[Assert\NotBlank(allowNull: true)]
+  private ?string $comment = null;
+
   #[ORM\OneToOne(mappedBy: 'club', targetEntity: ClubSetting::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
   #[Groups(['club-read'])]
   #[ApiProperty(security: "is_granted('".ClubRole::supervisor->value."', object)")] // Property can be read by club admin/supervisor
@@ -104,6 +109,15 @@ class Club extends UuidEntity implements TimestampEntityInterface {
   public function setBadgerToken(?string $badgerToken): static {
       $this->badgerToken = $badgerToken;
       return $this;
+  }
+
+  public function getComment(): ?string {
+    return $this->comment;
+  }
+
+  public function setComment(?string $comment): Club {
+    $this->comment = $comment;
+    return $this;
   }
 
   public function getSettings(): ?ClubSetting {

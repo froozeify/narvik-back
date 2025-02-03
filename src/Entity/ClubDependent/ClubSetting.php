@@ -96,6 +96,7 @@ class ClubSetting extends UuidEntity implements ClubLinkedEntityInterface {
 
   #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
   #[Groups(['club-setting-read'])]
+  #[ApiProperty(security: "is_granted('".ClubRole::admin->value."', object)")] // Property can be read by club admin
   private ?\DateTimeImmutable $itacImportDate = null;
 
   #[ORM\Column(options: ['default' => 0])]

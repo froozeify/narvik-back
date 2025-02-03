@@ -67,7 +67,6 @@ class Club extends UuidEntity implements TimestampEntityInterface {
 
   #[ORM\OneToOne(mappedBy: 'club', targetEntity: ClubSetting::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
   #[Groups(['club-read'])]
-  #[ApiProperty(security: "is_granted('".ClubRole::supervisor->value."', object)")] // Property can be read by club admin/supervisor
   private ?ClubSetting $settings = null;
 
   public function __construct() {

@@ -10,6 +10,7 @@ use App\Enum\UserRole;
 use App\Service\RequestService;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -19,6 +20,7 @@ class ClubVoter extends Voter {
 
   public function __construct(
     private readonly Security $security,
+    private readonly RequestStack $requestStack,
     private readonly RequestService $requestService,
   ) {
   }
@@ -37,7 +39,7 @@ class ClubVoter extends Voter {
   }
 
   protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool {
-    $selectedProfile = null;
+    $selectedProfile = $this->requestService->getSelectedProfileFromRequest($this->requestStack->getCurrentRequest());
     if ($subject instanceof Request) {
       $selectedProfile = $this->requestService->getSelectedProfileFromRequest($subject);
       $subject = $this->requestService->getClubFromRequest($subject);

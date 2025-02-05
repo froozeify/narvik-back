@@ -61,13 +61,14 @@ class UserService {
     $user
       ->setAccountActivated(true)
       ->setFirstname($firstname)
-      ->setlastname($lastname)
-      ->setPlainPassword($password);
+      ->setlastname($lastname);
 
     $errors = $this->validator->validate($user);
     if (count($errors) > 0) {
       throw new HttpException(Response::HTTP_BAD_REQUEST, $errors);
     }
+
+    $this->changeUserPassword($user, $password, false);
 
     $this->em->persist($user);
     $this->em->flush();

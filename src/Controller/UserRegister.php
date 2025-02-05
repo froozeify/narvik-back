@@ -26,13 +26,18 @@ class UserRegister extends AbstractController {
       throw new HttpException(Response::HTTP_BAD_REQUEST);
     }
 
-    $validated = $userService->validateSecurityCode($user, UserSecurityCodeTrigger::accountValidation, $securityCode);
+    $validated = $userService->validateSecurityCode($user, UserSecurityCodeTrigger::accountValidation, $securityCode, false);
     if (!$validated) {
       $userService->initiateAccountValidation($user); // We trigger a new password query
       throw new HttpException(Response::HTTP_BAD_REQUEST, "A new security code has been sent.");
     }
 
+    // We activate the account and check all fields match
     $userService->activateAccount($user, $firstname, $lastname, $password);
+
+    // We can now consume the security code
+    $userService->consumeAllSecurityCodes($user, UserSecurityCodeTrigger::accountValidation);
+
     return new JsonResponse();
   }
 

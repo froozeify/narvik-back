@@ -132,15 +132,15 @@ class UserService {
     if (!$securityCodeQuery || $securityCodeQuery->getCode() !== trim($securityCode)) {
       return false;
     }
+    return true;
+  }
 
-    // We consume all
-    $codes = $this->userSecurityCodeRepository->findAllByTrigger($user, UserSecurityCodeTrigger::resetPassword);
+  public function consumeAllSecurityCodes(User $user, UserSecurityCodeTrigger $trigger): void {
+    $codes = $this->userSecurityCodeRepository->findAllByTrigger($user, $trigger);
     foreach ($codes as $code) {
       $this->em->remove($code);
     }
     $this->em->flush();
-
-    return true;
   }
 
   public function createOrGetFromMember(Member $member): ?User {

@@ -32,9 +32,11 @@ class UserPasswordReset extends AbstractController {
 
     $changeError = $userService->changeUserPassword($user, $password);
     if ($changeError) {
-      $userService->initiateResetPassword($user); // We trigger a new password query
-      throw new HttpException(Response::HTTP_BAD_REQUEST, $changeError . " A new security code has been sent.");
+      throw new HttpException(Response::HTTP_BAD_REQUEST, $changeError);
     }
+
+    // We can now consume the security code
+    $userService->consumeAllSecurityCodes($user, UserSecurityCodeTrigger::resetPassword);
 
     return new JsonResponse();
   }

@@ -15,11 +15,11 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\UserPasswordReset;
 use App\Controller\UserPasswordResetInitiate;
-use App\Controller\UserRegister;
+use App\Controller\UserInitiateRegister;
 use App\Controller\UserSelf;
 use App\Controller\UserSelfDeleteAccount;
 use App\Controller\UserSelfUpdatePassword;
-use App\Controller\UserValidateAccount;
+use App\Controller\UserRegister;
 use App\Entity\Abstract\UuidEntity;
 use App\Entity\ClubDependent\Member;
 use App\Enum\UserRole;
@@ -83,8 +83,8 @@ use Symfony\Component\Validator\Constraints as Assert;
     write: false),
 
   new Post(
-    uriTemplate: '/users/-/register',
-    controller: UserRegister::class,
+    uriTemplate: '/users/-/initiate-register',
+    controller: UserInitiateRegister::class,
     openapi:
     new Model\Operation(
       summary: 'Trigger the user account creation logic. Will send an email with a securityCode. Email must be enabled for this to work',
@@ -96,9 +96,6 @@ use Symfony\Component\Validator\Constraints as Assert;
               'type'       => 'object',
               'properties' => [
                 'email'     => ['type' => 'string'],
-                'firstname' => ['type' => 'string'],
-                'lastname'  => ['type' => 'string'],
-                'password'  => ['type' => 'string'],
               ],
             ],
           ],
@@ -112,8 +109,8 @@ use Symfony\Component\Validator\Constraints as Assert;
     serialize: false,
   ),
   new Post(
-    uriTemplate: '/users/-/validate-account',
-    controller: UserValidateAccount::class,
+    uriTemplate: '/users/-/register',
+    controller: UserRegister::class,
     openapi:
     new Model\Operation(
       summary: 'Validate the user account creation. If securityCode is invalid a new one will be sent.',
@@ -126,6 +123,9 @@ use Symfony\Component\Validator\Constraints as Assert;
               'properties' => [
                 'email'        => ['type' => 'string'],
                 'securityCode' => ['type' => 'string'],
+                'firstname' => ['type' => 'string'],
+                'lastname'  => ['type' => 'string'],
+                'password'  => ['type' => 'string'],
               ],
             ],
           ],
@@ -235,14 +235,17 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
 
   #[ORM\Column(length: 180, unique: true)]
   #[Groups(['user-read', 'super-admin-write'])]
+  #[Assert\NotBlank(allowNull: false)]
   private ?string $email = null;
 
-  #[ORM\Column(length: 255)]
+  #[ORM\Column(length: 255, nullable: true)]
   #[Groups(['autocomplete', 'user-read', 'super-admin-write'])]
+  #[Assert\NotBlank(allowNull: false)]
   private ?string $firstname = null;
 
-  #[ORM\Column(length: 255)]
+  #[ORM\Column(length: 255, nullable: true)]
   #[Groups(['autocomplete', 'user-read', 'super-admin-write'])]
+  #[Assert\NotBlank(allowNull: false)]
   private ?string $lastname = null;
 
   /**

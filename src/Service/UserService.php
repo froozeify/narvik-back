@@ -11,7 +11,10 @@ use App\Mailer\EmailService;
 use App\Repository\UserRepository;
 use App\Repository\UserSecurityCodeRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class UserService {
   public function __construct(
@@ -19,6 +22,7 @@ class UserService {
     private readonly EmailService $emailService,
     private readonly UserPasswordHasherInterface $passwordHasher,
     private readonly UserRepository $userRepository,
+    private readonly ValidatorInterface $validator,
     private readonly userSecurityCodeRepository $userSecurityCodeRepository,
   ) {
   }
@@ -47,20 +51,50 @@ class UserService {
     return true;
   }
 
-  public function activateAccount(User $user): void {
-    $user->setAccountActivated(true);
+  public function activateAccount(User $user, string $firstname, string $lastname, string $password): void {
+    // We validate the password
+    $errorPassword = $this->validateUserPassword($password);
+    if ($errorPassword) {
+      throw new HttpException(Response::HTTP_BAD_REQUEST, $errorPassword);
+    }
+
+    $user
+      ->setAccountActivated(true)
+      ->setFirstname($firstname)
+      ->setlastname($lastname)
+      ->setPlainPassword($password);
+
+    $errors = $this->validator->validate($user);
+    if (count($errors) > 0) {
+      throw new HttpException(Response::HTTP_BAD_REQUEST, $errors);
+    }
+
     $this->em->persist($user);
     $this->em->flush();
   }
 
   /**
-   * @param User $user
    * @param string $password
    * @return string|null Error message or null if ever everything is ok
    */
-  public function changeUserPassword(User $user, string $password, bool $flush = true): ?string {
+  private function validateUserPassword(string $password): ?string {
     if (empty($password) || strlen($password) < 8) {
       return 'Password must be at least 8 letters long.';
+    }
+
+    return null;
+  }
+
+  /**
+   * @param User $user
+   * @param string $password
+   * @param bool $flush
+   * @return string|null Error message or null if ever everything is ok
+   */
+  public function changeUserPassword(User $user, string $password, bool $flush = true): ?string {
+    $errorPassword = $this->validateUserPassword($password);
+    if ($errorPassword) {
+      return $errorPassword;
     }
 
     $this->userRepository->upgradePassword($user, $this->passwordHasher->hashPassword($user, $password), $flush);

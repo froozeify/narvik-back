@@ -271,56 +271,45 @@ class UserTest extends AbstractEntityTestCase {
     );
   }
 
-  public function testUserRegister(): void {
+  public function testUserInitiateRegister(): void {
     GlobalSettingStory::load(); // We load the default settings so we can send email
 
-    $this->makePostRequest($this->getRootUrl() . "/-/register", []);
+    $this->makePostRequest($this->getRootUrl() . "/-/initiate-register", []);
     $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
 
-    $this->makePostRequest($this->getRootUrl() . "/-/register", [
-      "email" => "newaccount@example.com",
-      "password" => "short",
-      "firstname" => "John",
-      "lastname" => "Doe",
-    ]);
-    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
-    $this->assertJsonContains([
-      "detail" => "Password must be at least 8 letters long.",
-    ]);
-
-    $this->makePostRequest($this->getRootUrl() . "/-/register", [
+    $this->makePostRequest($this->getRootUrl() . "/-/initiate-register", [
       "email" => "admin@admin.com",
-      "password" => "p@ssword1234",
-      "firstname" => "John",
-      "lastname" => "Doe",
     ]);
     $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
     $this->assertJsonContains([
       "detail" => "User already registered.",
     ]);
 
-    $this->makePostRequest($this->getRootUrl() . "/-/register", [
+    $this->makePostRequest($this->getRootUrl() . "/-/initiate-register", [
       "email" => "newaccount@example.com",
-      "password" => "p@ssword1234",
-      "firstname" => "John",
-      "lastname" => "Doe",
     ]);
     $this->assertResponseIsSuccessful();
   }
 
-  public function testAccountValidation(): void {
+  public function testAccountRegister(): void {
     GlobalSettingStory::load(); // We load the default settings so we can send email
     $user = UserFactory::createOne(["accountActivated" => false]);
 
-    $this->makePostRequest($this->getRootUrl() . "/-/validate-account", [
+    $this->makePostRequest($this->getRootUrl() . "/-/register", [
       "email" => "invalidemail",
       "securityCode" => "nop",
+      "password" => "P@ssword1234",
+      "firstname" => "John",
+      "lastname" => "Doe",
     ]);
     $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
 
-    $this->makePostRequest($this->getRootUrl() . "/-/validate-account", [
+    $this->makePostRequest($this->getRootUrl() . "/-/register", [
       "email" => $user->getEmail(),
       "securityCode" => "wrong code",
+      "password" => "P@ssword1234",
+      "firstname" => "John",
+      "lastname" => "Doe",
     ]);
     $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
     $this->assertJsonContains([
@@ -332,9 +321,28 @@ class UserTest extends AbstractEntityTestCase {
       "user" => $user,
       "trigger" => UserSecurityCodeTrigger::accountValidation
     ]);
-    $this->makePostRequest($this->getRootUrl() . "/-/validate-account", [
+
+
+    // Password too short
+    $this->makePostRequest($this->getRootUrl() . "/-/register", [
       "email" => $user->getEmail(),
       "securityCode" => $userSecurityCode->getCode(),
+      "password" => "short",
+      "firstname" => "John",
+      "lastname" => "Doe",
+    ]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+    $this->assertJsonContains([
+      "detail" => "Password must be at least 8 letters long.",
+    ]);
+
+
+    $this->makePostRequest($this->getRootUrl() . "/-/register", [
+      "email" => $user->getEmail(),
+      "securityCode" => $userSecurityCode->getCode(),
+      "password" => "P@ssword1234",
+      "firstname" => "John",
+      "lastname" => "Doe",
     ]);
     $this->assertResponseStatusCodeSame(ResponseCodeEnum::ok->value);
   }

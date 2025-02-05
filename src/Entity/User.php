@@ -22,6 +22,8 @@ use App\Controller\UserSelfUpdatePassword;
 use App\Controller\UserRegister;
 use App\Entity\Abstract\UuidEntity;
 use App\Entity\ClubDependent\Member;
+use App\Entity\Interface\TimestampEntityInterface;
+use App\Entity\Trait\TimestampTrait;
 use App\Enum\UserRole;
 use App\Filter\MultipleFilter;
 use App\Repository\UserRepository;
@@ -199,8 +201,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[ApiFilter(SearchFilter::class, properties: ['role' => 'exact'])]
 #[ApiFilter(OrderFilter::class, properties: ['lastname' => 'ASC', 'firstname' => 'ASC'])]
-#[ApiFilter(MultipleFilter::class, properties: ['firstname', 'lastname'])]
-class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUserInterface {
+#[ApiFilter(MultipleFilter::class, properties: ['firstname', 'lastname', 'email'])]
+class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUserInterface, TimestampEntityInterface {
+  use TimestampTrait;
+
   private bool $skipAutoSetUserMember = false;
 
   #[Groups(['autocomplete', 'user-read', 'member-read'])]

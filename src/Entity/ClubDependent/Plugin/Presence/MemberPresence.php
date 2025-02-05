@@ -28,6 +28,7 @@ use App\Entity\Trait\TimestampTrait;
 use App\Enum\ClubRole;
 use App\Filter\MultipleFilter;
 use App\Repository\ClubDependent\Plugin\Presence\MemberPresenceRepository;
+use App\Security\Voter\SelfMemberVoter;
 use App\Validator\Constraints\ActivityMustBeEnabled;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -162,7 +163,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
   uriTemplate: '/clubs/{clubUuid}/members/{memberUuid}/presences.{_format}',
   operations: [
     new GetCollection(
-      security: "is_granted('".ClubRole::member->value."', request) || is_granted('".ClubRole::badger->value."', request)",
+      security: "is_granted('".ClubRole::supervisor->value."', request) || is_granted('".ClubRole::badger->value."', request) || is_granted('" . SelfMemberVoter::READ . "', request)",
     ),
   ], uriVariables: [
   'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),

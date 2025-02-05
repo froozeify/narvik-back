@@ -366,4 +366,20 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
     $this->assertJsonContains(["detail" => "Member must have an email address."]);
 
   }
+
+  public function testSelfMember(): void {
+    $member = _InitStory::MEMBER_member_club_1();
+    $member2 = _InitStory::MEMBER_member_club_2();
+
+    // We can get our self member infos
+    $this->loggedAsMemberClub1();
+
+    $this->makeGetRequest($this->getIriFromResource($member));
+    $this->assertResponseIsSuccessful();
+    $this->assertMatchesResourceItemJsonSchema($this->getClassname());
+
+    // We can't read other member datas
+    $this->makeGetRequest($this->getIriFromResource($member2));
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::not_found->value);
+  }
 }

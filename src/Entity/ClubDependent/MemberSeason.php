@@ -15,6 +15,7 @@ use App\Entity\Interface\ClubLinkedEntityInterface;
 use App\Entity\Season;
 use App\Enum\ClubRole;
 use App\Repository\ClubDependent\MemberSeasonRepository;
+use App\Security\Voter\SelfMemberVoter;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -30,7 +31,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
         'memberUuid' => new Link(toProperty: 'member', fromClass: Member::class),
       ],
-      security: "is_granted('".ClubRole::supervisor->value."', request)",
+      security: "is_granted('".ClubRole::supervisor->value."', request)  || is_granted('" . SelfMemberVoter::READ . "', request)",
     ),
 
     new Post(
@@ -44,7 +45,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     ),
 
     new Get(
-      security: "is_granted('".ClubRole::supervisor->value."', object)",
+      security: "is_granted('".ClubRole::supervisor->value."', object) || is_granted('" . SelfMemberVoter::READ . "', object)",
     ),
     new Delete(
       security: "is_granted('".ClubRole::supervisor->value."', object)",

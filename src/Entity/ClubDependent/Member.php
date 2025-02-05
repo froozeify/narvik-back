@@ -31,6 +31,7 @@ use App\Enum\ClubRole;
 use App\Filter\CurrentSeasonFilter;
 use App\Filter\MultipleFilter;
 use App\Repository\ClubDependent\MemberRepository;
+use App\Security\Voter\SelfMemberVoter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -60,7 +61,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     ),
 
     new Get(
-      security: "is_granted('".ClubRole::supervisor->value."', object) || is_granted('".ClubRole::badger->value."', object)",
+      security: "is_granted('".ClubRole::supervisor->value."', object) || is_granted('".ClubRole::badger->value."', object) || is_granted('" . SelfMemberVoter::READ . "', object)",
     ),
     new Patch(
       security: "is_granted('".ClubRole::supervisor->value."', object)",

@@ -19,6 +19,7 @@ class MemberSeasonTest extends AbstractEntityClubLinkedTestCase {
   protected int $TOTAL_ADMIN_CLUB_1 = 1;
   protected int $TOTAL_ADMIN_CLUB_2 = 0; // Since we are forced on member club 1
   protected int $TOTAL_SUPERVISOR_CLUB_1 = 1;
+  protected int $TOTAL_MEMBER_CLUB_1 = 1;
 
   private Member $selectedMember;
 
@@ -39,6 +40,12 @@ class MemberSeasonTest extends AbstractEntityClubLinkedTestCase {
 
   protected function getRootWClubUrl(Club $club): string {
     return $this->getIriFromResource($club) . "/members/{$this->selectedMember->getUuid()}/seasons";
+  }
+
+  protected function getCollectionGrantedAccess() : array {
+    $access = parent::getCollectionGrantedAccess();
+    $access[ClubRole::member->value] = true;
+    return $access;
   }
 
   public function testCreate(): void {

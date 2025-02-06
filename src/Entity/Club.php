@@ -44,7 +44,7 @@ class Club extends UuidEntity implements TimestampEntityInterface {
   use TimestampTrait;
 
   #[ORM\Column(length: 255)]
-  #[Groups(['club-read', 'self-read', 'super-admin-write'])]
+  #[Groups(['common-read', 'super-admin-write'])]
   #[Assert\NotBlank]
   private ?string $name = null;
 

@@ -382,4 +382,51 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
     $this->makeGetRequest($this->getIriFromResource($member2));
     $this->assertResponseStatusCodeSame(ResponseCodeEnum::not_found->value);
   }
+
+  public function testMemberLinkWithUser(): void {
+    $member = _InitStory::MEMBER_member_club_1();
+    $memberIri = $this->getIriFromResource($member);
+
+    $member2 = MemberFactory::createOne(['club' => _InitStory::club_1()]);
+    $member2Iri = $this->getIriFromResource($member2);
+
+    $user = UserFactory::createOne();
+    $user2 = _InitStory::USER_member_club_2();
+
+
+    $payload = [
+      "email" => $user->getEmail(),
+    ];
+
+    $this->loggedAsMemberClub1();
+    $this->makePatchRequest($memberIri . "/link", $payload);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::forbidden->value);
+
+    $this->loggedAsSupervisorClub1();
+    $this->makePatchRequest($memberIri . "/link", $payload);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::forbidden->value);
+
+
+    $this->loggedAsAdminClub1();
+    $this->makePatchRequest($memberIri . "/link", ['email' => 'toto']);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+    $this->assertJsonContains([
+      "detail" => "No active account exist with this email.",
+    ]);
+
+    $this->makePatchRequest($memberIri . "/link", $payload);
+    $this->assertResponseIsSuccessful();
+
+    $this->makePatchRequest($memberIri . "/link", ['email' => $user2->getEmail()]);
+    $this->assertResponseIsSuccessful();
+
+    // Member with no linked user
+    $response = $this->makeGetRequest($member2Iri);
+    $this->assertJsonNotHasKey('linkedEmail', $response);
+    $this->makePatchRequest($member2Iri . "/link", ['email' => $user2->getEmail()]);
+    $this->assertResponseIsSuccessful();
+    $response = $this->makeGetRequest($member2Iri);
+    $this->assertNotNull($response->toArray()['linkedEmail']);
+
+  }
 }

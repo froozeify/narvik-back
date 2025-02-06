@@ -82,7 +82,8 @@ use Symfony\Component\Validator\Constraints as Assert;
           ),
       ),
     read: false,
-    write: false),
+    write: false
+  ),
 
   new Post(
     uriTemplate: '/users/-/initiate-register',

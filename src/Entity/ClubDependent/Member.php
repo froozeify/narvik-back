@@ -17,6 +17,7 @@ use ApiPlatform\OpenApi\Model;
 use App\Controller\ClubDependent\MemberChangeRole;
 use App\Controller\ClubDependent\MemberImportFromItac;
 use App\Controller\ClubDependent\MemberImportSecondaryClubFromItac;
+use App\Controller\ClubDependent\MemberLinkWithUser;
 use App\Controller\ClubDependent\MemberPhotosImportFromItac;
 use App\Controller\ClubDependent\MemberSearchByLicenceOrName;
 use App\Entity\Abstract\UuidEntity;
@@ -73,6 +74,16 @@ use Symfony\Component\Validator\Constraints as Assert;
       uriTemplate: '/clubs/{clubUuid}/members/{uuid}/role',
       controller: MemberChangeRole::class,
       security: "is_granted('".ClubRole::admin->value."', object)",
+      deserialize: false,
+      write: false
+    ),
+
+    new Patch(
+      uriTemplate: '/clubs/{clubUuid}/members/{uuid}/link',
+      controller: MemberLinkWithUser::class,
+      security: "is_granted('".ClubRole::admin->value."', object)",
+      deserialize: false,
+      write: false
     ),
 
     new Post(
@@ -223,6 +234,9 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
 
   #[Groups(['member-read', 'member-presence-read'])]
   private ClubRole|null $role = null;
+
+  #[Groups(['member-read'])]
+  private ?string $linkedEmail = null;
 
   #[Groups(['autocomplete', 'self-read', 'member-read', 'member-presence-read', 'sale-read'])]
   private ?string $fullName = null;
@@ -586,6 +600,10 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
 
   public function getRole(): ?ClubRole {
     return $this->getUserMember()?->getRole();
+  }
+
+  public function getLinkedEmail(): ?string {
+    return $this->getUserMember()?->getUser()?->getEmail();
   }
 
   public function isSkipAutoSetUserMember(): bool {

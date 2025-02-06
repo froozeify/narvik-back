@@ -64,9 +64,9 @@ class ConfigProvider implements ProviderInterface {
     $config->setId('user');
 
     foreach ($user->getLinkedProfiles() as $profile) {
-      $id = $profile["id"];
+      $id = $profile->getId();
       /** @var Club $club */
-      $club = $profile["club"];
+      $club = $profile->getClub();
 
       if ($this->authorizationChecker->isGranted(ClubRole::supervisor->value, $club) || $this->authorizationChecker->isGranted(ClubRole::badger->value, $club)) {
       $config->addProfileModule($id, 'presences', [

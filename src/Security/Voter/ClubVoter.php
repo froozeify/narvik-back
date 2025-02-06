@@ -79,14 +79,14 @@ class ClubVoter extends Voter {
 
     foreach ($linkedProfiles as $linkedProfile) {
       if ($selectedProfile) {
-        if (!$linkedProfile['id'] || $linkedProfile['id'] !== $selectedProfile) {
+        if (!$linkedProfile->getId() || $linkedProfile->getId() !== $selectedProfile) {
           continue;
         }
       }
 
-      if ($linkedProfile['club']->getId() === $targetedClub->getId()) {
+      if ($linkedProfile->getClub()->getId() === $targetedClub->getId()) {
         /** @var ClubRole $role */
-        $role = $linkedProfile['role'];
+        $role = $linkedProfile->getRole();
         return $role->hasRole($targetedClubRole);
       }
     }

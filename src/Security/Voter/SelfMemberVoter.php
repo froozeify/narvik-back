@@ -61,7 +61,7 @@ class SelfMemberVoter extends Voter {
   private function voteForMemberEntity(Member $member, User $user): bool {
     $linkedProfiles = $user->getLinkedProfiles();
     foreach ($linkedProfiles as $linkedProfile) {
-      if (array_key_exists('member', $linkedProfile) && $linkedProfile['member']->getUuid()->toString() === $member->getUuid()->toString()) {
+      if ($linkedProfile->getMember()?->getUuid()->toString() === $member->getUuid()->toString()) {
         return true;
       }
     }
@@ -75,9 +75,9 @@ class SelfMemberVoter extends Voter {
 
     $linkedProfiles = $user->getLinkedProfiles();
     foreach ($linkedProfiles as $linkedProfile) {
-      if (array_key_exists('member', $linkedProfile) && $linkedProfile['member']->getUuid()->toString() === $memberUuid) {
+      if ($linkedProfile->getMember()?->getUuid()->toString() === $memberUuid) {
         if ($clubUUid) { // We match also the club
-          return $linkedProfile['club']->getUuid()->toString() === $clubUUid;
+          return $linkedProfile->getClub()->getUuid()->toString() === $clubUUid;
         }
         return true;
       }

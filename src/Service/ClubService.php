@@ -62,7 +62,7 @@ class ClubService {
     // We check the club are matching
     $matched = false;
     foreach ($user->getLinkedProfiles() as $dbClub) {
-      if ($dbClub['club'] === $club) {
+      if ($dbClub->getClub() === $club) {
         $matched = true;
         break;
       }

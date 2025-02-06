@@ -216,8 +216,11 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
   #[Groups(['user'])]
   private UserRole $role = UserRole::user;
 
+  /**
+   * @var Collection<int, Profile>
+   */
   #[Groups(['user', 'self-read'])]
-  private array $linkedProfiles = [];
+  private Collection $linkedProfiles;
 
   /**
    * @var string The hashed password
@@ -266,24 +269,23 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
   // Custom calculated fields
 
   /**
-   * @return array{id: string, displayName: string, club: Club, role: string, member: ?Member}[]
+   * @return Collection<int, Profile>
    */
-  public function getLinkedProfiles(): array {
+  public function getLinkedProfiles(): Collection {
     $userClubs = [];
     $multipleClubs = $this->getMemberships()->count() > 1;
 
     foreach ($this->getMemberships() as $membership) {
       $club = $membership?->getMember()?->getClub() ?? $membership->getBadgerClub();
       if ($club) {
-        $userClub = [
-          'club' => $club,
-          'role' => $membership->getRole(),
-        ];
+        $profile = new Profile();
+        $profile->setRole($membership->getRole());
+
         $displayName = $club->getName();
         $id = "c-" . $club->getUuid()->toString();
 
         if ($membership->getMember()) {
-          $userClub['member'] = $membership->getMember();
+          $profile->setMember($membership->getMember());
           $id = "m-" . $membership->getMember()->getUuid()->toString();
           if ($multipleClubs) {
             $displayName .= " - " . $membership->getMember()->getFullName();
@@ -292,17 +294,22 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
           }
         }
 
-        $userClub['id'] = $id;
-        $userClub['displayName'] = $displayName;
-        $userClubs[] = $userClub;
+        $profile
+          ->setId($id)
+          ->setDisplayName($displayName)
+          ->setClub($club);
+
+        $userClubs[] = $profile;
       }
     }
 
-    usort($userClubs, function($a, $b) {
-      return $a['displayName'] <=> $b['displayName'];
+    usort($userClubs, function(Profile $a, Profile $b) {
+      return $a->getDisplayName() <=> $b->getDisplayName();
     });
 
-    return $userClubs;
+    $this->linkedProfiles = new ArrayCollection($userClubs);
+
+    return $this->linkedProfiles;
   }
 
   public function getFullName(): ?string {

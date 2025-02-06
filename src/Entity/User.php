@@ -216,7 +216,7 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
   #[Groups(['user'])]
   private UserRole $role = UserRole::user;
 
-  #[Groups(['self-read'])]
+  #[Groups(['user', 'self-read'])]
   private array $linkedProfiles = [];
 
   /**

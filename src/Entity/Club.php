@@ -19,11 +19,14 @@ use App\Enum\ClubRole;
 use App\Enum\UserRole;
 use App\Filter\MultipleFilter;
 use App\Repository\ClubRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ClubRepository::class)]
+#[UniqueEntity(fields: ['name'])]
 #[ApiResource(operations: [
   new GetCollection(security: "is_granted('".UserRole::super_admin->value."')"), // Collection only to super admin, other should get them through /self
   new Get(),
@@ -34,8 +37,8 @@ use Symfony\Component\Validator\Constraints as Assert;
   'groups' => ['club', 'club-read', 'common-read'],
 ], denormalizationContext: [
   'groups' => ['club', 'club-write'],
-], order: ['name' => 'ASC'],)]
-#[ApiFilter(OrderFilter::class, properties: ['name' => 'ASC', 'createdAt' => 'DESC'])]
+], order: ['renewDate' => 'ASC', 'isActivated' => 'ASC', 'name' => 'ASC'],)]
+#[ApiFilter(OrderFilter::class, properties: ['isActivated' => 'ASC', 'renewDate' => 'ASC', 'name' => 'ASC', 'createdAt' => 'DESC'])]
 #[ApiFilter(MultipleFilter::class, properties: ['name'])]
 class Club extends UuidEntity implements TimestampEntityInterface {
   use TimestampTrait;
@@ -49,6 +52,10 @@ class Club extends UuidEntity implements TimestampEntityInterface {
   #[Groups(['club-read', 'super-admin-write'])]
   #[ApiProperty(securityPostDenormalize: "is_granted('".ClubRole::supervisor->value."', object)")] // Property can be read by club admin/supervisor
   private bool $isActivated = true;
+
+  #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+  #[Groups(['club-read', 'super-admin-write'])]
+  private ?\DateTimeImmutable $renewDate = null;
 
   #[ORM\Column(options: ['default' => false])]
   #[Groups(['club-read', 'super-admin-write'])]
@@ -130,6 +137,18 @@ class Club extends UuidEntity implements TimestampEntityInterface {
     }
 
     $this->settings = $setting;
+    return $this;
+  }
+
+  public function getRenewDate(): ?\DateTimeImmutable {
+    return $this->renewDate;
+  }
+
+  public function setRenewDate(?\DateTimeImmutable $renewDate): Club {
+    if ($renewDate) {
+      $renewDate = $renewDate->setTime(23, 59, 59);
+    }
+    $this->renewDate = $renewDate;
     return $this;
   }
 

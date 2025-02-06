@@ -246,7 +246,7 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
 
   #[ORM\Column(length: 180, nullable: true)]
   #[Groups(['member-read', 'club-supervisor-write'])]
-  #[Assert\NotBlank(allowNull: false)]
+  #[Assert\NotBlank(allowNull: true)]
   private ?string $email = null;
 
   #[ORM\Column(length: 10, unique: true, nullable: true)]

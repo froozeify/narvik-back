@@ -244,7 +244,7 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
   #[ORM\OneToOne(mappedBy: 'member', targetEntity: UserMember::class)]
   private ?UserMember $userMember = null;
 
-  #[ORM\OneToMany(mappedBy: 'member', targetEntity: MemberPresence::class, orphanRemoval: true)]
+  #[ORM\OneToMany(mappedBy: 'member', targetEntity: MemberPresence::class)]
   private Collection $memberPresences;
 
   #[ORM\OneToMany(mappedBy: 'member', targetEntity: MemberSeason::class, orphanRemoval: true)]

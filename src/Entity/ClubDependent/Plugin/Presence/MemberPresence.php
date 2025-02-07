@@ -182,7 +182,7 @@ class MemberPresence extends UuidEntity implements TimestampEntityInterface, Clu
   use SelfClubLinkedEntityTrait;
 
   #[ORM\ManyToOne(targetEntity: Member::class, inversedBy: 'memberPresences')]
-  #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+  #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
   #[Groups(['member-presence'])]
   private ?Member $member = null;
 
@@ -202,11 +202,11 @@ class MemberPresence extends UuidEntity implements TimestampEntityInterface, Clu
   }
 
   public function getClub(): ?Club {
-    return $this->member?->getClub();
+    return $this->club;
   }
 
   public function setClub(?Club $club): static {
-    $this->member?->setClub($club);
+    $this->club = $club;
     return $this;
   }
 

@@ -93,7 +93,8 @@ class MemberSeason extends UuidEntity implements ClubLinkedEntityInterface {
   }
 
   public function setClub(?Club $club): static {
-    $this->member?->setClub($club);
+    // We don't set the club in the parent
+    // $this->member?->setClub($club);
     return $this;
   }
 

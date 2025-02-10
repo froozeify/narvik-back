@@ -26,17 +26,18 @@ trait PresenceRepositoryTrait {
     if ($club) {
       $this->applyClubRestriction($qb, $club);
 
-      // FIXME: Change it to get the value from clubsettings
-      $ignoredActivities = $this->globalSettingService->getSettingValue(GlobalSetting::IGNORED_ACTIVITIES_OPENING_STATS);
+      $ignoredActivities = $club->getSettings()?->getExcludedActivitiesFromOpeningDays();
+
       if ($ignoredActivities) {
-        $ids = array_values(json_decode($ignoredActivities, true));
-        if (empty($ids)) {
-          return;
-        }
+        dump($ignoredActivities);
+//        $ids = array_values(json_decode($ignoredActivities, true));
+//        if (empty($ids)) {
+//          return;
+//        }
 
         $qb->leftJoin('m.activities', 'mpa')
-           ->andWhere($qb->expr()->notIn("mpa.id", ":ids"))
-           ->setParameter("ids", $ids)
+           ->andWhere($qb->expr()->notIn("mpa", ":ids"))
+           ->setParameter("ids", $ignoredActivities)
         ;
       }
     }

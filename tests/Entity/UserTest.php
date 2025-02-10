@@ -261,6 +261,7 @@ class UserTest extends AbstractEntityTestCase {
 
   public function testDeleteSelf(): void {
     $this->makeAllLoggedRequests(
+      superAdminCode: ResponseCodeEnum::bad_request,
       memberClub1Code: ResponseCodeEnum::ok,
       adminClub2Code: ResponseCodeEnum::ok,
       badgerClub1Code: ResponseCodeEnum::ok,

@@ -68,7 +68,7 @@ security:
 
         - { path: ^/age-categories, roles: [ROLE_SUPER_ADMIN]}
         - { path: ^/global-settings, roles: [ROLE_SUPER_ADMIN]}
-        - { path: ^/metrics, roles: [ROLE_USER]}
+        - { path: ^/metrics, roles: [ROLE_SUPER_ADMIN]}
         - { path: ^/seasons, roles: [ROLE_USER]}
         - { path: ^/users, roles: [ROLE_SUPER_ADMIN]}
             

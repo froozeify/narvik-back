@@ -29,12 +29,6 @@ trait PresenceRepositoryTrait {
       $ignoredActivities = $club->getSettings()?->getExcludedActivitiesFromOpeningDays();
 
       if ($ignoredActivities) {
-        dump($ignoredActivities);
-//        $ids = array_values(json_decode($ignoredActivities, true));
-//        if (empty($ids)) {
-//          return;
-//        }
-
         $qb->leftJoin('m.activities', 'mpa')
            ->andWhere($qb->expr()->notIn("mpa", ":ids"))
            ->setParameter("ids", $ignoredActivities)

@@ -13,6 +13,8 @@ use App\Entity\Trait\SelfClubLinkedEntityTrait;
 use App\Enum\ClubRole;
 use App\Enum\UserRole;
 use App\State\MetricProvider;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
@@ -55,9 +57,16 @@ class Metric {
   #[Groups(['metric'])]
   private float $value = 0;
 
+  /**
+   * @var Collection<int, Metric>
+   */
   #[Groups(['metric'])]
-  #[ApiProperty(jsonldContext:["@type" => "#Metric[]"])]
-  private array $childMetrics = [];
+  private Collection $childMetrics;
+
+  public function __construct() {
+    $this->childMetrics = new ArrayCollection();
+  }
+
 
   public function getClub(): ?Club {
     return $this->club;
@@ -86,12 +95,12 @@ class Metric {
     return $this;
   }
 
-  public function getChildMetrics(): ?array {
+  public function getChildMetrics(): ?Collection {
     return $this->childMetrics;
   }
 
   public function setChildMetrics(?array $childMetrics): Metric {
-    $this->childMetrics = $childMetrics;
+    $this->childMetrics = new ArrayCollection($childMetrics);
     return $this;
   }
 }

@@ -13,7 +13,8 @@ enum ResponseCodeEnum: int {
   case not_allowed = Response::HTTP_METHOD_NOT_ALLOWED;
   case bad_request = Response::HTTP_BAD_REQUEST;
   case forbidden = Response::HTTP_FORBIDDEN;
-  case locked = Response::HTTP_LOCKED;
+  case unprocessable_422 = Response::HTTP_UNPROCESSABLE_ENTITY;
+  case locked_423 = Response::HTTP_LOCKED;
 
   public function isSuccess(): bool {
     return ($this->value >= 200 && $this->value <= 299);

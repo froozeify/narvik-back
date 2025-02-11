@@ -181,7 +181,7 @@ class ClubTest extends AbstractEntityTestCase {
     $this->assertResponseIsSuccessful(); // Read only
 
     $this->makePatchRequest($clubSettingIri, $payload);
-    $this->assertResponseStatusCodeSame(ResponseCodeEnum::locked->value);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::locked_423->value);
     $this->assertJsonContains([
       "detail" => "Club not activated.",
     ]);
@@ -217,7 +217,7 @@ class ClubTest extends AbstractEntityTestCase {
     $this->assertResponseIsSuccessful(); // Read only
 
     $this->makePatchRequest($paymentMode, $payload);
-    $this->assertResponseStatusCodeSame(ResponseCodeEnum::locked->value);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::locked_423->value);
     $this->assertJsonContains([
       "detail" => "Sales plugin not activated.",
     ]);

@@ -99,4 +99,13 @@ class SeasonTest extends AbstractEntityTestCase {
       }
     );
   }
+
+  public function testCreateSeasonWithSameName(): void {
+    $this->loggedAsSuperAdmin();
+    $this->makePostRequest($this->getRootUrl(), ['name' => '2024/2025']);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::unprocessable_422->value);
+    $this->assertJsonContains([
+      "detail" => "name: This value is already used.",
+    ]);
+  }
 }

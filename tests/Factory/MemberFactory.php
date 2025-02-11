@@ -4,6 +4,7 @@ namespace App\Tests\Factory;
 
 use App\Entity\ClubDependent\Member;
 use App\Repository\ClubDependent\MemberRepository;
+use App\Tests\Story\SeasonStory;
 use Zenstruck\Foundry\FactoryCollection;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
@@ -66,7 +67,6 @@ final class MemberFactory extends PersistentProxyObjectFactory {
       'lastname'              => self::faker()->lastName(),
       'email'                 => self::faker()->unique()->safeEmail(),
       'licence'               => str_pad(self::faker()->numberBetween(1000000, 99999999), 8, "0", STR_PAD_LEFT),
-      'memberSeasons'         => MemberSeasonFactory::new()->many(1),
     ];
   }
 
@@ -74,8 +74,13 @@ final class MemberFactory extends PersistentProxyObjectFactory {
    * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
    */
   protected function initialize(): static {
-    return $this// ->afterInstantiate(function(User $user): void {})
-      ;
+    return $this->afterInstantiate(function(Member $member): void {
+      // For all member we link them with the current season
+      MemberSeasonFactory::new([
+        'season' => SeasonStory::season_2024(),
+        'member' => $member
+      ])->create();
+    });
   }
 
   public static function class(): string {

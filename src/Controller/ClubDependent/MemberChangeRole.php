@@ -9,6 +9,7 @@ use App\Enum\ClubRole;
 use App\Repository\UserMemberRepository;
 use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -16,7 +17,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class MemberChangeRole extends AbstractClubDependentController {
 
-  public function __invoke(Request $request, Member $member, UserService $userService, UserMemberRepository $userMemberRepository, EntityManagerInterface $em, ValidatorInterface $validator): Member {
+  public function __invoke(Request $request, #[MapEntity(mapping: ['uuid' => 'uuid'])] Member $member, UserService $userService, UserMemberRepository $userMemberRepository, EntityManagerInterface $em, ValidatorInterface $validator): Member {
     $payload = $this->checkAndGetJsonValues($request, ['role']);
     $role = ClubRole::tryFrom($payload['role']);
 

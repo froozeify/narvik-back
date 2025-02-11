@@ -5,13 +5,14 @@ namespace App\Controller\ClubDependent\Plugin\Presence;
 use App\Controller\Abstract\AbstractClubDependentController;
 use App\Entity\ClubDependent\Plugin\Presence\Activity;
 use App\Repository\ClubDependent\Plugin\Presence\ActivityRepository;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ActivityMerge extends AbstractClubDependentController {
 
-  public function __invoke(Request $request, Activity $activity, ActivityRepository $activityRepository): Response {
+  public function __invoke(Request $request, #[MapEntity(mapping: ['uuid' => 'uuid'])] Activity $activity, ActivityRepository $activityRepository): Response {
     $json = $this->checkAndGetJsonValues($request, ['target']);
 
     $targetActivity = $activityRepository->findOneByUuid($json['target']);

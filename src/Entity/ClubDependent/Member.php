@@ -37,11 +37,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: MemberRepository::class)]
 #[ORM\Table(name: 'member')]
+#[UniqueEntity(fields: ['licence', 'club'], message: 'Licence already registered')]
 #[ApiResource(
   uriTemplate: '/clubs/{clubUuid}/members/{uuid}.{_format}',
   operations: [
@@ -263,7 +265,7 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
   #[Assert\NotBlank(allowNull: true)]
   private ?string $email = null;
 
-  #[ORM\Column(length: 10, unique: true, nullable: true)]
+  #[ORM\Column(length: 10, nullable: true)]
   #[Groups(['autocomplete', 'member-read', 'club-supervisor-write', 'member-presence-read'])]
   #[Assert\Regex(pattern: '/\d{8,10}/')]
   private ?string $licence = null;

@@ -427,6 +427,28 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
     $this->assertResponseIsSuccessful();
     $response = $this->makeGetRequest($member2Iri);
     $this->assertNotNull($response->toArray()['linkedEmail']);
+  }
 
+  public function testRegisteringMemberSameInfoAsClub1(): void {
+    $member = _InitStory::MEMBER_member_club_1();
+    $payload = [
+      "licence" => $member->getLicence(),
+      "email" => $member->getEmail(),
+      "firstname" => $member->getFirstname(),
+      "lastname" => $member->getLastname(),
+    ];
+
+    $this->loggedAsAdminClub2();
+    $response = $this->makePostRequest($this->getRootWClubUrl(_InitStory::club_2()), $payload);
+    $this->assertResponseIsSuccessful();
+    $userIri = $response->toArray()['@id'];
+
+    $this->loggedAsAdminClub1();
+    $this->makeDeleteRequest($this->getIriFromResource($member));
+    $this->assertResponseIsSuccessful();
+
+    $this->loggedAsAdminClub2();
+    $this->makeGetRequest($userIri);
+    $this->assertResponseIsSuccessful();
   }
 }

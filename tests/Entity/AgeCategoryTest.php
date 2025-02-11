@@ -3,6 +3,7 @@
 namespace App\Tests\Entity;
 
 use App\Entity\AgeCategory;
+use App\Enum\ClubRole;
 use App\Tests\Entity\Abstract\AbstractEntityTestCase;
 use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Factory\AgeCategoryFactory;
@@ -10,6 +11,10 @@ use App\Tests\Story\AgeCategoryStory;
 
 class AgeCategoryTest extends AbstractEntityTestCase {
   protected int $TOTAL_SUPER_ADMIN = 16;
+  protected int $TOTAL_ADMIN_CLUB_1 = 16;
+  protected int $TOTAL_ADMIN_CLUB_2 = 16;
+  protected int $TOTAL_SUPERVISOR_CLUB_1 = 16;
+  protected int $TOTAL_MEMBER_CLUB_1 = 16;
 
   protected function getClassname(): string {
     return AgeCategory::class;
@@ -17,6 +22,15 @@ class AgeCategoryTest extends AbstractEntityTestCase {
 
   protected function getRootUrl(): string {
     return '/age-categories';
+  }
+
+  protected function getCollectionGrantedAccess(): array {
+    $access = parent::getCollectionGrantedAccess();
+    $access[ClubRole::admin->value] = true;
+    $access[ClubRole::supervisor->value] = true;
+
+    $access[ClubRole::member->value] = true;
+    return $access;
   }
 
   public function initDefaultFixtures(): void {

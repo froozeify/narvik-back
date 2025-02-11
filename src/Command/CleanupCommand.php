@@ -2,7 +2,9 @@
 
 namespace App\Command;
 
+use App\Repository\UserRepository;
 use App\Repository\UserSecurityCodeRepository;
+use App\Service\SeasonService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -18,6 +20,7 @@ class CleanupCommand extends Command {
   public function __construct(
     private readonly EntityManagerInterface $entityManager,
     private readonly UserSecurityCodeRepository $memberSecurityCodeRepository,
+    private readonly SeasonService $seasonService,
   ) {
     parent::__construct();
   }
@@ -28,6 +31,7 @@ class CleanupCommand extends Command {
 
     $this->cleanJwt();
     $this->cleanSecurityCodes();
+    $this->updateSeasons();
 
     return Command::SUCCESS;
   }
@@ -51,6 +55,12 @@ class CleanupCommand extends Command {
     }
 
     $this->entityManager->flush();
+  }
+
+  private function updateSeasons(): void {
+    $this->io->section("Updating seasons");
+    $currentSeason = SeasonService::getCurrentSeasonName();
+    $this->seasonService->getOrCreateSeason($currentSeason);
   }
 
 }

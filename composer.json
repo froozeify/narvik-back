@@ -62,7 +62,7 @@
         "doctrine/doctrine-fixtures-bundle": "^4.0",
         "justinrainbow/json-schema": "^6.0",
         "phpstan/phpstan-doctrine": "^2.0",
-        "phpunit/phpunit": "^11",
+        "phpunit/phpunit": "^12",
         "rector/rector": "^2.0",
         "symfony/browser-kit": "7.2.*",
         "symfony/css-selector": "7.2.*",

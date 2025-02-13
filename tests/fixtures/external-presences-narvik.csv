@@ -1,0 +1,4 @@
+licence,firstname,lastname,date,activities.0.name,activities.1.name,activities.2.name,activities.3.name
+10000001,Jean,LASTNAME,2000-01-03T00:00:00+00:00,Permanence,,,
+,Jean,LASTNAME,2000-01-10T00:00:00+00:00,10M,Bureau,Permanence,Travaux
+,Alice,Name,2000-01-05T00:00:00+00:00,10M,Bureau,Permanence,Travaux

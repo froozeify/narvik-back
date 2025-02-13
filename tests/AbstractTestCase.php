@@ -262,6 +262,10 @@ abstract class AbstractTestCase extends ApiTestCase {
     return $this->makeLoggedRequest(Request::METHOD_GET, $url, uriParameters: $uriParameters);
   }
 
+  public function makeGetCsvRequest(string $url): ResponseInterface {
+    return $this->makeLoggedRequest(Request::METHOD_GET, $url, queryOptions: ['headers' => ['accept' => ['text/csv']]]);
+  }
+
   public function makePostRequest(string $url, ?array $data = null, array $uriParameters = []): ResponseInterface {
     return $this->makeLoggedRequest(Request::METHOD_POST, $url, $data, $uriParameters);
   }

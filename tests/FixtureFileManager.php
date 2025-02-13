@@ -11,6 +11,7 @@ class FixtureFileManager {
   const string ITAC_MEMBERS = 'itac-members.csv';
   const string ITAC_SECONDARY_MEMBERS = 'itac-secondary-members.csv';
   const string PRESENCES_NARVIK = 'presences-narvik.csv';
+  const string EXTERNAL_PRESENCES_NARVIK = 'external-presences-narvik.csv';
   const string PRESENCES_CERBERE = 'presences-cerbere.xls';
 
   /**

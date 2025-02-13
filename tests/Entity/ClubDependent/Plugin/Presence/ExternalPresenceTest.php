@@ -126,4 +126,79 @@ class ExternalPresenceTest extends AbstractEntityClubLinkedTestCase {
     $this->assertResponseStatusCodeSame(ResponseCodeEnum::ok->value);
     $this->assertCount(5, $response->toArray()['member']);
   }
+
+  public function testExportPresencesInCSV(): void {
+    $club = _InitStory::club_1();
+
+    $this->loggedAsAdminClub1();
+    $response = $this->makeGetCsvRequest($this->getRootWClubUrl($club) . ".csv");
+    $this->assertResponseIsSuccessful();
+    $csv = str_getcsv($response->getContent(), separator: ',', escape: '');
+    $this->assertEquals("firstname", $csv[0]);
+    $this->assertEquals("lastname", $csv[1]);
+    $this->assertEquals("date", $csv[2]);
+  }
+
+  public function testImportPresencesFromCSV(): void {
+    $club = _InitStory::club_1();
+
+    $file = FixtureFileManager::getUploadedFile(FixtureFileManager::EXTERNAL_PRESENCES_NARVIK);
+    $fileFail = FixtureFileManager::getUploadedFile(FixtureFileManager::LOGO);
+
+    $this->loggedAsAdminClub1();
+    $response = $this->makeGetRequest($this->getRootWClubUrl($club));
+    $this->assertCount($this->TOTAL_ADMIN_CLUB_1, $response->toArray()['member']);
+
+    // Not a CSV
+    $this->makePostRequest($this->getRootWClubUrl($club) . "/-/from-csv", [
+      '_not_json' => true,
+      'headers' => ['Content-Type' => 'multipart/form-data'],
+      'extra' => [
+        'files' => [
+          'file' => $fileFail,
+        ],
+      ],
+    ]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+    $this->assertJsonContains([
+      "detail" => "The \"file\" must be a csv",
+    ]);
+
+    $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/from-csv", [
+      '_not_json' => true,
+      'headers' => ['Content-Type' => 'multipart/form-data'],
+      'extra' => [
+        'files' => [
+          'file' => $file,
+        ],
+      ],
+    ]);
+    $this->assertResponseIsSuccessful();
+
+    $this->assertCount(3, $response->toArray()['created']);
+    $this->assertCount(0, $response->toArray()['warnings']);
+    $this->assertCount(0, $response->toArray()['errors']);
+
+    // 3 new presences
+    $response = $this->makeGetRequest($this->getRootWClubUrl($club));
+    $this->assertCount($this->TOTAL_ADMIN_CLUB_1 + 3, $response->toArray()['member']);
+
+    // Running the import a second time should not change the count
+    $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/from-csv", [
+      '_not_json' => true,
+      'headers' => ['Content-Type' => 'multipart/form-data'],
+      'extra' => [
+        'files' => [
+          'file' => $file,
+        ],
+      ],
+    ]);
+    $this->assertResponseIsSuccessful();
+    $this->assertCount(0, $response->toArray()['created']);
+    $this->assertCount(3, $response->toArray()['warnings']); // Already registered
+    $this->assertCount(0, $response->toArray()['errors']);
+
+    $response = $this->makeGetRequest($this->getRootWClubUrl($club));
+    $this->assertCount($this->TOTAL_ADMIN_CLUB_1 + 3, $response->toArray()['member']);
+  }
 }

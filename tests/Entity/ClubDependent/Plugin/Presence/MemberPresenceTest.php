@@ -222,14 +222,43 @@ class MemberPresenceTest extends AbstractEntityClubLinkedTestCase {
 
   }
 
+  public function testExportPresencesInCSV(): void {
+    $club = _InitStory::club_1();
+
+    $this->loggedAsAdminClub1();
+    $response = $this->makeGetCsvRequest($this->getRootWClubUrl($club) . ".csv");
+    $this->assertResponseIsSuccessful();
+    $csv = str_getcsv($response->getContent(), separator: ',', escape: '');
+    $this->assertEquals("member.fullName", $csv[0]);
+    $this->assertEquals("member.licence", $csv[1]);
+    $this->assertEquals("member.uuid", $csv[2]);
+    $this->assertEquals("date", $csv[3]);
+  }
+
   public function testImportPresencesFromCSV(): void {
     $club = _InitStory::club_1();
 
     $file = FixtureFileManager::getUploadedFile(FixtureFileManager::PRESENCES_NARVIK);
+    $fileFail = FixtureFileManager::getUploadedFile(FixtureFileManager::LOGO);
 
     $this->loggedAsAdminClub1();
     $response = $this->makeGetRequest($this->getRootWClubUrl($club));
     $this->assertCount($this->TOTAL_ADMIN_CLUB_1, $response->toArray()['member']);
+
+    // Not a CSV
+    $this->makePostRequest($this->getRootWClubUrl($club) . "/-/from-csv", [
+      '_not_json' => true,
+      'headers' => ['Content-Type' => 'multipart/form-data'],
+      'extra' => [
+        'files' => [
+          'file' => $fileFail,
+        ],
+      ],
+    ]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+    $this->assertJsonContains([
+      "detail" => "The \"file\" must be a csv",
+    ]);
 
     $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/from-csv", [
       '_not_json' => true,
@@ -240,7 +269,6 @@ class MemberPresenceTest extends AbstractEntityClubLinkedTestCase {
         ],
       ],
     ]);
-
     $this->assertResponseIsSuccessful();
 
     $this->assertCount(2, $response->toArray()['created']);

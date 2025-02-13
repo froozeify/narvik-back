@@ -68,7 +68,6 @@ class ImportExternalPresence extends AbstractCsvImporter {
 
     // We check the presence is not already registered
     $existingPresence = $this->externalPresenceRepository->findOneByDay($this->getClub(), $firstname, $lastname, $date);
-    dump($existingPresence);
     if ($existingPresence) {
       $warning = new WarningImportedItem("$lastname $firstname");
       $warning->addWarning(self::ERROR_CODES[200]);

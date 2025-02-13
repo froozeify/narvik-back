@@ -54,7 +54,8 @@ class MemberSeasonRepository extends ServiceEntityRepository {
                ->andWhere('m.member = :member')
                ->andWhere('m.season = :season')
                ->setParameter('member', $member)
-               ->setParameter('season', $season);
+               ->setParameter('season', $season)
+               ->setMaxResults(1);
 
     try {
       return $qb->getQuery()->getOneOrNullResult();

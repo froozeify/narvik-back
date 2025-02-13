@@ -35,14 +35,16 @@ class ExternalPresenceRepository extends ServiceEntityRepository implements Pres
       ->getQuery()->getResult();
   }
 
-  public function findOneByDay(string $firstname, string $lastname, \DateTimeImmutable $date): ?ExternalPresence {
-    $qb = $this->createQueryBuilder('e');
+  public function findOneByDay(Club $club, string $firstname, string $lastname, \DateTimeImmutable $date): ?ExternalPresence {
+    $qb = $this->createQueryBuilder('m');
+    $this->applyClubRestriction($qb, $club);
     $query = $this
       ->applyDayConstraint($qb, $date)
-      ->andWhere("e.firstname = :firstname")
-      ->andWhere("e.lastname = :lastname")
+      ->andWhere("m.firstname = :firstname")
+      ->andWhere("m.lastname = :lastname")
       ->setParameter("firstname", $firstname)
       ->setParameter("lastname", $lastname)
+      ->setMaxResults(1)
       ->getQuery();
 
     try {

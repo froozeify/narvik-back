@@ -23,6 +23,7 @@ class AgeCategoryRepository extends ServiceEntityRepository {
     $query = $this->createQueryBuilder('a')
                 ->andWhere('a.code = :code')
                 ->setParameter('code', $code)
+                ->setMaxResults(1)
                 ->getQuery();
 
     try {

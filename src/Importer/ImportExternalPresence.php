@@ -4,19 +4,16 @@ namespace App\Importer;
 
 use App\Entity\Club;
 use App\Entity\ClubDependent\Plugin\Presence\ExternalPresence;
-use App\Entity\ClubDependent\Plugin\Presence\MemberPresence;
 use App\Importer\Model\AbstractImportedItemResult;
 use App\Importer\Model\ErrorImportedItem;
 use App\Importer\Model\SuccessImportedItem;
 use App\Importer\Model\WarningImportedItem;
-use App\Repository\ClubDependent\MemberRepository;
 use App\Repository\ClubDependent\Plugin\Presence\ActivityRepository;
 use App\Repository\ClubDependent\Plugin\Presence\ExternalPresenceRepository;
-use App\Repository\ClubDependent\Plugin\Presence\MemberPresenceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class ImportExternalMemberPresence extends AbstractCsvImporter {
+class ImportExternalPresence extends AbstractCsvImporter {
   private Club $club;
 
   public const string COL_LICENCE = 'licence';
@@ -70,7 +67,8 @@ class ImportExternalMemberPresence extends AbstractCsvImporter {
     $date = new \DateTimeImmutable($date);
 
     // We check the presence is not already registered
-    $existingPresence = $this->externalPresenceRepository->findOneByDay($firstname, $lastname, $date);
+    $existingPresence = $this->externalPresenceRepository->findOneByDay($this->getClub(), $firstname, $lastname, $date);
+    dump($existingPresence);
     if ($existingPresence) {
       $warning = new WarningImportedItem("$lastname $firstname");
       $warning->addWarning(self::ERROR_CODES[200]);
@@ -80,6 +78,7 @@ class ImportExternalMemberPresence extends AbstractCsvImporter {
 
     $externalPresence = new ExternalPresence();
     $externalPresence
+      ->setClub($this->getClub())
       ->setLicence($licence)
       ->setFirstName($firstname)
       ->setLastName($lastname)
@@ -108,7 +107,7 @@ class ImportExternalMemberPresence extends AbstractCsvImporter {
     return $this->club;
   }
 
-  public function setClub(Club $club): ImportExternalMemberPresence {
+  public function setClub(Club $club): ImportExternalPresence {
     $this->club = $club;
     return $this;
   }

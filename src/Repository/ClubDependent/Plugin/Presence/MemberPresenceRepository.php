@@ -37,6 +37,7 @@ class MemberPresenceRepository extends ServiceEntityRepository implements Presen
       ->applyDayConstraint($qb, $date)
       ->andWhere("m.member = :member")
       ->setParameter("member", $member)
+      ->setMaxResults(1)
       ->getQuery();
 
     try {

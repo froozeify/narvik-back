@@ -35,6 +35,7 @@ class ActivityRepository extends ServiceEntityRepository implements ClubLinkedIn
       ->andWhere("a.club = :club")
       ->setParameter('name', $name)
       ->setParameter('club', $club)
+      ->setMaxResults(1)
       ->getQuery();
 
     try {

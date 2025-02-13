@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
+use App\Controller\ClubDependent\Plugin\Presence\ExternalPresencesFromCsv;
 use App\Controller\ClubDependent\Plugin\Presence\ExternalPresenceToday;
 use App\Entity\Abstract\UuidEntity;
 use App\Entity\Club;
@@ -73,7 +74,35 @@ use Symfony\Component\Serializer\Attribute\Groups;
       security: "is_granted('".ClubRole::supervisor->value."', request) || is_granted('".ClubRole::badger->value."', request)",
       read: false,
       write: false
-    )
+    ),
+
+    new Post(
+      uriTemplate: '/clubs/{clubUuid}/external-presences/-/from-csv',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
+      controller: ExternalPresencesFromCsv::class,
+      openapi: new Model\Operation(
+        requestBody: new Model\RequestBody(
+          content: new \ArrayObject([
+            'multipart/form-data' => [
+              'schema' => [
+                'type' => 'object',
+                'properties' => [
+                  'file' => [
+                    'type' => 'string',
+                    'format' => 'binary'
+                  ]
+                ]
+              ]
+            ]
+          ])
+        )
+      ),
+      securityPostDenormalize: "is_granted('".ClubRole::admin->value."', request)",
+      read: false,
+      deserialize: false
+    ),
   ],
   uriVariables: [
     'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
@@ -84,7 +113,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
   ],
   denormalizationContext: [
     'groups' => ['external-presence', 'external-presence-write']
-  ]
+  ],
+  paginationClientEnabled: true,
 )]
 #[ApiFilter(DateFilter::class, properties: ['date' => DateFilter::EXCLUDE_NULL])]
 #[ApiFilter(OrderFilter::class, properties: ['date' => 'DESC', 'createdAt' => 'DESC'])]

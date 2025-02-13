@@ -69,8 +69,23 @@ class Club extends UuidEntity implements TimestampEntityInterface {
 
   #[ORM\Column(length: 255, nullable: true)]
   #[Groups(['super-admin-read', 'super-admin-write'])]
-  #[Assert\NotBlank(allowNull: true)]
   private ?string $comment = null;
+
+  #[ORM\Column(length: 255, nullable: true)]
+  #[Groups(['super-admin-read', 'super-admin-write'])]
+  private ?string $website = null;
+
+  #[ORM\Column(length: 255, nullable: true)]
+  #[Groups(['super-admin-read', 'super-admin-write'])]
+  private ?string $contactName = null;
+
+  #[ORM\Column(length: 255, nullable: true)]
+  #[Groups(['super-admin-read', 'super-admin-write'])]
+  private ?string $contactPhone = null;
+
+  #[ORM\Column(length: 255, nullable: true)]
+  #[Groups(['super-admin-read', 'super-admin-write'])]
+  private ?string $contactEmail = null;
 
   #[ORM\OneToOne(mappedBy: 'club', targetEntity: ClubSetting::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
   #[Groups(['club-read'])]
@@ -152,4 +167,39 @@ class Club extends UuidEntity implements TimestampEntityInterface {
     return $this;
   }
 
+  public function getWebsite(): ?string {
+    return $this->website;
+  }
+
+  public function setWebsite(?string $website): Club {
+    $this->website = $website;
+    return $this;
+  }
+
+  public function getContactName(): ?string {
+    return $this->contactName;
+  }
+
+  public function setContactName(?string $contactName): Club {
+    $this->contactName = $contactName;
+    return $this;
+  }
+
+  public function getContactPhone(): ?string {
+    return $this->contactPhone;
+  }
+
+  public function setContactPhone(?string $contactPhone): Club {
+    $this->contactPhone = $contactPhone;
+    return $this;
+  }
+
+  public function getContactEmail(): ?string {
+    return $this->contactEmail;
+  }
+
+  public function setContactEmail(?string $contactEmail): Club {
+    $this->contactEmail = $contactEmail;
+    return $this;
+  }
 }

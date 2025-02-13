@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Serializer\CsvSerializer;
+use App\Service\CsvService;
 use Doctrine\Common\Collections\Collection;
 use ReflectionClass;
 use ReflectionException;
@@ -28,7 +28,7 @@ class SerializerValidateCsv extends Command {
 
   public function __construct(
     private readonly KernelInterface $kernel,
-    private readonly CsvSerializer $csvSerializer,
+    private readonly CsvService $csvService,
   ) {
     parent::__construct();
   }
@@ -39,7 +39,7 @@ class SerializerValidateCsv extends Command {
     $this->output = $output;
 
     $this->extractAppEntities();
-    $this->customCsvConfigs = $this->csvSerializer->getCustomCsvConfigs();
+    $this->customCsvConfigs = $this->csvService->getCustomCsvConfigs();
 
     if ($this->validateEntities()) $hasError = true;
     if ($this->validateCustomCsv()) $hasError = true;

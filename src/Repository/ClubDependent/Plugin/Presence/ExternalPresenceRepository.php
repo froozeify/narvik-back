@@ -35,4 +35,21 @@ class ExternalPresenceRepository extends ServiceEntityRepository implements Pres
       ->getQuery()->getResult();
   }
 
+  public function findOneByDay(string $firstname, string $lastname, \DateTimeImmutable $date): ?ExternalPresence {
+    $qb = $this->createQueryBuilder('e');
+    $query = $this
+      ->applyDayConstraint($qb, $date)
+      ->andWhere("e.firstname = :firstname")
+      ->andWhere("e.lastname = :lastname")
+      ->setParameter("firstname", $firstname)
+      ->setParameter("lastname", $lastname)
+      ->getQuery();
+
+    try {
+      return $query->getOneOrNullResult();
+    } catch (\Exception $e) {
+      return null;
+    }
+  }
+
 }

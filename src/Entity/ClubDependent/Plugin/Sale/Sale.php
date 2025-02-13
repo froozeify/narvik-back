@@ -97,7 +97,6 @@ class Sale extends UuidEntity implements TimestampEntityInterface, ClubLinkedEnt
 
   #[ORM\Column(length: 255, nullable: true)]
   #[Groups(['sale'])]
-  #[Assert\NotBlank(allowNull: true)]
   private ?string $comment = null;
 
   /**
@@ -146,6 +145,9 @@ class Sale extends UuidEntity implements TimestampEntityInterface, ClubLinkedEnt
   }
 
   public function setComment(?string $comment): static {
+    if (empty($comment)) {
+      $comment = null;
+    }
     $this->comment = $comment;
     return $this;
   }

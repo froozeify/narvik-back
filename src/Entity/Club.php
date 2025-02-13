@@ -137,6 +137,9 @@ class Club extends UuidEntity implements TimestampEntityInterface {
   }
 
   public function setComment(?string $comment): Club {
+    if (empty($comment)) {
+      $comment = null;
+    }
     $this->comment = $comment;
     return $this;
   }

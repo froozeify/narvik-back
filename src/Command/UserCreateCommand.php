@@ -2,9 +2,9 @@
 
 namespace App\Command;
 
-use App\Entity\ClubDependent\Member;
-use App\Enum\ClubRole;
-use App\Repository\ClubDependent\MemberRepository;
+use App\Entity\User;
+use App\Enum\UserRole;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -15,13 +15,13 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-#[AsCommand(name: 'member:create', description: 'Create a member')]
-class MemberCreateCommand extends Command {
+#[AsCommand(name: 'user:create', description: 'Create an user')]
+class UserCreateCommand extends Command {
   private SymfonyStyle $io;
 
   public function __construct(
     private readonly EntityManagerInterface $em,
-    private readonly MemberRepository $memberRepository,
+    private readonly UserRepository $userRepository,
     private readonly ValidatorInterface $validator,
   ) {
     parent::__construct();
@@ -32,8 +32,7 @@ class MemberCreateCommand extends Command {
     $this->addOption('password', null,InputOption::VALUE_OPTIONAL, 'Mot de passe');
     $this->addOption('firstname', null,InputOption::VALUE_OPTIONAL, 'Prénom');
     $this->addOption('lastname', null,InputOption::VALUE_OPTIONAL, 'Nom');
-    $this->addOption('role', null,InputOption::VALUE_OPTIONAL, 'Rôle. Valeurs possibles : ' . implode(', ', array_column(ClubRole::cases(), 'value')));
-    $this->addOption('licence', null,InputOption::VALUE_OPTIONAL, 'Licence. Écrire `null` pour ne pas en définir');
+    $this->addOption('role', null,InputOption::VALUE_OPTIONAL, 'Rôle. Valeurs possibles : ' . implode(', ', array_column(UserRole::cases(), 'value')));
   }
 
   protected function execute(InputInterface $input, OutputInterface $output): int {
@@ -45,7 +44,7 @@ class MemberCreateCommand extends Command {
       $email = $this->io->askQuestion(new Question("Adresse mail", "admin@admin.com"));
     }
 
-    $dbMember = $this->memberRepository->findOneByEmail($email);
+    $dbMember = $this->userRepository->findOneByEmail($email);
     if ($dbMember) {
       $this->io->info("Email déjà existant, création du compte ignoré.");
       return Command::INVALID;
@@ -91,42 +90,33 @@ class MemberCreateCommand extends Command {
 
     $role = $input->getOption('role');
     if (!$role) {
-      $role = $this->io->askQuestion(new Question("Rôle. Valeurs possibles : " . implode(', ', array_column(ClubRole::cases(), 'value')), ClubRole::admin->value));
+      $role = $this->io->askQuestion(new Question("Rôle. Valeurs possibles : " . implode(', ', array_column(UserRole::cases(), 'value')), UserRole::super_admin->value));
     }
-    $role = ClubRole::tryFrom($role) ?? ClubRole::admin;
+    $role = UserRole::tryFrom($role) ?? UserRole::super_admin;
 
-    $licence = $input->getOption('licence');
-    if (!$licence) {
-      $licence = $this->io->askQuestion(new Question("'Licence. Écrire `null` ou faire Entrer pour ne pas en définir'"));
-    }
-    if ($licence === 'null') {
-      $licence = null;
-    }
-
-    $this->createAccount($email, $password, $firstname, $lastname, $role, $licence);
+    $this->createAccount($email, $password, $firstname, $lastname, $role);
 
     return Command::SUCCESS;
   }
 
-  private function createAccount(string $email, string $password, string $firstname, string $lastname, ClubRole $role, ?string $licence = null): void {
-    $member = new Member();
-    $member
+  private function createAccount(string $email, string $password, string $firstname, string $lastname, UserRole $role): void {
+    $user = new User();
+    $user
       ->setFirstname($firstname)
       ->setLastname($lastname)
       ->setEmail($email)
-      ->setLicence($licence)
       ->setPlainPassword($password)
       ->setRole($role)
       ->setAccountActivated(true);
 
-    $errors = $this->validator->validate($member);
+    $errors = $this->validator->validate($user);
     if (count($errors) > 0) {
       $this->io->error('Erreur lors la création du compte');
       $this->io->error((string) $errors);
       return;
     }
 
-    $this->em->persist($member);
+    $this->em->persist($user);
     $this->em->flush();
 
     $this->io->success('Compte créé.');

@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Enum\ClubRole;
+use App\Enum\UserRole;
 use App\Repository\ClubDependent\MemberRepository;
 use App\Service\GlobalSettingService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -42,8 +42,6 @@ class InstallCommand extends Command {
     $this->creatingDatabaseSchema();
     $this->generateJwtKeys();
     $this->createAdminAccount();
-    $this->createBadgerAccount();
-//    $this->generateBadgerLoginToken();
     $this->generateGlobalSettingsDefault();
 
     $this->io->success('Environnement configuré');
@@ -103,69 +101,13 @@ class InstallCommand extends Command {
     $this->io->section("Création d'un compte administrateur");
 
     $command = new ArrayInput([
-      'command' => 'member:create',
-      '--licence' => 'null',
-      '--role' => ClubRole::admin->value,
+      'command' => 'user:create',
+      '--role' => UserRole::super_admin->value,
       '--firstname' => 'Admin',
       '--lastname' => 'ADMIN',
     ]);
     $this->getApplication()->doRun($command, $this->io);
   }
-
-  private function createBadgerAccount(): void {
-    $this->io->section("Création du compte 'Badger'");
-    $badger = $this->memberRepository->findOneByEmail('badger');
-
-    if ($badger) {
-      $this->io->info("Compte 'Badger' déjà présent");
-      return;
-    }
-
-    $command = new ArrayInput([
-      'command' => 'member:create',
-      '--licence' => 'null',
-      '--role' => ClubRole::badger->value,
-      '--email' => 'badger',
-      '--password' => 'badger',
-      '--firstname' => 'Badger',
-      '--lastname' => 'badger',
-    ]);
-    $this->getApplication()->doRun($command, $this->io);
-  }
-
-//  private function generateBadgerLoginToken(): void {
-//    $this->io->section("Génération du token de connexion pour 'Badger'");
-//
-//    $existingToken = false;
-//    if (!empty($this->globalSettingService->getSettingValue(GlobalSetting::BADGER_TOKEN))) {
-//      $existingToken = true;
-//    }
-//
-//    if ($existingToken) {
-//      $question = new Question("Voulez-vous générer un nouveau token de connexion pour 'Badger' ? (oui/non)", "n");
-//      $question->setValidator(function (?string $value): string {
-//        if (empty($value)) {
-//          $value = "o";
-//        }
-//        return strtolower($value);
-//      });
-//      $question = $this->io->askQuestion($question);
-//      if ($question[0] !== "o") {
-//        return;
-//      }
-//    }
-//
-//    $badgerToken = $this->randomToken(mt_rand(180, 200));
-//    $this->globalSettingService->updateSettingValue(GlobalSetting::BADGER_TOKEN, $badgerToken);
-//
-//    $this->io->table([
-//      'token',
-//    ], [
-//      [
-//        $badgerToken,
-//      ]
-//    ]);
-//  }
 
   private function generateGlobalSettingsDefault(): void {
     $command = new ArrayInput([

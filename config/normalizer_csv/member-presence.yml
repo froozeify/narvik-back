@@ -13,5 +13,4 @@ App\Entity\ClubDependent\Plugin\Presence\MemberPresence:
     activities:
         prefix: activities
         fields:
-            id: ~
             name: ~

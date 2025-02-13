@@ -1,0 +1,13 @@
+App\Entity\ClubDependent\Plugin\Presence\ExternalPresence:
+    uuid: ~
+    date: ~
+    createdAt: ~
+    
+    licence: ~
+    firstname: ~
+    lastname: ~
+
+    activities:
+        prefix: activities
+        fields:
+            name: ~

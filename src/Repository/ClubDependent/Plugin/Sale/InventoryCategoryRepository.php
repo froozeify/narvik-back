@@ -2,7 +2,9 @@
 
 namespace App\Repository\ClubDependent\Plugin\Sale;
 
+use App\Entity\Club;
 use App\Entity\ClubDependent\Plugin\Sale\InventoryCategory;
+use App\Entity\ClubDependent\Plugin\Sale\InventoryItem;
 use App\Repository\Interface\ClubLinkedInterface;
 use App\Repository\Interface\SortableRepositoryInterface;
 use App\Repository\Trait\ClubLinkedTrait;
@@ -26,6 +28,23 @@ class InventoryCategoryRepository extends ServiceEntityRepository implements Sor
 
   public function __construct(ManagerRegistry $registry) {
     parent::__construct($registry, InventoryCategory::class);
+  }
+
+  public function findOneByName(Club $club, string $name): ?InventoryCategory {
+    $qb = $this->createQueryBuilder('i');
+    $this->applyClubRestriction($qb, $club);
+    $query = $qb
+      ->andWhere($qb->expr()->eq($qb->expr()->lower('i.name'), $qb->expr()->lower(':name')))
+      ->setParameter('name', $name)
+      ->setMaxResults(1)
+      ->getQuery();
+
+    try {
+      return $query->getOneOrNullResult();
+    }
+    catch (\Exception $e) {
+      return null;
+    }
   }
 
   //    /**

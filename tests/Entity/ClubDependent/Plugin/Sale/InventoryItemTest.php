@@ -6,7 +6,9 @@ use App\Entity\ClubDependent\Plugin\Sale\InventoryItem;
 use App\Tests\Entity\Abstract\AbstractEntityClubLinkedTestCase;
 use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Factory\InventoryItemFactory;
+use App\Tests\FixtureFileManager;
 use App\Tests\Story\_InitStory;
+use App\Tests\Story\SalePaymentModeStory;
 
 class InventoryItemTest extends AbstractEntityClubLinkedTestCase {
   protected int $TOTAL_SUPER_ADMIN = 10;
@@ -79,5 +81,50 @@ class InventoryItemTest extends AbstractEntityClubLinkedTestCase {
         $this->makeDeleteRequest($this->getIriFromResource($item));
       },
     );
+  }
+
+  public function testImportPresencesFromCSV(): void {
+    $club = _InitStory::club_1();
+
+    $file = FixtureFileManager::getUploadedFile(FixtureFileManager::NARVIK_INVENTORIES);
+    $fileFail = FixtureFileManager::getUploadedFile(FixtureFileManager::LOGO);
+
+    $this->loggedAsAdminClub1();
+    $response = $this->makeGetRequest($this->getRootWClubUrl($club));
+    $this->assertCount($this->TOTAL_ADMIN_CLUB_1, $response->toArray()['member']);
+
+    // Not a CSV
+    $this->makePostRequest($this->getRootWClubUrl($club) . "/-/from-csv", [
+      '_not_json' => true,
+      'headers' => ['Content-Type' => 'multipart/form-data'],
+      'extra' => [
+        'files' => [
+          'file' => $fileFail,
+        ],
+      ],
+    ]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+    $this->assertJsonContains([
+      "detail" => "The \"file\" must be a csv",
+    ]);
+
+    $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/from-csv", [
+      '_not_json' => true,
+      'headers' => ['Content-Type' => 'multipart/form-data'],
+      'extra' => [
+        'files' => [
+          'file' => $file,
+        ],
+      ],
+    ]);
+    $this->assertResponseIsSuccessful();
+
+    $this->assertCount(5, $response->toArray()['created']);
+    $this->assertCount(0, $response->toArray()['warnings']);
+    $this->assertCount(0, $response->toArray()['errors']);
+
+    // 2 new sales
+    $response = $this->makeGetRequest($this->getRootWClubUrl($club));
+    $this->assertCount($this->TOTAL_ADMIN_CLUB_1 + 5, $response->toArray()['member']);
   }
 }

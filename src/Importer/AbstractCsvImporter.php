@@ -185,23 +185,32 @@ abstract class AbstractCsvImporter {
    * @param string $type the check that is made, can be int, bool
    *
    * @return mixed the value sanitized
-   * @throws \Exception When the value is malformed
    */
   protected function sanitizeColValueForNumber(mixed $value, string $type = "int") {
     if ($type === "int") {
       if ($value === "") $value = null;
       if (!is_null($value) && !is_numeric($value)) {
-        throw new \Exception("Malformed value");
+        return null;
       }
     } elseif ($type === "bool") {
       if (!is_bool($value) && !is_null($value)) {
-        $value = strtolower((string) $value);
-        return !in_array($value, ["", "0", "false"]);
+        return $this->toBoolean($value);
       } else {
         return false;
       }
     }
     return $value;
+  }
+
+  /**
+   * Convert the passed value to boolean.
+   * Will be `false` if value is incorrect
+   *
+   * @param $value
+   * @return bool
+   */
+  protected function toBoolean($value): bool {
+    return is_bool($value) ? $value : !in_array(strtolower((string) $value), ['', '0', 'false']);
   }
 
   private function parseRow(int $lineNumber, array &$row, array &$result): void {

@@ -14,6 +14,8 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\OpenApi\Model;
+use App\Controller\ClubDependent\Plugin\Sale\InventoryItemsFromCsv;
 use App\Entity\Abstract\UuidEntity;
 use App\Entity\Club;
 use App\Entity\Interface\ClubLinkedEntityInterface;
@@ -60,6 +62,34 @@ use Symfony\Component\Validator\Constraints as Assert;
     new Delete(
       security: "is_granted('".ClubRole::admin->value."', object)",
     ),
+
+    new Post(
+      uriTemplate: '/clubs/{clubUuid}/inventory-items/-/from-csv',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
+      controller: InventoryItemsFromCsv::class,
+      openapi: new Model\Operation(
+        requestBody: new Model\RequestBody(
+          content: new \ArrayObject([
+            'multipart/form-data' => [
+              'schema' => [
+                'type' => 'object',
+                'properties' => [
+                  'file' => [
+                    'type' => 'string',
+                    'format' => 'binary'
+                  ]
+                ]
+              ]
+            ]
+          ])
+        )
+      ),
+      securityPostDenormalize: "is_granted('".ClubRole::admin->value."', request)",
+      read: false,
+      deserialize: false
+    ),
   ],
   uriVariables: [
     'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
@@ -71,7 +101,8 @@ use Symfony\Component\Validator\Constraints as Assert;
   denormalizationContext: [
     'groups' => ['inventory-item', 'inventory-item-write']
   ],
-  order: ['category.weight' => 'ASC', 'name' => 'ASC']
+  order: ['category.weight' => 'ASC', 'name' => 'ASC'],
+  paginationClientEnabled: true,
 )]
 #[ApiFilter(OrderFilter::class, properties: ['name' => 'ASC', 'category.name' => 'ASC', 'category.weight' => 'ASC', 'quantity' => ['default_direction' => 'ASC', 'nulls_comparison' => OrderFilter::NULLS_ALWAYS_LAST ]])]
 #[ApiFilter(MultipleFilter::class, properties: ['name', 'barcode'])]

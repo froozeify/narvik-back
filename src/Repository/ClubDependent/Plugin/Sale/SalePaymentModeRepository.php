@@ -28,7 +28,7 @@ class SalePaymentModeRepository extends ServiceEntityRepository implements Sorta
     $qb = $this->createQueryBuilder('s');
     $this->applyClubRestriction($qb, $club);
     $query = $qb
-      ->andWhere($qb->expr()->like($qb->expr()->lower('s.name'), $qb->expr()->lower(':name')))
+      ->andWhere($qb->expr()->eq($qb->expr()->lower('s.name'), $qb->expr()->lower(':name')))
       ->setParameter('name', $name)
       ->setMaxResults(1)
       ->getQuery();

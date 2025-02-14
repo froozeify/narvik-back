@@ -37,7 +37,7 @@ class AppFixtures extends Fixture {
 
     $itemsMapping = [
       "Cibles" => ['Cible C50', 'Visuel C50', 'Pistolet 10M', 'Carabine 10M'],
-      "Munitions" => ['semi-auto 22lr', '9mm - Sellier & Bellot', '9mm - Geco', 'Plombs'],
+      "Munitions" => ['semi-auto 22lr', '9mm - SB', '9mm - G', 'Plombs'],
       "Administratif" => ['licence', 'droit d\'entrée', 'second club'],
       "Droit de tir" => ['10M', '25/50M'],
     ];

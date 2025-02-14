@@ -4,7 +4,7 @@ namespace App\Importer\Model;
 
 class ErrorImportedItem extends AbstractImportedItemResult {
 
-  public function __construct(string $identifier, array $data = []) {
+  public function __construct(?string $identifier = null, array $data = []) {
     parent::__construct(static::ERROR, $identifier, $data);
   }
 

@@ -3,13 +3,19 @@
 namespace App\Repository\ClubDependent\Plugin\Sale;
 
 use App\Entity\ClubDependent\Plugin\Sale\Sale;
+use App\Repository\Interface\ClubLinkedInterface;
+use App\Repository\Trait\ClubLinkedTrait;
+use App\Repository\Trait\UuidEntityRepositoryTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Sale>
  */
-class SaleRepository extends ServiceEntityRepository {
+class SaleRepository extends ServiceEntityRepository implements ClubLinkedInterface {
+  use UuidEntityRepositoryTrait;
+  use ClubLinkedTrait;
+
   public function __construct(ManagerRegistry $registry) {
     parent::__construct($registry, Sale::class);
   }

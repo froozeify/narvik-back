@@ -13,6 +13,7 @@ class FixtureFileManager {
   const string PRESENCES_NARVIK = 'presences-narvik.csv';
   const string EXTERNAL_PRESENCES_NARVIK = 'external-presences-narvik.csv';
   const string PRESENCES_CERBERE = 'presences-cerbere.xls';
+  const string NARVIK_SALES = 'narvik-sales.csv';
 
   /**
    * @param string $filename

@@ -8,7 +8,9 @@ use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Factory\InventoryItemFactory;
 use App\Tests\Factory\SaleFactory;
 use App\Tests\Factory\SalePaymentModeFactory;
+use App\Tests\FixtureFileManager;
 use App\Tests\Story\_InitStory;
+use App\Tests\Story\SalePaymentModeStory;
 use function Zenstruck\Foundry\faker;
 
 class SaleTest extends AbstractEntityClubLinkedTestCase {
@@ -128,5 +130,60 @@ class SaleTest extends AbstractEntityClubLinkedTestCase {
     );
   }
 
-  // TODO: Add check item can be sold and paymentMode is available
+  public function testExportPresencesInCSV(): void {
+    $club = _InitStory::club_1();
+
+    $this->loggedAsAdminClub1();
+    $response = $this->makeGetCsvRequest($this->getRootWClubUrl($club) . ".csv");
+    $this->assertResponseIsSuccessful();
+    $csv = $response->getContent();
+    $this->assertTrue(str_contains($csv, "seller.licence"));
+  }
+
+  public function testImportPresencesFromCSV(): void {
+    SalePaymentModeStory::load();
+
+    $club = _InitStory::club_1();
+
+    $file = FixtureFileManager::getUploadedFile(FixtureFileManager::NARVIK_SALES);
+    $fileFail = FixtureFileManager::getUploadedFile(FixtureFileManager::LOGO);
+
+    $this->loggedAsAdminClub1();
+    $response = $this->makeGetRequest($this->getRootWClubUrl($club));
+    $this->assertCount($this->TOTAL_ADMIN_CLUB_1, $response->toArray()['member']);
+
+    // Not a CSV
+    $this->makePostRequest($this->getRootWClubUrl($club) . "/-/from-csv", [
+      '_not_json' => true,
+      'headers' => ['Content-Type' => 'multipart/form-data'],
+      'extra' => [
+        'files' => [
+          'file' => $fileFail,
+        ],
+      ],
+    ]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+    $this->assertJsonContains([
+      "detail" => "The \"file\" must be a csv",
+    ]);
+
+    $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/from-csv", [
+      '_not_json' => true,
+      'headers' => ['Content-Type' => 'multipart/form-data'],
+      'extra' => [
+        'files' => [
+          'file' => $file,
+        ],
+      ],
+    ]);
+    $this->assertResponseIsSuccessful();
+
+    $this->assertCount(2, $response->toArray()['created']);
+    $this->assertCount(0, $response->toArray()['warnings']);
+    $this->assertCount(1, $response->toArray()['errors']);
+
+    // 2 new sales
+    $response = $this->makeGetRequest($this->getRootWClubUrl($club));
+    $this->assertCount($this->TOTAL_ADMIN_CLUB_1 + 2, $response->toArray()['member']);
+  }
 }

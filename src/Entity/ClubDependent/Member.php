@@ -266,7 +266,7 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
   private ?string $email = null;
 
   #[ORM\Column(length: 10, nullable: true)]
-  #[Groups(['autocomplete', 'member-read', 'club-supervisor-write', 'member-presence-read'])]
+  #[Groups(['autocomplete', 'member-read', 'club-supervisor-write', 'member-presence-read', 'sale-read'])]
   #[Assert\Regex(pattern: '/\d{8,10}/')]
   private ?string $licence = null;
 

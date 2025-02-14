@@ -64,6 +64,7 @@ final class SaleFactory extends PersistentProxyObjectFactory {
     return [
       // 'price' => self::faker()->randomFloat(2, 20, 80),
       'club' => _InitStory::club_1(),
+      'seller' => _InitStory::MEMBER_supervisor_club_1(),
       'salePurchasedItems'  => SalePurchasedItemFactory::createMany(self::faker()->numberBetween(1, 6)),
       'paymentMode' => SalePaymentModeFactory::randomOrCreate(),
       'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTimeBetween('-1 years')),

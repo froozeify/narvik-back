@@ -7,7 +7,7 @@ abstract class AbstractImportedItemResult {
   public const WARNING = "warning";
   public const ERROR = "error";
 
-  public function __construct(protected string $status, protected string $identifier, protected array $data = []) {
+  public function __construct(protected string $status, protected ?string $identifier = null, protected array $data = []) {
     if (!empty($this->identifier)) $this->data["identifier"] = $this->identifier;
   }
 

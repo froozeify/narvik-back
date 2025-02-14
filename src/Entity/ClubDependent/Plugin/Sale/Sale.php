@@ -13,6 +13,8 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\OpenApi\Model;
+use App\Controller\ClubDependent\Plugin\Sale\SalesFromCsv;
 use App\Entity\Abstract\UuidEntity;
 use App\Entity\Club;
 use App\Entity\ClubDependent\Member;
@@ -59,6 +61,34 @@ use Symfony\Component\Validator\Constraints as Assert;
     new Delete(
       security: "is_granted('".ClubRole::admin->value."', object)  || is_granted('".SaleVoter::DELETE."', object)",
     ),
+
+    new Post(
+      uriTemplate: '/clubs/{clubUuid}/sales/-/from-csv',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
+      controller: SalesFromCsv::class,
+      openapi: new Model\Operation(
+        requestBody: new Model\RequestBody(
+          content: new \ArrayObject([
+            'multipart/form-data' => [
+              'schema' => [
+                'type' => 'object',
+                'properties' => [
+                  'file' => [
+                    'type' => 'string',
+                    'format' => 'binary'
+                  ]
+                ]
+              ]
+            ]
+          ])
+        )
+      ),
+      securityPostDenormalize: "is_granted('".ClubRole::admin->value."', request)",
+      read: false,
+      deserialize: false
+    ),
   ],
   uriVariables: [
     'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
@@ -77,15 +107,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(SearchFilter::class, properties: ['seller.uuid' => 'exact'])]
 #[ApiFilter(DateFilter::class, properties: ['createdAt' => DateFilter::EXCLUDE_NULL])]
 class Sale extends UuidEntity implements TimestampEntityInterface, ClubLinkedEntityInterface {
-  // TODO: Add check item can be sold and paymentMode is available
   use TimestampTrait;
   use SelfClubLinkedEntityTrait;
 
   #[ORM\ManyToOne(inversedBy: 'sales')]
+  #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
   #[Groups(['sale'])]
   private ?Member $seller = null;
 
   #[ORM\ManyToOne]
+  #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
   #[Groups(['sale'])]
   #[Assert\NotNull]
   private ?SalePaymentMode $paymentMode = null;

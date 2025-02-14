@@ -1,0 +1,4 @@
+seller.licence,paymentMode.name,price,comment,item.0.name,item.0.category,item.0.price,item.0.quantity,uuid,createdAt
+99999999,Espèces,14.31,Should fail,"Cible C50",Cibles,14.31,1,01950394-b472-7135-beb6-f138d91d624c,2025-02-14T08:30:32+00:00
+10000001,Espèces,14.31,Ok,"Cible C50",Cibles,14.31,1,01950394-b472-7135-beb6-f138d91d624c,2025-02-14T08:30:32+00:00
+10000001,Espèces,14.31,,"Cible C50",Cibles,14.31,1,01950394-b472-7135-beb6-f138d91d624c,2025-02-14T09:32:32+00:00

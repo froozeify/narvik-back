@@ -34,7 +34,7 @@ class LoginTest extends AbstractTestCase {
     ]);
 
     $this->loggedAs("notactivated@user.fr", "testuser123");
-    $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+    $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
     // We enable the account
     $this->loggedAsSuperAdmin();
@@ -48,7 +48,7 @@ class LoginTest extends AbstractTestCase {
 
   public function testLoginWithWrongPassword(): void {
     $this->loggedAs("admin@admin.com", "wrong");
-    $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+    $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
     // We request a PRIVATE resource
     $this->makeGetRequest('/clubs');
@@ -62,7 +62,7 @@ class LoginTest extends AbstractTestCase {
    */
   public function testLoginAsUnknown(): void {
     $this->loggedAs("notexisting@test.fr", "test");
-    $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+    $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
   }
 
   public function testLoginWithMultipleProfiles(): void {

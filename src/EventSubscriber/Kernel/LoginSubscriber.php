@@ -94,6 +94,18 @@ final class LoginSubscriber implements EventSubscriberInterface {
     $event->setUser($user);
   }
 
+//  public function jwtSuccess(AuthenticationSuccessEvent $event): void {
+//    $user = $event->getUser();
+//    if (!$user instanceof Member) {
+//      return;
+//    }
+//
+//    $this->member = $user;
+//    $memberLimiter = $this->getMemberLimiter();
+//    $memberLimiter?->reset();
+//  }
+
+
   private function getMemberLimiter(): ?LimiterInterface {
     $request = $this->requestStack->getCurrentRequest();
     $email = $this->member?->getEmail();

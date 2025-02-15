@@ -9,7 +9,7 @@ league_oauth2_server:
     resource_server:
         public_key: '%env(resolve:OAUTH_PUBLIC_KEY)%'
     scopes:
-        available: [ 'all' ]
+        available: [ 'all', 'badger' ]
         default: [ 'all' ]
     persistence:
         doctrine:

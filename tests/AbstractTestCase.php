@@ -101,7 +101,7 @@ abstract class AbstractTestCase extends ApiTestCase {
     }
 
     $data = $response->toArray();
-    $this->accessToken = $data['token'];
+    $this->accessToken = $data['access_token'];
     $this->refreshToken = $data['refresh_token'];
     return true;
   }
@@ -120,7 +120,7 @@ abstract class AbstractTestCase extends ApiTestCase {
     }
 
     $data = $response->toArray();
-    $this->accessToken = $data['token'];
+    $this->accessToken = $data['access_token'];
     $this->refreshToken = $data['refresh_token'];
     return true;
   }

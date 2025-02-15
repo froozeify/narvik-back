@@ -32,7 +32,14 @@ use Zenstruck\Foundry\Story;
 final class _InitStory extends Story {
   public function build(): void {
     // We create the frontend client
-    ClientFactory::createOne();
+    ClientFactory::createOne([
+      'name'       => 'test',
+      'identifier' => 'test',
+    ]);
+    ClientFactory::createOne([
+      'name'       => 'badger',
+      'identifier' => 'badger',
+    ]);
 
     $this->addState('USER_super_admin', UserFactory::new()->superAdmin("admin@admin.com")->create(), 'super_admin');
 

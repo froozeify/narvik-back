@@ -26,8 +26,6 @@ final class ClientFactory extends PersistentProxyObjectFactory {
     return [
       'active'             => true,
       'allowPlainTextPkce' => false,
-      'name'               => 'test',
-      'identifier'         => 'test',
       'secret'             => 'secretTestOnly'
     ];
   }

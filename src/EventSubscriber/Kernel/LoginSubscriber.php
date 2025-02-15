@@ -3,6 +3,9 @@
 namespace App\EventSubscriber\Kernel;
 
 use App\Entity\ClubDependent\Member;
+use App\Entity\User;
+use League\Bundle\OAuth2ServerBundle\Event\UserResolveEvent;
+use League\Bundle\OAuth2ServerBundle\OAuth2Events;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationSuccessEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Events;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
@@ -10,8 +13,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 final class LoginSubscriber implements EventSubscriberInterface {
 
@@ -22,9 +30,12 @@ final class LoginSubscriber implements EventSubscriberInterface {
       KernelEvents::REQUEST => [
         ['requestEvent', 10],
       ],
-      Events::AUTHENTICATION_SUCCESS => [
-        ['jwtSuccess', 10],
-      ],
+      OAuth2Events::USER_RESOLVE => [
+        ['onUserResolve', 10],
+      ]
+//      Events::AUTHENTICATION_SUCCESS => [
+//        ['jwtSuccess', 10],
+//      ],
     ];
   }
 
@@ -33,6 +44,8 @@ final class LoginSubscriber implements EventSubscriberInterface {
     private readonly RateLimiterFactory $memberIpLoginLimiter,
     private readonly RateLimiterFactory $ipLoginLimiter,
     private readonly ContainerBagInterface $containerBag,
+    private readonly UserProviderInterface $userProvider,
+    private readonly UserPasswordHasherInterface $userPasswordHasher,
   ) {
   }
 
@@ -63,16 +76,37 @@ final class LoginSubscriber implements EventSubscriberInterface {
     $memberLimiter?->consume(1)->ensureAccepted();
   }
 
-  public function jwtSuccess(AuthenticationSuccessEvent $event): void {
-    $user = $event->getUser();
-    if (!$user instanceof Member) {
+  public function onUserResolve(UserResolveEvent $event): void {
+    dump("call");
+    try {
+      $user = $this->userProvider->loadUserByIdentifier($event->getUsername());
+    } catch (AuthenticationException $e) {
       return;
     }
 
-    $this->member = $user;
-    $memberLimiter = $this->getMemberLimiter();
-    $memberLimiter?->reset();
+    if (!$user instanceof User) {
+      return;
+    }
+
+    dump("call");
+
+    if (!$this->userPasswordHasher->isPasswordValid($user, $event->getPassword())) {
+      return;
+    }
+
+    $event->setUser($user);
   }
+
+//  public function jwtSuccess(AuthenticationSuccessEvent $event): void {
+//    $user = $event->getUser();
+//    if (!$user instanceof Member) {
+//      return;
+//    }
+//
+//    $this->member = $user;
+//    $memberLimiter = $this->getMemberLimiter();
+//    $memberLimiter?->reset();
+//  }
 
   private function getMemberLimiter(): ?LimiterInterface {
     $request = $this->requestStack->getCurrentRequest();

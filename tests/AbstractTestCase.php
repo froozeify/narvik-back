@@ -25,6 +25,8 @@ abstract class AbstractTestCase extends ApiTestCase {
 
   use CustomApiTestAssertionsTrait;
 
+  private string $clientAuthorization = 'dGVzdDpzZWNyZXRUZXN0T25seQ=='; // base64 encode test:secretTestOnly
+
   private ?string $accessToken = null;
   private ?string $refreshToken = null;
   private ?string $selectedProfile = null;
@@ -83,11 +85,15 @@ abstract class AbstractTestCase extends ApiTestCase {
   protected function loggedAs(string $email, string $password): bool {
     $this->logout();
 
-    $response = static::createClient()->request(Request::METHOD_POST, '/auth', [
-      'json' => [
-        'email' => $email,
+    $response = static::createClient()->request(Request::METHOD_POST, '/token', [
+      'body' => [
+        'grant_type' => 'password',
+        'username' => $email,
         'password' => $password,
       ],
+      'headers' => [
+        'Authorization' => 'Basic ' . $this->clientAuthorization,
+      ]
     ]);
 
     if ($response->getStatusCode() !== Response::HTTP_OK) {

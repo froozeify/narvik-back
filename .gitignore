@@ -10,11 +10,6 @@
 /private
 supervisord.log
 supervisord.pid
-
-###> lexik/jwt-authentication-bundle ###
-/config/jwt/*.pem
-###< lexik/jwt-authentication-bundle ###
-
 dump/
 
 ###> phpstan/phpstan ###
@@ -31,3 +26,7 @@ tests/coverage/
 /phpunit.xml
 .phpunit.result.cache
 ###< phpunit/phpunit ###
+
+###> league/oauth2-server-bundle ###
+/config/jwt/*.pem
+###< league/oauth2-server-bundle ###

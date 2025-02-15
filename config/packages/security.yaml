@@ -13,28 +13,14 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+        api_token:
+            pattern: ^/token$
+            security: false
         main:
-            entry_point:
-                jwt
+            security: true
             stateless: true
+            oauth2: true
             provider: app_user_provider
-            json_login:
-                check_path: api_login
-                username_path: email
-                password_path: password
-                success_handler: lexik_jwt_authentication.handler.authentication_success
-                failure_handler: lexik_jwt_authentication.handler.authentication_failure
-            jwt: ~
-            refresh_jwt:
-                check_path: gesdinet_jwt_refresh_token
-            #form_login:
-            #    login_path: app_login
-            #    check_path: app_login
-            #    enable_csrf: true
-            #logout:
-            #    path: app_logout
-            #    # where to redirect after logout
-            #    # target: app_any_route
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -52,7 +38,6 @@ security:
     access_control:
         - { path: ^/$, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
         - { path: ^/docs, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI docs
-        - { route: ^/auth, roles: PUBLIC_ACCESS }
         - { route: 'auth_bdg', roles: PUBLIC_ACCESS }
         - { path: ^/public, roles: PUBLIC_ACCESS }
         - { path: ^/users/-/initiate-register, roles: PUBLIC_ACCESS }

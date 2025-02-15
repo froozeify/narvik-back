@@ -64,8 +64,10 @@ abstract class AbstractTestCase extends ApiTestCase {
   protected function createClientWithCredentials(?string $token = null): Client {
     $token = $token ?? $this->accessToken;
 
+    $authorization = $token ? 'Bearer ' . $token : 'Basic ' . $this->clientAuthorization; // No token pass we request as Basic api
+
     $headers = [
-      'Authorization' => 'Bearer ' . $token,
+      'Authorization' => $authorization,
     ];
     if ($this->selectedProfile) {
       $headers['Profile'] = $this->selectedProfile;
@@ -250,6 +252,10 @@ abstract class AbstractTestCase extends ApiTestCase {
     return $options;
   }
 
+  /**
+   * Making a request with no authentication.
+   * Since now we are in an oauth context, this should never be used
+   */
   public function makeNotLoggedRequest(string $method, string $url, ?array $data = null, array $uriParameters = []): ResponseInterface {
     $options = $this->prepareRequestOptions($data, $uriParameters);
     $response = static::createClient()->request($method, $url, $options);

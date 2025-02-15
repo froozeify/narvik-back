@@ -10,6 +10,7 @@ enum ResponseCodeEnum: int {
   case no_content = Response::HTTP_NO_CONTENT;
 
   case not_found = Response::HTTP_NOT_FOUND;
+  case unauthorized = Response::HTTP_UNAUTHORIZED;
   case not_allowed = Response::HTTP_METHOD_NOT_ALLOWED;
   case bad_request = Response::HTTP_BAD_REQUEST;
   case forbidden = Response::HTTP_FORBIDDEN;

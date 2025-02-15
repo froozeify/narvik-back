@@ -37,10 +37,10 @@ class CleanupCommand extends Command {
   }
 
   private function cleanJwt(): void {
-    $this->io->section("Refresh token");
+    $this->io->section("Clearing expired access, refresh tokens and auth codes");
 
     $command = new ArrayInput([
-      'command' => 'gesdinet:jwt:clear',
+      'command' => 'league:oauth2-server:clear-expired-tokens',
     ]);
     $this->getApplication()->doRun($command, $this->io);
   }

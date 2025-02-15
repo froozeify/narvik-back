@@ -2,18 +2,6 @@
 set -e
 
 IGNORE_MIGRATION=${IGNORE_MIGRATION:-false}
-OAUTH2_PRIVATE_KEY_PASSPHRASE=${$OAUTH2_PRIVATE_KEY_PASSPHRASE:-changeme}
-
-generateOauthKeyFiles() {
-  if [ -f config/oauth/private.key ]; then
-    echo "Key files for oauth already exist, nothing done"
-  else
-    echo "Generating key files with oauth pass phrase"
-    openssl genrsa -out config/oauth/private.key -aes256 -passout pass:"$OAUTH2_PRIVATE_KEY_PASSPHRASE" 4096
-    openssl rsa -pubout -passin pass:"$OAUTH2_PRIVATE_KEY_PASSPHRASE" -in config/oauth/private.key -out config/oauth/public.key
-  fi
-}
-
 
 if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 	if [ -z "$(ls -A 'vendor/' 2>/dev/null)" ]; then
@@ -63,7 +51,8 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 	setfacl -R -m u:www-data:rwX -m u:"$(whoami)":rwX var
 	setfacl -dR -m u:www-data:rwX -m u:"$(whoami)":rwX var
 
-	generateOauthKeyFiles
+	echo "Configuring oauth"
+	php bin/console install:oauth
 
 #	echo "Updating default global settings"
 #	php bin/console install:default-settings

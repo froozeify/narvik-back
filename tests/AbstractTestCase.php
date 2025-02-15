@@ -86,7 +86,7 @@ abstract class AbstractTestCase extends ApiTestCase {
     $this->logout();
 
     $response = static::createClient()->request(Request::METHOD_POST, '/token', [
-      'body' => [
+      'json' => [
         'grant_type' => 'password',
         'username' => $email,
         'password' => $password,

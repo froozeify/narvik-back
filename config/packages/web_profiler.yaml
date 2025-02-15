@@ -14,4 +14,4 @@ when@test:
         intercept_redirects: false
 
     framework:
-        profiler: { enabled: true, collect: false  }
+        profiler: { collect: false }

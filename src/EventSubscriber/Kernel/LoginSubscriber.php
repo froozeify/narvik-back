@@ -77,7 +77,6 @@ final class LoginSubscriber implements EventSubscriberInterface {
   }
 
   public function onUserResolve(UserResolveEvent $event): void {
-    dump("call");
     try {
       $user = $this->userProvider->loadUserByIdentifier($event->getUsername());
     } catch (AuthenticationException $e) {
@@ -88,25 +87,12 @@ final class LoginSubscriber implements EventSubscriberInterface {
       return;
     }
 
-    dump("call");
-
     if (!$this->userPasswordHasher->isPasswordValid($user, $event->getPassword())) {
       return;
     }
 
     $event->setUser($user);
   }
-
-//  public function jwtSuccess(AuthenticationSuccessEvent $event): void {
-//    $user = $event->getUser();
-//    if (!$user instanceof Member) {
-//      return;
-//    }
-//
-//    $this->member = $user;
-//    $memberLimiter = $this->getMemberLimiter();
-//    $memberLimiter?->reset();
-//  }
 
   private function getMemberLimiter(): ?LimiterInterface {
     $request = $this->requestStack->getCurrentRequest();

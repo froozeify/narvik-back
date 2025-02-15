@@ -16,7 +16,9 @@ league_oauth2_server:
             entity_manager: default
             table_prefix: oauth2_
 
-when@test:
-    league_oauth2_server:
-        persistence:
-            in_memory: null
+
+# when@test:
+# We keep the persistence, otherwise can't log
+#     league_oauth2_server:
+#         persistence:
+#             in_memory: null

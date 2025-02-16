@@ -41,7 +41,7 @@ jobs:
             *.cache-to=type=gha,scope=${{github.ref}},mode=max
       -
         name: Start services
-        run: docker compose up --no-build
+        run: docker compose up --wait --no-build
       -
         name: Check HTTP reachability
         run: curl -v --fail-with-body http://localhost
@@ -56,7 +56,7 @@ jobs:
         run: docker compose exec -T php bin/console -e test doctrine:database:create
       -
         name: Create JWT keys
-        run: docker compose exec -T php bin/console -e test lexik:jwt:generate-keypair --overwrite
+        run: docker compose exec -T php bin/console -e test install:oauth
       -
         name: Run migrations
         if: false # Remove this line if Doctrine Migrations is installed

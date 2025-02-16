@@ -1,0 +1,13 @@
+App\Entity\ExternalPresence:
+    id: ~
+    date: ~
+    createdAt: ~
+
+    licence: ~
+    firstname: ~
+    lastname: ~
+
+    activities:
+        prefix: activities
+        fields:
+            name: ~

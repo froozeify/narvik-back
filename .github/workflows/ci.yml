@@ -46,6 +46,10 @@ jobs:
         name: Create test database
         run: docker compose exec -T php bin/console -e test doctrine:database:create
       -
+        name: Run migrations
+        run: docker compose exec -T php bin/console -e test doctrine:migrations:migrate --no-interaction
+
+      -
         name: Create JWT keys
         run: docker compose exec -T php bin/console -e test install:oauth
       -
@@ -57,11 +61,6 @@ jobs:
       -
         name: Check Mercure reachability
         run: curl -vkI --fail-with-body https://localhost/.well-known/mercure?topic=test
-  
-      -
-        name: Run migrations
-        if: false # Remove this line if Doctrine Migrations is installed
-        run: docker compose exec -T php bin/console -e test doctrine:migrations:migrate --no-interaction
       -
         name: Run PHPUnit
         run: | 

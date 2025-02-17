@@ -1,24 +1,23 @@
-App\Entity\Sale:
-    id: ~
+App\Entity\ClubDependent\Plugin\Sale\Sale:
+    uuid: ~
     createdAt: ~ 
-    updatedAt: ~ 
     price: ~ 
     comment: ~ 
-    
+
     seller:
         prefix: seller
         fields:
             fullName: ~
-        
+            licence: ~
+
     paymentMode:
         prefix: paymentMode
         fields:
             name: ~
-            
+
     salePurchasedItems:
         prefix: item
         fields:
-            id: ~
             itemName: name
             itemCategory: category
             itemPrice: price

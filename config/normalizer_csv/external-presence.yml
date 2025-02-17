@@ -1,8 +1,8 @@
-App\Entity\ExternalPresence:
-    id: ~
+App\Entity\ClubDependent\Plugin\Presence\ExternalPresence:
+    uuid: ~
     date: ~
     createdAt: ~
-
+    
     licence: ~
     firstname: ~
     lastname: ~

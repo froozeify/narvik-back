@@ -12,7 +12,7 @@ use Symfony\Component\PropertyInfo\Type;
 final class MultipleFilter extends AbstractFilter {
   public const PROPERTY_NAME = "multiple";
 
-  protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void {
+  protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void {
     if ($property !== static::PROPERTY_NAME) return;
     if (!is_array($values)) return;
     if ($this->properties === null) {

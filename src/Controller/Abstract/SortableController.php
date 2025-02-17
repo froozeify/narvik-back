@@ -2,18 +2,19 @@
 
 namespace App\Controller\Abstract;
 
+use App\Entity\ClubDependent\Member;
 use App\Entity\Interface\SortableEntityInterface;
-use App\Entity\Member;
+use App\Entity\User;
 use App\Repository\Interface\SortableRepositoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class SortableController extends AbstractController {
-  public function move(Request $request, SortableEntityInterface $entity, SortableRepositoryInterface $repository) {
+class SortableController extends AbstractClubDependentController {
+  public function move(Request $request, SortableEntityInterface $entity, SortableRepositoryInterface $repository): JsonResponse {
     $user = $this->getUser();
-    if (!$user instanceof Member) {
+    if (!$user instanceof User) {
       throw new HttpException(Response::HTTP_BAD_REQUEST);
     }
 
@@ -25,9 +26,9 @@ class SortableController extends AbstractController {
     }
 
     if ($direction === 'up') {
-      $repository->moveUp($entity);
+      $repository->moveUp($this->getQueryClub(), $entity);
     } else {
-      $repository->moveDown($entity);
+      $repository->moveDown($this->getQueryClub(), $entity);
     }
 
     return new JsonResponse();

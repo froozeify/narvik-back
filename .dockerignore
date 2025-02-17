@@ -33,7 +33,6 @@ vendor/
 .env.*.local
 .env.local
 .env.local.php
-.env.test
 
 config/jwt
 private/
@@ -41,3 +40,4 @@ supervisord.log
 supervisord.pid
 
 dump/
+tests/coverage/

@@ -7,90 +7,60 @@ security:
         # used to reload user from session & other features (e.g. switch_user)
         app_user_provider:
             entity:
-                class: App\Entity\Member
-                property: email
+                class: App\Entity\User
 
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+        api_token:
+            pattern: ^/token$
+            security: false
         main:
-            entry_point:
-                jwt
+            security: true
             stateless: true
+            oauth2: true
             provider: app_user_provider
-            json_login:
-                check_path: api_login
-                username_path: email
-                password_path: password
-                success_handler: lexik_jwt_authentication.handler.authentication_success
-                failure_handler: lexik_jwt_authentication.handler.authentication_failure
-            jwt: ~
-            refresh_jwt:
-                check_path: gesdinet_jwt_refresh_token
-            #form_login:
-            #    login_path: app_login
-            #    check_path: app_login
-            #    enable_csrf: true
-            #logout:
-            #    path: app_logout
-            #    # where to redirect after logout
-            #    # target: app_any_route
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
 
             # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
+            switch_user: { parameter: X-Switch-User }
 
 
     role_hierarchy:
-        ROLE_ADMIN: [ ROLE_SUPERVISOR, ROLE_MEMBER, ROLE_BADGER ]
-        ROLE_SUPERVISOR: [ ROLE_MEMBER, ROLE_BADGER ]
-        ROLE_MEMBER: [ ROLE_USER ] # To enable when member will be able to log-in
+        ROLE_SUPER_ADMIN: [ ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH ]
+        ROLE_ADMIN: [ ROLE_USER ]
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/$, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
         - { path: ^/docs, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI docs
-        - { route: ^/auth, roles: PUBLIC_ACCESS }
         - { route: 'auth_bdg', roles: PUBLIC_ACCESS }
         - { path: ^/public, roles: PUBLIC_ACCESS }
-        - { path: ^/members/-/initiate-reset-password, roles: PUBLIC_ACCESS }
-        - { path: ^/members/-/reset-password, roles: PUBLIC_ACCESS }
+        - { path: ^/users/-/initiate-register, roles: PUBLIC_ACCESS }
+        - { path: ^/users/-/register, roles: PUBLIC_ACCESS }
+        - { path: ^/users/-/initiate-reset-password, roles: PUBLIC_ACCESS }
+        - { path: ^/users/-/reset-password, roles: PUBLIC_ACCESS }
 
-        - { path: ^/images, roles: [ROLE_ADMIN, ROLE_BADGER]}
+        - { path: ^/images, roles: [ROLE_USER, ROLE_BADGER]}
 
-        - {path: ^/self, roles: [ ROLE_MEMBER, ROLE_BADGER ]}
+        - {path: ^/self, roles: [ ROLE_USER, ROLE_BADGER ]}
 
-        - { path: ^/activities, roles: [ROLE_SUPERVISOR, ROLE_BADGER]}
+        - { path: ^/clubs, roles: [ROLE_USER, ROLE_BADGER]} # ClubDepend access control is defined directly in the entities
 
-        - { path: ^/external-presences, roles: [ROLE_SUPERVISOR, ROLE_BADGER]}
-        - { path: ^/global-settings, roles: [ROLE_ADMIN]}
+        - { path: ^/age-categories, roles: [ROLE_USER]}
+        - { path: ^/global-settings, roles: [ROLE_SUPER_ADMIN]}
+        - { path: ^/metrics, roles: [ROLE_SUPER_ADMIN]}
+        - { path: ^/seasons, roles: [ROLE_USER]}
+        - { path: ^/users, roles: [ROLE_SUPER_ADMIN]}
             
-        - { path: ^/inventory-categories, roles: [ROLE_SUPERVISOR]}
-        - { path: ^/inventory-items, roles: [ROLE_SUPERVISOR]}
-        - { path: ^/inventory-item-histories, roles: [ROLE_SUPERVISOR]}
-
-        - { path: ^/members/-/from-itac, roles: [ROLE_ADMIN]}
-        - { path: ^/members, roles: [ROLE_SUPERVISOR, ROLE_BADGER]}
-
-        - { path: ^/member-presences/-/from-cerbere, roles: [ROLE_ADMIN]}
-        - { path: ^/member-presences, roles: [ROLE_SUPERVISOR, ROLE_BADGER]}
-        - { path: ^/metrics, roles: [ROLE_SUPERVISOR]}
-
-        - { path: ^/sales, roles: [ROLE_SUPERVISOR]}
-        - { path: ^/sale-payment-modes, roles: [ROLE_SUPERVISOR]}
-        # - { path: ^/sale-purchased-items, roles: [ROLE_SUPERVISOR]} # Not available in the API
-            
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
-        # - { path: ^/imports, roles: ROLE_ADMIN }
         # - { route: 'presence_list', roles: ROLE_BADGER } # route will also include presence_list_* it's like path, it's regex 
 
         # Always at the end, in case we forgot to protect a route, only admin will be able to access it
-        - { path: ^/, roles: ROLE_ADMIN }
+        - { path: ^/, roles: ROLE_SUPER_ADMIN }
 
 when@test:
     security:

@@ -2,56 +2,42 @@
 
 namespace App\DataFixtures;
 
-use App\Factory\ExternalPresenceFactory;
-use App\Factory\InventoryCategoryFactory;
-use App\Factory\InventoryItemFactory;
-use App\Factory\InventoryItemHistoryFactory;
-use App\Factory\MemberFactory;
-use App\Factory\MemberPresenceFactory;
-use App\Factory\MemberSeasonFactory;
-use App\Factory\SaleFactory;
-use App\Factory\SeasonFactory;
-use App\Story\ActivityStory;
-use App\Story\GlobalSettingStory;
-use App\Story\InventoryCategoryStory;
-use App\Story\SalePaymentModeStory;
-use App\Story\SeasonStory;
+use App\Tests\Factory\ExternalPresenceFactory;
+use App\Tests\Factory\InventoryItemFactory;
+use App\Tests\Factory\InventoryItemHistoryFactory;
+use App\Tests\Factory\MemberPresenceFactory;
+use App\Tests\Story\_InitStory;
+use App\Tests\Story\ActivityStory;
+use App\Tests\Story\AgeCategoryStory;
+use App\Tests\Story\GlobalSettingStory;
+use App\Tests\Story\InventoryCategoryStory;
+use App\Tests\Story\SalePaymentModeStory;
+use App\Tests\Story\SeasonStory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use function Zenstruck\Foundry\faker;
 
 class AppFixtures extends Fixture {
   public function load(ObjectManager $manager): void {
-    // We generate the activities
-    ActivityStory::load();
-
-    // We create the default season
-    SeasonStory::load();
+    // We create the bare minium required (some users and clubs)
+    _InitStory::load();
 
     // We create the default global settings
     GlobalSettingStory::load();
 
-    // We create the users
-    $adminMember = MemberFactory::new()->admin("admin@admin.com")->create();
-    MemberFactory::new()->badger()->create();
-    MemberFactory::createMany(faker()->numberBetween(60, 120), [
-      'memberPresences' => MemberPresenceFactory::new()->many(1, 4),
-      'memberSeasons'   => MemberSeasonFactory::new()->many(0, 4),
-    ]);
-
-    // We record some external presence
-    ExternalPresenceFactory::new()->many(40, 80)->create();
+    // We record some presence
+    MemberPresenceFactory::new()->many(20, 40)->create();
+    ExternalPresenceFactory::new()->many(20, 40)->create();
 
     /*******************************************************
      *                    INVENTORY                        *
      ******************************************************/
 
-    // We create the default season
+    // We create the default categories
     $defaultCategoriesPool = InventoryCategoryStory::load();
 
     $itemsMapping = [
       "Cibles" => ['Cible C50', 'Visuel C50', 'Pistolet 10M', 'Carabine 10M'],
-      "Munitions" => ['semi-auto 22lr', '9mm - Sellier & Bellot', '9mm - Geco', 'Plombs'],
+      "Munitions" => ['semi-auto 22lr', '9mm - SB', '9mm - G', 'Plombs'],
       "Administratif" => ['licence', 'droit d\'entrée', 'second club'],
       "Droit de tir" => ['10M', '25/50M'],
     ];
@@ -72,8 +58,8 @@ class AppFixtures extends Fixture {
     }
 
     SalePaymentModeStory::load();
-    SaleFactory::createMany(faker()->numberBetween(20, 50), [
-      'seller' => $adminMember,
-    ]);
+//    SaleFactory::createMany(faker()->numberBetween(10, 30), [
+//      'seller' => $clubSupervisor,
+//    ]);
   }
 }

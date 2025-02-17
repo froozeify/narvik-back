@@ -5,12 +5,12 @@ namespace App\State;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
+use App\Entity\Club;
 use App\Entity\Config;
-use App\Entity\Member;
-use App\Enum\GlobalSetting;
-use App\Enum\MemberRole;
+use App\Entity\User;
+use App\Enum\ClubRole;
+use App\Enum\UserRole;
 use App\Mailer\EmailService;
-use App\Service\GlobalSettingService;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -20,7 +20,6 @@ class ConfigProvider implements ProviderInterface {
   public function __construct(
     private readonly Security $security,
     private readonly AuthorizationCheckerInterface $authorizationChecker,
-    private readonly GlobalSettingService $globalSettingService,
     private readonly ContainerBagInterface $params,
     private readonly EmailService $emailService,
   ) {
@@ -34,25 +33,26 @@ class ConfigProvider implements ProviderInterface {
     $config = new Config();
     $this->getDefaultConfig($config);
 
-    $member = $this->security->getUser();
+    $user = $this->security->getUser();
 
-    if (!$member instanceof Member) {
+    if (!$user instanceof User) {
       return $config;
     }
 
-    $this->getUserConfig($config, $member);
+    $this->getUserConfig($config, $user);
 
     return $config;
   }
 
   public function getDefaultConfig(Config $config): void {
-    if ($this->authorizationChecker->isGranted(MemberRole::admin->value) ||
+    if ($this->authorizationChecker->isGranted(UserRole::super_admin->value) ||
         $this->params->get('app.expose_version')
     ) {
       $config->setAppVersion(\Composer\InstalledVersions::getRootPackage()['pretty_version']);
     }
 
-    $config->setLogo($this->globalSettingService->getSettingValue(GlobalSetting::LOGO));
+    $config->setLogo("/images/logo-narvik.png");
+    $config->setLogoWhite("/images/logo-narvik-white.png");
 
     // Email notifications
     $config->addModule('notifications', [
@@ -60,15 +60,40 @@ class ConfigProvider implements ProviderInterface {
     ]);
   }
 
-  public function getUserConfig(Config $config, Member $member): void {
+  public function getUserConfig(Config $config, User $user): void {
     $config->setId('user');
 
-    // User a supervisor, he can have access to the sale management
-    if ($this->authorizationChecker->isGranted(MemberRole::supervisor->value)) {
-      $config->addModule('sales', [
+    foreach ($user->getLinkedProfiles() as $profile) {
+      $id = $profile->getId();
+      /** @var Club $club */
+      $club = $profile->getClub();
+
+      if ($this->authorizationChecker->isGranted(ClubRole::supervisor->value, $club) || $this->authorizationChecker->isGranted(ClubRole::badger->value, $club)) {
+      $config->addProfileModule($id, 'presences', [
         'enabled' => true,
       ]);
     }
+
+    // User a supervisor, he can have access to the sale management
+    if ($this->authorizationChecker->isGranted(ClubRole::supervisor->value, $club)) {
+      $config->addProfileModule($id, 'sales', [
+        'enabled' => $club->getSalesEnabled(),
+      ]);
+    }
+  }
+
+//    if ($this->authorizationChecker->isGranted(ClubRole::supervisor->value) || $this->authorizationChecker->isGranted(ClubRole::badger->value)) {
+//      $config->addProfileModule('presences', [
+//        'enabled' => true,
+//      ]);
+//    }
+//
+//    // User a supervisor, he can have access to the sale management
+//    if ($this->authorizationChecker->isGranted(ClubRole::supervisor->value)) {
+//      $config->addProfileModule('sales', [
+//        'enabled' => true,
+//      ]);
+//    }
   }
 
 }

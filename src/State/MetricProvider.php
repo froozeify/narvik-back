@@ -5,24 +5,34 @@ namespace App\State;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\Entity\Metric;
-use App\Repository\ExternalPresenceRepository;
+use App\Entity\Club;
+use App\Entity\ClubDependent\Metric;
+use App\Repository\ClubDependent\MemberRepository;
+use App\Repository\ClubDependent\MemberSeasonRepository;
+use App\Repository\ClubDependent\Plugin\Presence\ExternalPresenceRepository;
+use App\Repository\ClubDependent\Plugin\Presence\MemberPresenceRepository;
 use App\Repository\Interface\PresenceRepositoryInterface;
-use App\Repository\MemberPresenceRepository;
-use App\Repository\MemberRepository;
-use App\Repository\MemberSeasonRepository;
+use App\Service\RequestService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class MetricProvider implements ProviderInterface {
   public const METRICS = [
     "members",
     "presences",
     "external-presences",
-    "import-batches",
+//    "import-batches",
     "activities"
   ];
 
+  // TODO: super admin only metrics (import-batches)
+
+  private ?Club $club = null;
+
   public function __construct(
+    private readonly RequestStack $requestStack,
+    private readonly RequestService $requestService,
+
     private readonly MemberRepository $memberRepository,
     private readonly MemberSeasonRepository $memberSeasonRepository,
     private readonly MemberPresenceRepository $memberPresenceRepository,
@@ -32,6 +42,11 @@ class MetricProvider implements ProviderInterface {
   }
 
   public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null {
+    $this->club = null;
+    if (str_starts_with($operation->getName(), 'club_metric')) {
+      $this->club = $this->requestService->getClubFromRequest($this->requestStack->getCurrentRequest());
+    }
+
     if ($operation instanceof CollectionOperationInterface) {
       return $this->getAll();
     }
@@ -61,18 +76,21 @@ class MetricProvider implements ProviderInterface {
   }
 
   protected function getMembers(string $identifier): Metric {
-    $total = $this->memberRepository->countTotalMembers();
-    $previousSeason = $this->memberSeasonRepository->countTotalMembersForPreviousSeason();
-    $currentSeason = $this->memberSeasonRepository->countTotalMembersForThisSeason();
+    $total = $this->memberRepository->countTotalClubMembers($this->club);
+    $previousSeason = $this->memberSeasonRepository->countTotalMembersForPreviousSeason($this->club);
+    $currentSeason = $this->memberSeasonRepository->countTotalMembersForThisSeason($this->club);
 
     $metric = new Metric();
+    $metric->setClub($this->club);
     $metric->setName($identifier);
     $metric->setValue($total);
     $metric->setChildMetrics([
       (new Metric())
+        ->setClub($this->club)
         ->setName("previous-season")
         ->setValue($previousSeason),
       (new Metric())
+        ->setClub($this->club)
         ->setName("current-season")
         ->setValue($currentSeason),
     ]);
@@ -88,24 +106,27 @@ class MetricProvider implements ProviderInterface {
   }
 
   private function generatePresenceMetrics(string $identifier, PresenceRepositoryInterface $repository): Metric {
-    $total = $repository->countTotalPresences();
+    $total = $repository->countTotalPresences($this->club);
 
-    $currentYear = $repository->countTotalPresencesYearlyUntilToday();
-    $currentYearOpenedDays = $repository->countNumberOfPresenceDaysYearlyUntilToday();
+    $currentYear = $repository->countTotalPresencesYearlyUntilToday($this->club);
+    $currentYearOpenedDays = $repository->countNumberOfPresenceDaysYearlyUntilToday($this->club);
 
 
-    $lastYear = $repository->countTotalPresencesYearlyForPreviousYear();
-    $lastYearOpenedDays = $repository->countNumberOfPresenceDaysYearlyForPreviousYear();
+    $lastYear = $repository->countTotalPresencesYearlyForPreviousYear($this->club);
+    $lastYearOpenedDays = $repository->countNumberOfPresenceDaysYearlyForPreviousYear($this->club);
 
     $metric = new Metric();
+    $metric->setClub($this->club);
     $metric->setName($identifier);
     $metric->setValue($total);
     $metric->setChildMetrics([
       (new Metric())
+        ->setClub($this->club)
         ->setName("previous-year")
         ->setValue($lastYear)
         ->setChildMetrics([
           (new Metric())
+            ->setClub($this->club)
             ->setName("opened-days")
             ->setValue($lastYearOpenedDays),
         ]),
@@ -135,17 +156,21 @@ class MetricProvider implements ProviderInterface {
   protected function getActivities(string $identifier): Metric {
     $currentYearTotal = $lastYearTotal = 0;
     $currentYearMetrics = $lastYearMetrics = [];
-    foreach ($this->memberPresenceRepository->countPresencesPerActivitiesYearlyUntilToday() as $datas) {
+    foreach ($this->memberPresenceRepository->countPresencesPerActivitiesYearlyUntilToday($this->club) as $datas) {
       $m = new Metric();
-      $m->setName($datas["name"])
+      $m
+        ->setClub($this->club)
+        ->setName($datas["name"])
         ->setValue($datas["total"]);
       $currentYearTotal += $datas["total"];
       $currentYearMetrics[] = $m;
     }
 
-    foreach ($this->memberPresenceRepository->countPresencesPerActivitiesYearlyForPreviousYear() as $datas) {
+    foreach ($this->memberPresenceRepository->countPresencesPerActivitiesYearlyForPreviousYear($this->club) as $datas) {
       $m = new Metric();
-      $m->setName($datas["name"])
+      $m
+        ->setClub($this->club)
+        ->setName($datas["name"])
         ->setValue($datas["total"]);
       $lastYearTotal += $datas["total"];
       $lastYearMetrics[] = $m;
@@ -153,13 +178,16 @@ class MetricProvider implements ProviderInterface {
 
     $metric = new Metric();
     $metric->setName($identifier)
+           ->setClub($this->club)
            ->setValue(0)
            ->setChildMetrics([
              (new Metric())
+               ->setClub($this->club)
                ->setName("previous-year")
                ->setValue($lastYearTotal)
                ->setChildMetrics($lastYearMetrics),
              (new Metric())
+               ->setClub($this->club)
                ->setName("current-year")
                ->setValue($currentYearTotal)
                ->setChildMetrics($currentYearMetrics),

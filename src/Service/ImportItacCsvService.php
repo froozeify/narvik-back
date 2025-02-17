@@ -2,28 +2,20 @@
 
 namespace App\Service;
 
-use App\Entity\AgeCategory;
-use App\Entity\Member;
-use App\Entity\MemberSeason;
-use App\Entity\Season;
+use App\Entity\Club;
 use App\Enum\GlobalSetting;
-use App\Enum\ItacCsvHeaderMapping;
-use App\Enum\MemberRole;
 use App\Message\ItacMembersMessage;
 use App\Message\ItacSecondaryClubMembersMessage;
-use Doctrine\ORM\EntityManagerInterface;
-use League\Csv\CharsetConverter;
 use League\Csv\Reader;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ImportItacCsvService {
 
   public function __construct(
     private readonly MessageBusInterface $bus,
-    private readonly GlobalSettingService $globalSettingService,
+    private readonly ClubService $clubService,
   ) {
   }
 
@@ -33,22 +25,23 @@ class ImportItacCsvService {
    * @throws \League\Csv\Exception
    * @throws \League\Csv\UnavailableStream
    */
-  public function importFromFile(string $filename): int {
+  public function importFromFile(Club $club, string $filename): int {
     $reader = Reader::createFromPath($filename);
     $reader->setHeaderOffset(0); // Header is in first line
     $records = $reader->getRecords();
     $array = iterator_to_array($records);
-    foreach (array_chunk($array, 100) as $recordsChunk) {
+    $recordsChunks = array_chunk($array, 100);
+    $this->clubService->setItacImport($club, count($recordsChunks));
+
+    foreach ($recordsChunks as $recordsChunk) {
       $chunk = [];
       foreach ($recordsChunk as $key => $value) {
         foreach ($value as $k => $v) {
           $chunk[$key][$this->convert($k)] = $this->convert($v);
         }
       }
-      $this->bus->dispatch(new ItacMembersMessage($chunk));
+      $this->bus->dispatch(new ItacMembersMessage($club->getUuid()->toString(), $chunk));
     }
-
-    $this->globalSettingService->updateSettingValue(GlobalSetting::LAST_ITAC_IMPORT, (new \DateTimeImmutable())->format('c'));
 
     return count($array);
   }
@@ -59,22 +52,23 @@ class ImportItacCsvService {
    * @throws \League\Csv\Exception
    * @throws \League\Csv\UnavailableStream
    */
-  public function importSecondaryFromFile(string $filename): int {
+  public function importSecondaryFromFile(Club $club, string $filename): int {
     $reader = Reader::createFromPath($filename);
     $reader->setHeaderOffset(0); // Header is in first line
     $records = $reader->getRecords();
     $array = iterator_to_array($records);
-    foreach (array_chunk($array, 100) as $recordsChunk) {
+    $recordsChunks = array_chunk($array, 100);
+    $this->clubService->setItacSecondaryImport($club, count($recordsChunks));
+
+    foreach ($recordsChunks as $recordsChunk) {
       $chunk = [];
       foreach ($recordsChunk as $key => $value) {
         foreach ($value as $k => $v) {
           $chunk[$key][$this->convert($k)] = $this->convert($v);
         }
       }
-      $this->bus->dispatch(new ItacSecondaryClubMembersMessage($chunk));
+      $this->bus->dispatch(new ItacSecondaryClubMembersMessage($club->getUuid(), $chunk));
     }
-
-    $this->globalSettingService->updateSettingValue(GlobalSetting::LAST_SECONDARY_CLUB_ITAC_IMPORT, (new \DateTimeImmutable())->format('c'));
 
     return count($array);
   }

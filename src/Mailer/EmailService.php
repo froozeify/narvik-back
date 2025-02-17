@@ -42,14 +42,17 @@ class EmailService {
       return null;
     }
 
+    $email = new TemplatedEmail();
+
     $context['subject'] = $subject;
     $context['home_url'] = '';
 
-    $logo = $this->imageService->getLogo();
+    $logo = $this->imageService->getLogoFile();
     $context['logo'] = '';
     if ($logo) {
-      $logoPart = (new DataPart($this->imageService->getLogoFile(), 'logo', $logo->getMimeType()));
-      $context['logo'] = 'logo';
+      $logoPart = (new DataPart($logo, 'logo.png'));
+      $context['logo'] = $logoPart->getFilename();
+      $email->addPart($logoPart->asInline());
     }
 
     // We render the html
@@ -59,21 +62,16 @@ class EmailService {
     $smtpSender = $this->globalSettingService->getSettingValue(GlobalSetting::SMTP_SENDER);
     $smtpSenderName = $this->globalSettingService->getSettingValue(GlobalSetting::SMTP_SENDER_NAME) ?? 'Narvik';
 
-    $email = new TemplatedEmail();
     $email
       ->from(new Address($smtpSender, $smtpSenderName))
       ->subject($subject)
       ->html($htmlBody)
       ->context($context);
 
-    if ($logo) {
-      $email->addPart($logoPart->asInline());
-    }
-
     return $email;
   }
 
-  public function sendEmail(?TemplatedEmail $email, string $to = null): void {
+  public function sendEmail(?TemplatedEmail $email, ?string $to = null): void {
     if (!$this->canSendEmail() || !$email) {
       return;
     }

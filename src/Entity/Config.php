@@ -33,7 +33,13 @@ class Config {
   private ?string $logo = null;
 
   #[Groups(['config'])]
+  private ?string $logoWhite = null;
+
+  #[Groups(['config'])]
   private ?array $modules = null;
+
+  #[Groups(['config'])]
+  private ?array $profiles = null;
 
   public function getId(): string {
     return $this->id;
@@ -62,6 +68,15 @@ class Config {
     return $this;
   }
 
+  public function getLogoWhite(): ?string {
+    return $this->logoWhite;
+  }
+
+  public function setLogoWhite(?string $logoWhite): Config {
+    $this->logoWhite = $logoWhite;
+    return $this;
+  }
+
   public function getModules(): ?array {
     return $this->modules;
   }
@@ -73,6 +88,20 @@ class Config {
 
   public function addModule(string $name, array $moduleConfig): Config {
     $this->modules[$name] = $moduleConfig;
+    return $this;
+  }
+
+  public function getProfiles(): ?array {
+    return $this->profiles;
+  }
+
+  public function setProfiles(?array $profiles): Config {
+    $this->profiles = $profiles;
+    return $this;
+  }
+
+  public function addProfileModule(string $profile, string $name, array $moduleConfig): Config {
+    $this->profiles[$profile][$name] = $moduleConfig;
     return $this;
   }
 }

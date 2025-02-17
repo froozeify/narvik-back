@@ -1,5 +1,9 @@
 name: CI
 
+env:
+  IGNORE_MIGRATION: false
+  OAUTH_PASSPHRASE: changeme
+
 on:
   push:
     branches:
@@ -24,7 +28,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
       -
         name: Build Docker images
-        uses: docker/bake-action@v4
+        uses: docker/bake-action@v6
         with:
           pull: true
           load: true
@@ -39,27 +43,46 @@ jobs:
         name: Start services
         run: docker compose up --wait --no-build
       -
+        name: Create test database
+        run: docker compose exec -T php bin/console -e test doctrine:database:create
+      -
+        name: Run migrations
+        run: docker compose exec -T php bin/console -e test doctrine:migrations:migrate --no-interaction
+
+      -
+        name: Create JWT keys
+        run: docker compose exec -T php bin/console -e test install:oauth
+      -
         name: Check HTTP reachability
         run: curl -v --fail-with-body http://localhost
       -
         name: Check HTTPS reachability
-        if: false # Remove this line when the homepage will be configured, or change the path to check
         run: curl -vk --fail-with-body https://localhost
       -
-        name: Create test database
-        if: false # Remove this line if Doctrine ORM is installed
-        run: docker compose exec -T php bin/console -e test doctrine:database:create
-      -
-        name: Run migrations
-        if: false # Remove this line if Doctrine Migrations is installed
-        run: docker compose exec -T php bin/console -e test doctrine:migrations:migrate --no-interaction
+        name: Check Mercure reachability
+        run: curl -vkI --fail-with-body https://localhost/.well-known/mercure?topic=test
       -
         name: Run PHPUnit
-        if: false # Remove this line if PHPUnit is installed
-        run: docker compose exec -T php bin/phpunit
+        run: | 
+          docker compose exec -T php sh -c 'composer ci-test'
+          docker compose cp php:/app/coverage.xml ./coverage.xml
+          docker compose cp php:/app/junit.xml ./junit.xml
+      -
+        name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with: 
+          files: ./coverage.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+      -
+        name: Custom CSV Validator
+        run: docker compose exec -T php bin/console -e test serializer:validate:csv
       -
         name: Doctrine Schema Validator
-        if: false # Remove this line if Doctrine ORM is installed
         run: docker compose exec -T php bin/console -e test doctrine:schema:validate
 #  lint:
 #    name: Docker Lint

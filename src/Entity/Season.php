@@ -3,19 +3,32 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use App\Entity\ClubDependent\MemberSeason;
+use App\Enum\UserRole;
 use App\Repository\SeasonRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: SeasonRepository::class)]
+#[UniqueEntity(fields: ['name'])]
 #[ApiResource(
+  operations: [
+    new GetCollection(),
+    new Get(),
+    new Post(security: "is_granted('".UserRole::super_admin->value."')"),
+    new Patch(security: "is_granted('".UserRole::super_admin->value."')",),
+    new Delete(security: "is_granted('".UserRole::super_admin->value."')",),
+  ],
   normalizationContext: [
     'groups' => ['season', 'season-read']
-  ],
-  denormalizationContext: [
-    'groups' => []
   ],
   order: ['name' => 'DESC'],
 )]
@@ -27,11 +40,10 @@ class Season {
   private ?int $id = null;
 
   #[ORM\Column(length: 255)]
-  #[Groups(['season-read', 'admin-write', 'member-season-read', 'member-presence-read'])]
+  #[Groups(['super-admin-write', 'season-read', 'member-season-read', 'member-presence-read'])]
   private ?string $name = null;
 
   #[ORM\OneToMany(mappedBy: 'season', targetEntity: MemberSeason::class)]
-  #[Groups(['season-read'])]
   private Collection $memberSeasons;
 
   public function __construct() {

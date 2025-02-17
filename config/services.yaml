@@ -7,9 +7,13 @@ parameters:
     env(EXPOSE_VERSION): "false"
     app.expose_version: '%env(bool:resolve:EXPOSE_VERSION)%'
     
-    app.images: '%kernel.project_dir%/private/images'
-    app.public_images: '%kernel.project_dir%/private/images/public'
-    app.members_photos: '%app.images%/members'
+    app.files: '%kernel.project_dir%/private/files'
+    app.public_images: '%kernel.project_dir%/public/images'
+    # app.members_photos: '%app.files%/members'
+
+when@test:
+    parameters:
+        app.files: '%kernel.project_dir%/private/test'
 
 services:
     # default configuration for services in *this* file
@@ -32,4 +36,10 @@ services:
     App\Serializer\DefaultContextBuilder:
         decorates: 'api_platform.serializer.context_builder'
         arguments: [ '@App\Serializer\DefaultContextBuilder.inner' ]
+        autoconfigure: false
+        
+    # We overload the generated api documentation
+    App\OpenApi\OpenApiFactory:
+        decorates: 'api_platform.openapi.factory'
+        arguments: [ '@App\OpenApi\OpenApiFactory.inner' ]
         autoconfigure: false

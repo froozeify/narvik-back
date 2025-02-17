@@ -2,38 +2,28 @@
 
 namespace App\Service;
 
-use App\Entity\Member;
-use App\Entity\MemberSecurityCode;
-use App\Enum\GlobalSetting;
-use App\Enum\MemberSecurityCodeTrigger;
-use App\Mailer\EmailService;
-use App\Repository\ActivityRepository;
-use App\Repository\MemberPresenceRepository;
-use App\Repository\MemberRepository;
-use App\Repository\MemberSecurityCodeRepository;
+use App\Entity\ClubDependent\Member;
+use App\Entity\ClubDependent\Plugin\Presence\Activity;
+use App\Entity\User;
+use App\Entity\UserMember;
+use App\Enum\ClubRole;
+use App\Repository\ClubDependent\MemberRepository;
+use App\Repository\ClubDependent\Plugin\Presence\ActivityRepository;
+use App\Repository\ClubDependent\Plugin\Presence\MemberPresenceRepository;
 use App\Repository\SeasonRepository;
+use App\Repository\UserMemberRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class MemberService {
   public function __construct(
-    private readonly ImageService $imageService,
-    private readonly GlobalSettingService $globalSettingService,
-    private readonly EntityManagerInterface $em,
-    private readonly EmailService $emailService,
-    private readonly UserPasswordHasherInterface $passwordHasher,
-    private readonly ActivityRepository $activityRepository,
-    private readonly MemberRepository $memberRepository,
     private readonly MemberPresenceRepository $memberPresenceRepository,
-    private readonly MemberSecurityCodeRepository $memberSecurityCodeRepository,
     private readonly SeasonRepository $seasonRepository,
+    private readonly MemberRepository $memberRepository,
+    private readonly UserRepository $userRepository,
+    private readonly UserMemberRepository $userMemberMemberRepository,
+    private readonly EntityManagerInterface $entityManager
   ) {
-  }
-
-  public function setProfileImage(Member $member): void {
-    if ($member->getLicence() && $photoPath = $this->imageService->getMemberPhotoPath($member->getLicence())) {
-      $member->setProfileImage($photoPath);
-    }
   }
 
   public function setCurrentSeason(Member $member): void {
@@ -48,18 +38,8 @@ class MemberService {
     }
   }
 
-  public function setLastControlShooting(Member $member, ?string $controlShootingActivity = null): void {
+  public function setLastControlShooting(Member $member, ?Activity $controlShootingActivity = null): void {
     if (!$controlShootingActivity) {
-      $controlShootingActivity = $this->globalSettingService->getSettingValue(GlobalSetting::CONTROL_SHOOTING_ACTIVITY_ID);
-    }
-
-    // No control shooting defined
-    if (!$controlShootingActivity || !is_numeric($controlShootingActivity)) {
-      return;
-    }
-
-    $controlShootingActivity = $this->activityRepository->find($controlShootingActivity);
-    if (!$controlShootingActivity) { // Control shooting id passed does not exist
       return;
     }
 
@@ -69,58 +49,52 @@ class MemberService {
     }
   }
 
-  /**
-   * @param Member $member
-   * @param string $password
-   * @return string|null Error message or null if ever everything is ok
-   */
-  public function changeMemberPassword(Member $member, string $password): ?string {
-    if (empty($password) || strlen($password) < 8) {
-      return 'Password must be at least 8 letters long';
+  public function autolinkMemberWithUser(Member $member, ClubRole $role = ClubRole::member): void {
+    if ($member->isSkipAutoSetUserMember()) return;
+
+    $email = $member->getEmail();
+    if (empty($email)) return;
+
+    $user = $this->userRepository->findOneByEmail($email);
+    if (!$user) return;
+
+    $userMember = $this->userMemberMemberRepository->findOneByMember($member);
+    if ($userMember) {
+      return;
     }
 
-    $this->memberRepository->upgradePassword($member, $this->passwordHasher->hashPassword($member, $password));
+    // We create the link (with the lowest level)
+    $userMember = new UserMember()
+      ->setUser($user)
+      ->setMember($member)
+      ->setRole($role);
 
-    return null;
+    $this->entityManager->persist($userMember);
+    $this->entityManager->flush();
   }
 
-  public function initiateResetPassword(Member $member): bool {
-    if (!$member->isAccountActivated() || !$this->emailService->canSendEmail()) {
-      return false;
+  public function autolinkMemberFromUser(User $user): void {
+    if ($user->isSkipAutoSetUserMember()) return;
+
+    $email = $user->getEmail();
+    if (empty($email)) return;
+
+    $members = $this->memberRepository->findAllByEmail($email);
+
+    foreach ($members as $member) {
+      $userMember = $this->userMemberMemberRepository->findOneByMember($member);
+      if ($userMember) {
+        continue;
+      }
+
+      // We create the link (with the lowest level)
+      $userMember = new UserMember()
+        ->setUser($user)
+        ->setMember($member)
+        ->setRole(ClubRole::member);
+      $this->entityManager->persist($userMember);
     }
 
-    // We verify that we don't have more than 4 in progress reset for this user
-    $resetInProgress = $this->memberSecurityCodeRepository->findAllByTrigger($member, MemberSecurityCodeTrigger::resetPassword);
-    if (count($resetInProgress) > 3) {
-      return false;
-    }
-
-    $securityCode = new MemberSecurityCode();
-    $securityCode->setTrigger(MemberSecurityCodeTrigger::resetPassword)->setMember($member);
-
-    $this->em->persist($securityCode);
-    $this->em->flush();
-
-    // We sent the security code
-    $email = $this->emailService->getEmail('security-code.html.twig', 'Changement de mot de passe', ['security_code' => $securityCode->getCode()]);
-    $this->emailService->sendEmail($email, $member->getEmail());
-
-    return true;
-  }
-
-  public function validateSecurityCode(Member $member, MemberSecurityCodeTrigger $trigger, string $securityCode): bool {
-    $securityCodeQuery = $this->memberSecurityCodeRepository->findLastOneForMember($member, $trigger);
-    if (!$securityCodeQuery || $securityCodeQuery->getCode() !== trim($securityCode)) {
-      return false;
-    }
-
-    // We consume all
-    $codes = $this->memberSecurityCodeRepository->findAllByTrigger($member, MemberSecurityCodeTrigger::resetPassword);
-    foreach ($codes as $code) {
-      $this->em->remove($code);
-    }
-    $this->em->flush();
-
-    return true;
+    $this->entityManager->flush();
   }
 }

@@ -3,7 +3,8 @@
 namespace App\Serializer;
 
 use ApiPlatform\State\SerializerContextBuilderInterface;
-use App\Enum\MemberRole;
+use App\Enum\ClubRole;
+use App\Enum\UserRole;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -14,7 +15,7 @@ final readonly class DefaultContextBuilder implements SerializerContextBuilderIn
   ) {
   }
 
-  public function createFromRequest(Request $request, bool $normalization, array $extractedAttributes = null): array {
+  public function createFromRequest(Request $request, bool $normalization, ?array $extractedAttributes = null): array {
     $context = $this->decorated->createFromRequest($request, $normalization, $extractedAttributes);
     $resourceClass = $context['resource_class'] ?? null;
 
@@ -29,12 +30,29 @@ final readonly class DefaultContextBuilder implements SerializerContextBuilderIn
 
     // Normalization context
     if ($normalization) {
-      if ($this->authorizationChecker->isGranted(MemberRole::admin->value)) {
-        $context['groups'][] = 'admin-read';
+      $context['groups'][] = 'common-read';
+      $context['groups'][] = 'timestamp';
+      if ($this->authorizationChecker->isGranted(ClubRole::supervisor->value, $request)) {
+        $context['groups'][] = 'club-supervisor-read';
+      }
+      if ($this->authorizationChecker->isGranted(ClubRole::admin->value, $request)) {
+        $context['groups'][] = 'club-admin-read';
+      }
+      if ($this->authorizationChecker->isGranted(UserRole::super_admin->value, $request)) {
+        $context['groups'][] = 'super-admin-read';
       }
     } else {
-      if ($this->authorizationChecker->isGranted(MemberRole::admin->value)) {
-        $context['groups'][] = 'admin-write';
+      // FIXME: Context are not well applied
+      // i.e: When POST /activities $request do not contain the club ref
+      $context['groups'][] = 'common-write';
+      if ($this->authorizationChecker->isGranted(ClubRole::supervisor->value, $request)) {
+        $context['groups'][] = 'club-supervisor-write';
+      }
+      if ($this->authorizationChecker->isGranted(ClubRole::admin->value, $request)) {
+        $context['groups'][] = 'club-admin-write';
+      }
+      if ($this->authorizationChecker->isGranted(UserRole::super_admin->value, $request)) {
+        $context['groups'][] = 'super-admin-write';
       }
     }
 

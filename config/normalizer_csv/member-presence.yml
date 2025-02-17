@@ -1,17 +1,16 @@
-App\Entity\MemberPresence:
-    id: ~
+App\Entity\ClubDependent\Plugin\Presence\MemberPresence:
+    uuid: ~
     date: ~
     createdAt: ~ 
     
     member:
         prefix: member
         fields:
-            id: ~
+            uuid: ~
             licence: ~
             fullName: ~
 
     activities:
         prefix: activities
         fields:
-            id: ~
             name: ~

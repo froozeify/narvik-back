@@ -2,12 +2,12 @@
 
 namespace App\Command;
 
-use App\Entity\Member;
-use App\Enum\GlobalSetting;
-use App\Enum\MemberRole;
-use App\Repository\MemberRepository;
+use App\Enum\UserRole;
+use App\Repository\ClubDependent\MemberRepository;
 use App\Service\GlobalSettingService;
 use Doctrine\ORM\EntityManagerInterface;
+use League\Bundle\OAuth2ServerBundle\Repository\ClientRepository;
+use phpDocumentor\Reflection\PseudoTypes\IntegerRange;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -15,6 +15,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -24,7 +26,9 @@ class InstallCommand extends Command {
   private SymfonyStyle $io;
 
   public function __construct(
+    private readonly ParameterBagInterface $params,
     private readonly EntityManagerInterface $em,
+    private readonly ClientRepository $clientRepository,
     private readonly MemberRepository $memberRepository,
     private readonly GlobalSettingService $globalSettingService,
     private readonly UrlGeneratorInterface $router,
@@ -42,10 +46,7 @@ class InstallCommand extends Command {
     $this->io = new SymfonyStyle($input, $output);
 
     $this->creatingDatabaseSchema();
-    $this->generateJwtKeys();
     $this->createAdminAccount();
-    $this->createBadgerAccount();
-    $this->generateBadgerLoginToken();
     $this->generateGlobalSettingsDefault();
 
     $this->io->success('Environnement configuré');
@@ -73,100 +74,17 @@ class InstallCommand extends Command {
     $this->getApplication()->doRun($doctrineSchemaUpdateInput, $this->io);
   }
 
-  private function generateJwtKeys(): void {
-    $this->io->section("Génération des clés JWT");
-
-    $path = $this->kernel->getProjectDir() . "/config/jwt";
-    $existingJwt = $this->fs->exists(["$path/private.pem", "$path/public.pem"]);
-    if ($existingJwt) {
-      $this->io->warning("\nClés JWT présentes, re-générer celles-ci va invalider toutes connexions actuels");
-      $question = new Question("Voulez-vous générer des nouvelles clés JWT ? (oui/non)", "n");
-      $question->setValidator(function (?string $value): string {
-        if (empty($value)) {
-          $value = "o";
-        }
-        return strtolower($value);
-      });
-      $question = $this->io->askQuestion($question);
-      if ($question[0] !== "o") {
-        return;
-      }
-    }
-
-    $jwtKeyGenerateInput = new ArrayInput([
-      'command' => 'lexik:jwt:generate-keypair',
-      '--overwrite' => true
-    ]);
-    $this->getApplication()->doRun($jwtKeyGenerateInput, $this->io);
-  }
-
 
   private function createAdminAccount(): void {
     $this->io->section("Création d'un compte administrateur");
 
     $command = new ArrayInput([
-      'command' => 'member:create',
-      '--licence' => 'null',
-      '--role' => MemberRole::admin->value,
+      'command' => 'user:create',
+      '--role' => UserRole::super_admin->value,
       '--firstname' => 'Admin',
       '--lastname' => 'ADMIN',
     ]);
     $this->getApplication()->doRun($command, $this->io);
-  }
-
-  private function createBadgerAccount(): void {
-    $this->io->section("Création du compte 'Badger'");
-    $badger = $this->memberRepository->findOneByEmail('badger');
-
-    if ($badger) {
-      $this->io->info("Compte 'Badger' déjà présent");
-      return;
-    }
-
-    $command = new ArrayInput([
-      'command' => 'member:create',
-      '--licence' => 'null',
-      '--role' => MemberRole::badger->value,
-      '--email' => 'badger',
-      '--password' => 'badger',
-      '--firstname' => 'Badger',
-      '--lastname' => 'badger',
-    ]);
-    $this->getApplication()->doRun($command, $this->io);
-  }
-
-  private function generateBadgerLoginToken(): void {
-    $this->io->section("Génération du token de connexion pour 'Badger'");
-
-    $existingToken = false;
-    if (!empty($this->globalSettingService->getSettingValue(GlobalSetting::BADGER_TOKEN))) {
-      $existingToken = true;
-    }
-
-    if ($existingToken) {
-      $question = new Question("Voulez-vous générer un nouveau token de connexion pour 'Badger' ? (oui/non)", "n");
-      $question->setValidator(function (?string $value): string {
-        if (empty($value)) {
-          $value = "o";
-        }
-        return strtolower($value);
-      });
-      $question = $this->io->askQuestion($question);
-      if ($question[0] !== "o") {
-        return;
-      }
-    }
-
-    $badgerToken = $this->randomToken(mt_rand(180, 200));
-    $this->globalSettingService->updateSettingValue(GlobalSetting::BADGER_TOKEN, $badgerToken);
-
-    $this->io->table([
-      'token',
-    ], [
-      [
-        $badgerToken,
-      ]
-    ]);
   }
 
   private function generateGlobalSettingsDefault(): void {
@@ -174,15 +92,5 @@ class InstallCommand extends Command {
       'command' => 'install:default-settings',
     ]);
     $this->getApplication()->doRun($command, $this->io);
-  }
-
-  private function randomToken(int $length): string {
-    $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-';
-    $charLength = strlen($characters) - 1;
-    $result = '';
-    for ($i = 0; $i < $length; $i++) {
-      $result .= $characters[mt_rand(0, $charLength)];
-    }
-    return $result;
   }
 }

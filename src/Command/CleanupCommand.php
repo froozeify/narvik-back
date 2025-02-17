@@ -2,7 +2,9 @@
 
 namespace App\Command;
 
-use App\Repository\MemberSecurityCodeRepository;
+use App\Repository\UserRepository;
+use App\Repository\UserSecurityCodeRepository;
+use App\Service\SeasonService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -17,7 +19,8 @@ class CleanupCommand extends Command {
 
   public function __construct(
     private readonly EntityManagerInterface $entityManager,
-    private readonly MemberSecurityCodeRepository $memberSecurityCodeRepository,
+    private readonly UserSecurityCodeRepository $memberSecurityCodeRepository,
+    private readonly SeasonService $seasonService,
   ) {
     parent::__construct();
   }
@@ -28,15 +31,16 @@ class CleanupCommand extends Command {
 
     $this->cleanJwt();
     $this->cleanSecurityCodes();
+    $this->updateSeasons();
 
     return Command::SUCCESS;
   }
 
   private function cleanJwt(): void {
-    $this->io->section("Refresh token");
+    $this->io->section("Clearing expired access, refresh tokens and auth codes");
 
     $command = new ArrayInput([
-      'command' => 'gesdinet:jwt:clear',
+      'command' => 'league:oauth2-server:clear-expired-tokens',
     ]);
     $this->getApplication()->doRun($command, $this->io);
   }
@@ -51,6 +55,12 @@ class CleanupCommand extends Command {
     }
 
     $this->entityManager->flush();
+  }
+
+  private function updateSeasons(): void {
+    $this->io->section("Updating seasons");
+    $currentSeason = SeasonService::getCurrentSeasonName();
+    $this->seasonService->getOrCreateSeason($currentSeason);
   }
 
 }

@@ -2,12 +2,16 @@
 
 namespace App\Repository\Trait;
 
+use App\Entity\Club;
 use App\Entity\Interface\SortableEntityInterface;
+use Doctrine\ORM\NonUniqueResultException;
 
 trait SortableEntityRepositoryTrait {
-  public function getLatestAvailableWeight(): int {
+  public function getLatestAvailableWeight(Club $club): int {
     $query = $this->createQueryBuilder('i')
+                  ->andWhere('i.club = :club')
                   ->orderBy('i.weight', "DESC")
+                  ->setParameter('club', $club)
                   ->setMaxResults(1)
                   ->getQuery();
 
@@ -27,33 +31,45 @@ trait SortableEntityRepositoryTrait {
     return $lastWeight + 1;
   }
 
-  public function getUpperItem(int $currentWeight): ?SortableEntityInterface {
+  public function getUpperItem(Club $club, int $currentWeight): ?SortableEntityInterface {
     $query = $this->createQueryBuilder('i')
                   ->orderBy('i.weight', "DESC")
                   ->andWhere('i.weight < :weight')
+                  ->andWhere('i.club = :club')
                   ->setParameter('weight', $currentWeight)
+                  ->setParameter('club', $club)
                   ->setMaxResults(1)
                   ->getQuery();
 
-    return $query->getOneOrNullResult();
+    try {
+      return $query->getOneOrNullResult();
+    } catch (NonUniqueResultException $e) {
+      return null;
+    }
   }
 
-  public function getLowerItem(int $currentWeight): ?SortableEntityInterface {
+  public function getLowerItem(Club $club, int $currentWeight): ?SortableEntityInterface {
     $query = $this->createQueryBuilder('i')
                   ->orderBy('i.weight', "ASC")
                   ->andWhere('i.weight > :weight')
+                  ->andWhere('i.club = :club')
                   ->setParameter('weight', $currentWeight)
+                  ->setParameter('club', $club)
                   ->setMaxResults(1)
                   ->getQuery();
 
-    return $query->getOneOrNullResult();
+    try {
+      return $query->getOneOrNullResult();
+    } catch (NonUniqueResultException $e) {
+      return null;
+    }
   }
 
-  public function moveUp(SortableEntityInterface $itemToMove): void {
+  public function moveUp(Club $club, SortableEntityInterface $itemToMove): void {
     // We store the old weight since we make a swap
     $itemWeight = $itemToMove->getWeight();
 
-    $targetItem = $this->getUpperItem($itemWeight);
+    $targetItem = $this->getUpperItem($club, $itemWeight);
     // No item found, we do nothing
     if (!$targetItem) {
       return;
@@ -68,11 +84,11 @@ trait SortableEntityRepositoryTrait {
     $this->getEntityManager()->flush();
   }
 
-  public function moveDown(SortableEntityInterface $itemToMove): void {
+  public function moveDown(Club $club, SortableEntityInterface $itemToMove): void {
     // We store the old weight since we make a swap
     $itemWeight = $itemToMove->getWeight();
 
-    $targetItem = $this->getLowerItem($itemWeight);
+    $targetItem = $this->getLowerItem($club, $itemWeight);
     // No item found, we do nothing
     if (!$targetItem) {
       return;

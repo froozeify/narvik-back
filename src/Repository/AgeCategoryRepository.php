@@ -14,35 +14,22 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method AgeCategory[]    findAll()
  * @method AgeCategory[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class AgeCategoryRepository extends ServiceEntityRepository
-{
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, AgeCategory::class);
+class AgeCategoryRepository extends ServiceEntityRepository {
+  public function __construct(ManagerRegistry $registry) {
+    parent::__construct($registry, AgeCategory::class);
+  }
+
+  public function findOneByCode(string $code): ?AgeCategory {
+    $query = $this->createQueryBuilder('a')
+                ->andWhere('a.code = :code')
+                ->setParameter('code', $code)
+                ->setMaxResults(1)
+                ->getQuery();
+
+    try {
+      return $query->getOneOrNullResult();
+    } catch (\Exception) {
+      return null;
     }
-
-//    /**
-//     * @return AgeCategory[] Returns an array of AgeCategory objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('a.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?AgeCategory
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+  }
 }

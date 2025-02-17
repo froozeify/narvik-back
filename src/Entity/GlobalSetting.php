@@ -13,6 +13,7 @@ use App\Controller\GlobalSettingGetPublic;
 use App\Controller\GlobalSettingImportLogo;
 use App\Controller\GlobalSettingSmtp;
 use App\Controller\GlobalSettingTestEmail;
+use App\Enum\UserRole;
 use App\Repository\GlobalSettingRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -27,30 +28,6 @@ use Doctrine\ORM\Mapping as ORM;
     new Get(
       uriTemplate: '/public/global-settings/{name}',
       controller: GlobalSettingGetPublic::class,
-    ),
-
-    new Post(
-      uriTemplate: '/global-settings/-/logo',
-      controller: GlobalSettingImportLogo::class,
-      openapi: new Model\Operation(
-        requestBody: new Model\RequestBody(
-          content: new \ArrayObject([
-            'multipart/form-data' => [
-              'schema' => [
-                'type' => 'object',
-                'properties' => [
-                  'file' => [
-                    'type' => 'string',
-                    'format' => 'binary'
-                  ]
-                ]
-              ]
-            ]
-          ])
-        )
-      ),
-      security: "is_granted('ROLE_ADMIN')",
-      deserialize: false,
     ),
 
     new Post(
@@ -70,7 +47,7 @@ use Doctrine\ORM\Mapping as ORM;
           ])
         )
       ),
-      security: "is_granted('ROLE_ADMIN')",
+      security: "is_granted('".UserRole::super_admin->value."')",
       deserialize: false,
     ),
 
@@ -97,7 +74,7 @@ use Doctrine\ORM\Mapping as ORM;
           ])
         )
       ),
-      security: "is_granted('ROLE_ADMIN')",
+      security: "is_granted('".UserRole::super_admin->value."')",
       deserialize: false,
     ),
   ]

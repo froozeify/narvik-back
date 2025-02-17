@@ -14,6 +14,9 @@ SYMFONY  = $(PHP) bin/console
 .DEFAULT_GOAL = help
 .PHONY        : help build up start down logs sh composer vendor sf cc
 
+# Capture the first argument as `file`
+file=$(word 2,$(MAKECMDGOALS))
+
 ## —— 🎵 🐳 The Symfony Docker Makefile 🐳 🎵 ——————————————————————————————————
 help: ## Outputs this help screen
 	@grep -E '(^[a-zA-Z0-9\./_-]+:.*?##.*$$)|(^##)' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}{printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m##/[33m/'
@@ -52,7 +55,7 @@ logs: ## Show live logs
 	@$(DOCKER_COMP) logs --tail=0 --follow
 
 sh: ## Connect to the PHP FPM container
-	@$(PHP_CONT) sh
+	@$(PHP_CONT) bash
 
 ## —— Composer 🧙 ——————————————————————————————————————————————————————————————
 composer: ## Run composer, pass the parameter "c=" to run a given command, example: make composer c='req symfony/orm-pack'
@@ -71,6 +74,23 @@ sf: ## List all Symfony commands or pass the parameter "c=" to run a given comma
 cc: c=c:c ## Clear the cache
 cc: sf
 
+cc-test: ## Clear the test cache
+	@$(MAKE) --no-print-directory sf c='c:c --env=test'
+
+reload-fixture: ## Reload the database based on the default fixtures
+	@$(COMPOSER) reload-fixture
+
+test: ## Run the test suit on the app, add f=<filepath> to run the tests only in that specific file
+	@$(eval f ?=)
+	@if [ -z "$(f)" ]; then\
+		echo "\033[42m    Running test globally    \033[m";\
+	fi
+
+	@$(COMPOSER) test $(f)
+
+test-with-coverage: ## Run the test suit on the app with coverage report
+	@$(COMPOSER) test-with-coverage
+
 ## —— Database 📦 ——————————————————————————————————————————————————————————————
 db-dump: ## Dump the current database
 	@$(DB_CONT) sh -c 'pg_dumpall -c -U $$POSTGRES_USER | gzip' > ./dump/dump_`date +%Y-%m-%d"_"%H_%M_%S`.sql.gz
@@ -78,10 +98,3 @@ db-dump: ## Dump the current database
 db-restore: ## Restore a database dump. The file must be called './dump/dump.sql.gz'
 	docker compose exec database sh -c 'psql -d $$POSTGRES_DB -U $$POSTGRES_USER -c "DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public;"'
 	gunzip < ./dump/dump.sql.gz | docker compose exec -T database sh -c 'psql -d $$POSTGRES_DB -U $$POSTGRES_USER'
-
-## —— Cloudflared 🕸️ ——————————————————————————————————————————————————————————————
-cloudflared-tunnel: ## Expose local env through cloudflared tunnel (url must be set to host.docker.internal:3000 on cloudflare tunnel setting)
-	docker run --rm -it cloudflare/cloudflared:latest tunnel --no-autoupdate run --token $$CLOUDFLARED_TUNNEL
-
-cloudflared-tunnel-free: ## Expose local env through cloudflared tunnel (free version is limited to 200 in-flight request)
-	docker run --rm -it cloudflare/cloudflared:latest tunnel --no-autoupdate --url http://host.docker.internal:3000

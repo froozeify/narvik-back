@@ -2,11 +2,12 @@
 
 namespace App\Service;
 
-use App\Entity\ExternalPresence;
-use App\Entity\MemberPresence;
-use App\Repository\ExternalPresenceRepository;
-use App\Repository\MemberPresenceRepository;
-use App\Repository\MemberRepository;
+use App\Entity\Club;
+use App\Entity\ClubDependent\Plugin\Presence\ExternalPresence;
+use App\Entity\ClubDependent\Plugin\Presence\MemberPresence;
+use App\Repository\ClubDependent\MemberRepository;
+use App\Repository\ClubDependent\Plugin\Presence\ExternalPresenceRepository;
+use App\Repository\ClubDependent\Plugin\Presence\MemberPresenceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class MemberPresenceService {
@@ -17,17 +18,17 @@ class MemberPresenceService {
     private readonly MemberPresenceRepository $memberPresenceRepository,
   ) {
   }
-  public function importFromExternalPresence(): int {
+  public function importFromExternalPresence(Club $club): int {
     $totalImported = 0;
 
-    $presencesWithLicences = $this->externalPresenceRepository->findAllWithLicence();
+    $presencesWithLicences = $this->externalPresenceRepository->findAllWithLicence($club);
     /** @var ExternalPresence $extPresence */
     foreach ($presencesWithLicences as $extPresence) {
-      $member = $this->memberRepository->findOneByLicence($extPresence->getLicence());
+      $member = $this->memberRepository->findOneByLicence($club, $extPresence->getLicence());
       if (!$member) continue;
 
       // We check we don't have any record of it already
-      $alreadyPresent = $this->memberPresenceRepository->findBy(["member" => $member, "date" => $extPresence->getDate()]);
+      $alreadyPresent = $this->memberPresenceRepository->findOneByDay($member, $extPresence->getDate());
       if ($alreadyPresent) {
         $this->em->remove($extPresence);
         continue;
@@ -35,7 +36,8 @@ class MemberPresenceService {
 
       // We create the presence
       $presence = new MemberPresence();
-      $presence->setMember($member)
+      $presence
+        ->setMember($member)
         ->setDate($extPresence->getDate())
         ->setCreatedAt($extPresence->getCreatedAt());
 

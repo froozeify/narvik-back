@@ -9,8 +9,8 @@ Watch out of the `@Groups` annotation or even `@ApiProperty(security="is_granted
 
 Typical structure
 ```yaml
-App\Entity\MemberPresence:
-    id: ~
+App\Entity\ClubDependent\Plugin\Presence\MemberPresence:
+    uuid: ~
     date: ~
     createdAt: creation
 
@@ -22,7 +22,7 @@ App\Entity\MemberPresence:
     activities:
         prefix: activity
         fields:
-            id: ~
+            uuid: ~
             name: ~
 ```
 
@@ -33,7 +33,7 @@ The property must match to an existing property of the target entity.
 Possible values:
 
 - `not defined`: won't be normalized in the csv
-- `~`: the column in the csv will have the same name, for example `id`
+- `~`: the column in the csv will have the same name, for example `uuid`
 - `<string>`: any string value will rename the csv column with the string you defined
 
 ### Relational property
@@ -45,12 +45,12 @@ Structure example:
 activities:
     prefix: activities
     fields:
-        id: ~
+        uuid: ~
         name: ~
 ```
 
 - `prefix`: optional fields, should be defined for `OneToMany` relationships since it will be an array.  
-  The prefix will be applied in front of the fields name. Or in front of the loopings for array. In the previous example it will be `activities.0.id, activities.0.name, ...`  
+  The prefix will be applied in front of the fields name. Or in front of the loopings for array. In the previous example it will be `activities.0.uuid, activities.0.name, ...`  
   **If not defined, the fields will be defined as it was in the parent**
 
 - `fields`: always required, a structure, that could be either a `normal property` or `relational property`

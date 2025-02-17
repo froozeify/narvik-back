@@ -2,8 +2,7 @@
 
 namespace App\EventSubscriber\Doctrine;
 
-use App\Entity\Sale;
-use App\Entity\SalePurchasedItem;
+use App\Entity\ClubDependent\Plugin\Sale\SalePurchasedItem;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;

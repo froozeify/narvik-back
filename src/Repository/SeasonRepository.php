@@ -3,8 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\Season;
+use App\Service\SeasonService;
 use App\Service\UtilsService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -21,20 +23,26 @@ class SeasonRepository extends ServiceEntityRepository {
   }
 
   public function findOneByName(string $seasonName): ?Season {
-    return $this->createQueryBuilder("s")
-         ->andWhere("s.name = :seasonName")
-         ->setParameter("seasonName", $seasonName)
-         ->setMaxResults(1)
-         ->getQuery()
-         ->getOneOrNullResult();
+    $query = $this->createQueryBuilder("s")
+                  ->andWhere("s.name = :seasonName")
+                  ->setParameter("seasonName", $seasonName)
+                  ->setMaxResults(1)
+                  ->getQuery();
+
+    try {
+      return $query->getOneOrNullResult();
+    }
+    catch (\Exception) {
+      return null;
+    }
   }
 
-  public function findCurrentSeason():?Season  {
-    return $this->findOneByName(UtilsService::getCurrentSeasonName());
+  public function findCurrentSeason(): ?Season  {
+    return $this->findOneByName(SeasonService::getCurrentSeasonName());
   }
 
-  public function findPreviousSeason():?Season  {
-    return $this->findOneByName(UtilsService::getPreviousSeasonName());
+  public function findPreviousSeason(): ?Season  {
+    return $this->findOneByName(SeasonService::getPreviousSeasonName());
   }
 
 //    /**

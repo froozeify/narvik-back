@@ -2,8 +2,8 @@
 
 namespace App\EventSubscriber\Doctrine;
 
-use App\Entity\Member;
-use App\Entity\Sale;
+use App\Entity\ClubDependent\Member;
+use App\Entity\ClubDependent\Plugin\Sale\Sale;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\Event\PostPersistEventArgs;
 use Doctrine\ORM\Event\PostRemoveEventArgs;

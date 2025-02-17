@@ -3,43 +3,47 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use App\Enum\UserRole;
 use App\Repository\AgeCategoryRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AgeCategoryRepository::class)]
 #[ApiResource(
+  operations: [
+    new GetCollection(),
+    new Get(),
+    new Post(security: "is_granted('".UserRole::super_admin->value."')"),
+    new Patch(security: "is_granted('".UserRole::super_admin->value."')",),
+    new Delete(security: "is_granted('".UserRole::super_admin->value."')",),
+  ],
   normalizationContext: [
     'groups' => ['age-category', 'age-category-read']
   ],
-  denormalizationContext: [
-    'groups' => []
-  ]
+  order: ['name' => 'ASC']
 )]
 class AgeCategory {
   #[ORM\Id]
   #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
   #[ORM\Column]
-  #[Groups(['age-category-read', 'member-read', 'member-presence-read'])]
+  #[Groups(['age-category-read', 'member-read', 'member-presence-read', 'member-season-read'])]
   private ?int $id = null;
 
   #[ORM\Column(length: 255)]
-  #[Groups(['age-category-read', 'member-read', 'member-presence-read'])]
+  #[Groups(['super-admin-write', 'age-category-read', 'member-read', 'member-presence-read', 'member-season-read'])]
+  #[Assert\NotBlank]
   private ?string $code = null;
 
   #[ORM\Column(length: 255)]
-  #[Groups(['age-category-read', 'member-read', 'member-presence-read'])]
+  #[Groups(['super-admin-write', 'age-category-read', 'member-read', 'member-presence-read', 'member-season-read'])]
+  #[Assert\NotBlank]
   private ?string $name = null;
-
-  #[ORM\OneToMany(mappedBy: 'ageCategory', targetEntity: MemberSeason::class)]
-  #[Groups(['age-category-read'])]
-  private Collection $memberSeasons;
-
-  public function __construct() {
-    $this->memberSeasons = new ArrayCollection();
-  }
 
   public function getId(): ?int {
     return $this->id;
@@ -60,31 +64,6 @@ class AgeCategory {
 
   public function setName(string $name): static {
     $this->name = $name;
-    return $this;
-  }
-
-  /**
-   * @return Collection<int, MemberSeason>
-   */
-  public function getMemberSeasons(): Collection {
-    return $this->memberSeasons;
-  }
-
-  public function addMemberSeason(MemberSeason $memberSeason): static {
-    if (!$this->memberSeasons->contains($memberSeason)) {
-      $this->memberSeasons->add($memberSeason);
-      $memberSeason->setAgeCategory($this);
-    }
-    return $this;
-  }
-
-  public function removeMemberSeason(MemberSeason $memberSeason): static {
-    if ($this->memberSeasons->removeElement($memberSeason)) {
-      // set the owning side to null (unless already changed)
-      if ($memberSeason->getAgeCategory() === $this) {
-        $memberSeason->setAgeCategory(null);
-      }
-    }
     return $this;
   }
 }

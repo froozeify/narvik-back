@@ -2,17 +2,16 @@
 
 namespace App\Security\Voter;
 
-use App\Entity\Member;
-use App\Entity\Sale;
-use App\Enum\MemberRole;
+use App\Entity\ClubDependent\Plugin\Sale\Sale;
+use App\Entity\User;
+use App\Enum\ClubRole;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 class SaleVoter extends Voter {
-  public const UPDATE = 'SALE_UPDATE';
-  public const DELETE = 'SALE_DELETE';
+  public const string UPDATE = 'SALE_UPDATE';
+  public const string DELETE = 'SALE_DELETE';
 
   public function __construct(
     private readonly Security $security
@@ -28,9 +27,9 @@ class SaleVoter extends Voter {
 
     // Not a member
     if (
-      !$user instanceof Member ||
+      !$user instanceof User ||
       !$subject instanceof Sale ||
-      !$this->security->isGranted(MemberRole::supervisor->value)
+      !$this->security->isGranted(ClubRole::supervisor->value, $subject)
     ) {
       return false;
     }

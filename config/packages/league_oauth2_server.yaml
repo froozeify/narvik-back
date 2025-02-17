@@ -1,0 +1,24 @@
+league_oauth2_server:
+    authorization_server:
+        private_key: '%env(resolve:OAUTH_PRIVATE_KEY)%'
+        private_key_passphrase: '%env(resolve:OAUTH_PASSPHRASE)%'
+        encryption_key: '%env(resolve:OAUTH_ENCRYPTION_KEY)%'
+            
+        # Whether to enable the refresh token grant
+        enable_refresh_token_grant: true
+    resource_server:
+        public_key: '%env(resolve:OAUTH_PUBLIC_KEY)%'
+    scopes:
+        available: [ 'all', 'badger' ]
+        default: [ 'all' ]
+    persistence:
+        doctrine:
+            entity_manager: default
+            table_prefix: oauth2_
+
+
+# when@test:
+# We keep the persistence, otherwise can't log
+#     league_oauth2_server:
+#         persistence:
+#             in_memory: null

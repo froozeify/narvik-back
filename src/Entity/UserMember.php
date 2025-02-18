@@ -12,7 +12,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[UniqueEntity(fields: ['member'], message: 'Member already linked')]
 class UserMember {
   #[ORM\Id]
-  #[ORM\GeneratedValue]
+  #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
   #[ORM\Column]
   private ?int $id = null;
 

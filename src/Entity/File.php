@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Abstract\UuidEntity;
 use App\Entity\Interface\UuidEntityInterface;
 use App\Entity\Trait\UuidTrait;
 use App\Enum\FileCategory;
@@ -10,8 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: FileRepository::class)]
-class File implements UuidEntityInterface {
-  use UuidTrait;
+class File extends UuidEntity{
 
   #[Groups(['common-read'])]
   private ?string $publicUrl = null;

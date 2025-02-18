@@ -35,8 +35,6 @@ final class Version20250218095423 extends AbstractMigration {
     $this->addSql('CREATE SEQUENCE sale_purchased_item_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
     $this->addSql('CREATE SEQUENCE season_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
     $this->addSql('CREATE SEQUENCE "user_id_seq" INCREMENT BY 1 MINVALUE 1 START 1');
-    $this->addSql('CREATE SEQUENCE "user_member_id_seq" INCREMENT BY 1 MINVALUE 1 START 1');
-    $this->addSql('CREATE SEQUENCE "user_security_code_id_seq" INCREMENT BY 1 MINVALUE 1 START 1');
   }
 
   public function down(Schema $schema): void {
@@ -59,7 +57,5 @@ final class Version20250218095423 extends AbstractMigration {
     $this->addSql('DROP SEQUENCE sale_purchased_item_id_seq CASCADE');
     $this->addSql('DROP SEQUENCE season_id_seq CASCADE');
     $this->addSql('DROP SEQUENCE "user_id_seq" CASCADE');
-    $this->addSql('DROP SEQUENCE "user_member_id_seq" CASCADE');
-    $this->addSql('DROP SEQUENCE "user_security_code_id_seq" CASCADE');
   }
 }

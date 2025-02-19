@@ -232,4 +232,21 @@ class ClubTest extends AbstractEntityTestCase {
     $this->assertResponseIsSuccessful();
   }
 
+  public function testClubGenerateBadgerToken(): void {
+    $club1 = _InitStory::club_1();
+    $iri = $this->getIriFromResource($club1);
+
+    $this->loggedAsAdminClub1();
+    $response = $this->makeGetRequest($iri);
+    $this->assertResponseIsSuccessful();
+    $this->assertEquals("club1longbadgertoken", $response->toArray()["badgerToken"]);
+
+    $this->makePatchRequest($this->getIriFromResource($club1) . "/generate-badger");
+    $this->assertResponseIsSuccessful();
+
+    $response = $this->makeGetRequest($iri);
+    $this->assertResponseIsSuccessful();
+    $this->assertNotEquals("club1longbadgertoken", $response->toArray()["badgerToken"]);
+  }
+
 }

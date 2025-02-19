@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Controller\ClubGenerateBadger;
 use App\Entity\Abstract\UuidEntity;
 use App\Entity\ClubDependent\ClubSetting;
 use App\Entity\Interface\TimestampEntityInterface;
@@ -33,6 +34,14 @@ use Symfony\Component\Validator\Constraints as Assert;
   new Post(security: "is_granted('".UserRole::super_admin->value."')"),
   new Patch(security: "is_granted('".UserRole::super_admin->value."')",),
   new Delete(security: "is_granted('".UserRole::super_admin->value."')",),
+
+  new Patch(
+    uriTemplate: '/clubs/{uuid}/generate-badger',
+    controller: ClubGenerateBadger::class,
+    security: "is_granted('".ClubRole::admin->value."', object)",
+    deserialize: false,
+    write: false
+  ),
 ], normalizationContext: [
   'groups' => ['club', 'club-read', 'common-read'],
 ], denormalizationContext: [

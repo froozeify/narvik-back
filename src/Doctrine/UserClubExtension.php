@@ -10,6 +10,7 @@ use App\Entity\Club;
 use App\Entity\Interface\ClubLinkedEntityInterface;
 use App\Entity\User;
 use App\Enum\UserRole;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
@@ -55,35 +56,7 @@ final class UserClubExtension implements QueryCollectionExtensionInterface, Quer
     foreach ($user->getLinkedProfiles() as $club) {
       $userClubs[] = $club->getClub();
     }
-
     return $userClubs;
-  }
-
-  private function getUserCurrentClubRole(Club $club) {
-    // TODO: Return the futur UserClub object
-    // It should contain a col `role`, that is the current role
-  }
-
-  private function checkUserIsClubSupervisor(Club $club): bool {
-    $user = $this->getUser();
-    foreach ($user->getMemberships() as $membership) {
-      if ($membership->getMember()?->getClub() === $club) {
-        return $membership->getRole()->isSupervisor();
-      }
-    }
-
-    return false;
-  }
-
-  private function checkUserIsClubAdmin(Club $club): bool {
-    $user = $this->getUser();
-    foreach ($user->getMemberships() as $membership) {
-      if ($membership->getMember()?->getClub() === $club) {
-        return $membership->getRole()->isAdmin();
-      }
-    }
-
-    return false;
   }
 
   /**
@@ -129,19 +102,25 @@ final class UserClubExtension implements QueryCollectionExtensionInterface, Quer
     if (is_subclass_of($resourceClass, ClubLinkedEntityInterface::class)) {
       $userClubs = $this->getUserClubs();
 
-      $clubJoin = $this->addJoins($resourceClass::getClubSqlPath());
-      $this->queryBuilder
-        ->andWhere(
-          $this->queryBuilder->expr()->in($clubJoin, ":clubs"),
-        )
-        ->setParameter("clubs", $userClubs);
+      $hasClubLinked = false;
+      foreach ($this->queryBuilder->getDQLPart("join") as $dqlJoin) {
+        /** @var Join $join */
+        foreach ($dqlJoin as $join) {
+          if (str_ends_with($join->getJoin(), "club")) {
+            $hasClubLinked = true;
+            break 2;
+          }
+        }
+      }
+
+      if (!$hasClubLinked) {
+        $clubJoin = $this->addJoins($resourceClass::getClubSqlPath());
+        $this->queryBuilder
+          ->andWhere(
+            $this->queryBuilder->expr()->in($clubJoin, ":clubs"),
+          )
+          ->setParameter("clubs", $userClubs);
+      }
     }
-
-
-    // TODO: Do we restrict also based on the ROLE ? Or Voter will do the final perm check
-    // $resourceClassName = explode("\\", $resourceClass);
-    // $resourceClassName = $resourceClassName[count($resourceClassName) - 1];
-    // $methodName = "restrict" . $resourceClassName . "As";
-
   }
 }

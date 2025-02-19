@@ -380,7 +380,7 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
 
     // We can't read other member datas
     $this->makeGetRequest($this->getIriFromResource($member2));
-    $this->assertResponseStatusCodeSame(ResponseCodeEnum::not_found->value);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::forbidden->value);
   }
 
   public function testMemberLinkWithUser(): void {

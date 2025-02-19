@@ -70,10 +70,8 @@ class MemberPresenceTest extends AbstractEntityClubLinkedTestCase {
       $payloadCheck,
       supervisorClub1Code: ResponseCodeEnum::created,
       adminClub1Code: ResponseCodeEnum::created,
-      adminClub2Code: ResponseCodeEnum::bad_request,
       superAdminCode: ResponseCodeEnum::created,
       badgerClub1Code: ResponseCodeEnum::created,
-      badgerClub2Code: ResponseCodeEnum::bad_request,
       requestFunction: function (string $level, ?int $id) use (&$payloadCheck) {
         $club1 = _InitStory::club_1();
 
@@ -126,10 +124,8 @@ class MemberPresenceTest extends AbstractEntityClubLinkedTestCase {
       $payloadCheck,
       supervisorClub1Code: ResponseCodeEnum::no_content,
       adminClub1Code: ResponseCodeEnum::no_content,
-      adminClub2Code: ResponseCodeEnum::not_found,
       superAdminCode: ResponseCodeEnum::no_content,
       badgerClub1Code: ResponseCodeEnum::no_content,
-      badgerClub2Code: ResponseCodeEnum::not_found,
       requestFunction: function (string $level, ?int $id) use (&$payloadCheck) {
         $memberPresence = MemberPresenceFactory::createOne([
           'club' => _InitStory::club_1(),

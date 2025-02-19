@@ -158,10 +158,10 @@ abstract class AbstractTestCase extends ApiTestCase {
     ResponseCodeEnum $memberClub1Code = ResponseCodeEnum::forbidden,
     ResponseCodeEnum $supervisorClub1Code = ResponseCodeEnum::ok,
     ResponseCodeEnum $adminClub1Code  = ResponseCodeEnum::ok,
-    ?ResponseCodeEnum $adminClub2Code = ResponseCodeEnum::not_found,
+    ?ResponseCodeEnum $adminClub2Code = ResponseCodeEnum::forbidden,
     ResponseCodeEnum $superAdminCode = ResponseCodeEnum::ok,
     ResponseCodeEnum $badgerClub1Code = ResponseCodeEnum::forbidden,
-    ?ResponseCodeEnum $badgerClub2Code = ResponseCodeEnum::not_found,
+    ?ResponseCodeEnum $badgerClub2Code = ResponseCodeEnum::forbidden,
     ?\Closure $requestFunction = null,
   ): void {
     // Super admin

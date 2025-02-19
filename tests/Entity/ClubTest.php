@@ -56,6 +56,8 @@ class ClubTest extends AbstractEntityTestCase {
       $payload,
       supervisorClub1Code: ResponseCodeEnum::forbidden,
       adminClub1Code: ResponseCodeEnum::forbidden,
+      adminClub2Code: ResponseCodeEnum::not_found,
+      badgerClub2Code: ResponseCodeEnum::not_found,
       requestFunction: function (string $level, ?int $id) use ($iri, $payload) {
         $this->makePatchRequest($iri, $payload);
       }
@@ -68,8 +70,10 @@ class ClubTest extends AbstractEntityTestCase {
       memberClub1Code: ResponseCodeEnum::not_found,
       supervisorClub1Code: ResponseCodeEnum::not_found,
       adminClub1Code: ResponseCodeEnum::not_found,
+      adminClub2Code: ResponseCodeEnum::not_found,
       superAdminCode: ResponseCodeEnum::no_content,
       badgerClub1Code: ResponseCodeEnum::not_found,
+      badgerClub2Code: ResponseCodeEnum::not_found,
       requestFunction: function (string $level, ?int $id) {
         $club = ClubFactory::createOne([
           'name' => 'Club to delete',

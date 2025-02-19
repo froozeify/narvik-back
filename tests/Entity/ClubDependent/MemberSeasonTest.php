@@ -56,9 +56,7 @@ class MemberSeasonTest extends AbstractEntityClubLinkedTestCase {
       $payloadCheck,
       supervisorClub1Code: ResponseCodeEnum::created,
       adminClub1Code: ResponseCodeEnum::created,
-      adminClub2Code: ResponseCodeEnum::bad_request,
       superAdminCode: ResponseCodeEnum::created,
-      badgerClub2Code: ResponseCodeEnum::bad_request,
       requestFunction: function (string $level, ?int $id) use ($club1, &$payloadCheck, &$count) {
         // We update for each test since the name must be unique
         $sn = "season_" . $count;

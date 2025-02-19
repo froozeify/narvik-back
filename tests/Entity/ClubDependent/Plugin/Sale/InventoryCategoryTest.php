@@ -33,10 +33,7 @@ class InventoryCategoryTest extends AbstractEntityClubLinkedTestCase {
       $payloadCheck,
       supervisorClub1Code: ResponseCodeEnum::forbidden,
       adminClub1Code: ResponseCodeEnum::created,
-      adminClub2Code: ResponseCodeEnum::forbidden,
       superAdminCode: ResponseCodeEnum::created,
-      badgerClub1Code: ResponseCodeEnum::forbidden,
-      badgerClub2Code: ResponseCodeEnum::forbidden,
       requestFunction: function (string $level, ?int $id) use (&$payloadCheck) {
         $club1 = _InitStory::club_1();
         $payload = [
@@ -70,10 +67,7 @@ class InventoryCategoryTest extends AbstractEntityClubLinkedTestCase {
     $this->makeAllLoggedRequests(
       supervisorClub1Code: ResponseCodeEnum::forbidden,
       adminClub1Code: ResponseCodeEnum::no_content,
-      adminClub2Code: ResponseCodeEnum::not_found,
       superAdminCode: ResponseCodeEnum::no_content,
-      badgerClub1Code: ResponseCodeEnum::forbidden,
-      badgerClub2Code: ResponseCodeEnum::not_found,
       requestFunction: function (string $level, ?int $id) {
         $item = InventoryCategoryFactory::createOne();
         $this->makeDeleteRequest($this->getIriFromResource($item));

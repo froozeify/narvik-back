@@ -103,10 +103,7 @@ class SaleTest extends AbstractEntityClubLinkedTestCase {
     $this->makeAllLoggedRequests(
       supervisorClub1Code: ResponseCodeEnum::no_content,
       adminClub1Code: ResponseCodeEnum::no_content,
-      adminClub2Code: ResponseCodeEnum::not_found,
       superAdminCode: ResponseCodeEnum::no_content,
-      badgerClub1Code: ResponseCodeEnum::forbidden,
-      badgerClub2Code: ResponseCodeEnum::not_found,
       requestFunction: function (string $level, ?int $id) {
         $item = SaleFactory::createOne(['createdAt' => new \DateTimeImmutable()]);
         $this->makeDeleteRequest($this->getIriFromResource($item));
@@ -117,10 +114,7 @@ class SaleTest extends AbstractEntityClubLinkedTestCase {
     $this->makeAllLoggedRequests(
       supervisorClub1Code: ResponseCodeEnum::forbidden,
       adminClub1Code: ResponseCodeEnum::no_content,
-      adminClub2Code: ResponseCodeEnum::not_found,
       superAdminCode: ResponseCodeEnum::no_content,
-      badgerClub1Code: ResponseCodeEnum::forbidden,
-      badgerClub2Code: ResponseCodeEnum::not_found,
       requestFunction: function (string $level, ?int $id) {
         $item = SaleFactory::createOne([
           'createdAt' => \DateTimeImmutable::createFromMutable(faker()->dateTimeBetween('-10 days', '-2 days'))

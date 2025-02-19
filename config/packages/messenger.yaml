@@ -22,7 +22,7 @@ framework:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
                     queue_name: failed
-            # test: 'doctrine://default?queue_name=test'
+            test: 'doctrine://default?queue_name=test'
             # sync: 'sync://'
 
         routing:
@@ -32,6 +32,8 @@ framework:
             App\Message\ItacMembersMessage: async_medium
             App\Message\ItacSecondaryClubMembersMessage: async_low
             App\Message\CerberePresencesDateMessage: async_low
+            App\Message\MemberPresencesCsvMessage: async_low
+            
     
 when@test:
     framework:

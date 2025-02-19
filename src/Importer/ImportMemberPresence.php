@@ -20,6 +20,7 @@ class ImportMemberPresence extends AbstractCsvImporter {
   public const COL_LICENCE = 'member.licence';
   public const COL_DATE = 'date';
   public const COL_ACTIVITIES = 'activities';
+  public const COL_CREATED_AT = 'createdAt';
 
   public const ERROR_CODES = [
     // 1xx: Error
@@ -68,6 +69,7 @@ class ImportMemberPresence extends AbstractCsvImporter {
 
     $date = new \DateTimeImmutable($date);
 
+
     // We check the presence is not already registered
     $existingPresence = $this->memberPresenceRepository->findOneByDay($member, $date);
     if ($existingPresence) {
@@ -77,6 +79,17 @@ class ImportMemberPresence extends AbstractCsvImporter {
     }
 
     $memberPresence = new MemberPresence();
+
+    $createdAt = $this->getCurrentRowValue(self::COL_CREATED_AT);
+    if ($createdAt) {
+      try {
+        $createdAt = new \DateTimeImmutable($createdAt);
+        $memberPresence->setCreatedAt($createdAt);
+        $date = $date->setTime($createdAt->format('H'), $createdAt->format('i'), $createdAt->format('s'));
+      } catch (\Exception $e) {
+      }
+    }
+
     $memberPresence
       ->setMember($member)
       ->setDate($date);

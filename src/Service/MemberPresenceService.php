@@ -5,13 +5,18 @@ namespace App\Service;
 use App\Entity\Club;
 use App\Entity\ClubDependent\Plugin\Presence\ExternalPresence;
 use App\Entity\ClubDependent\Plugin\Presence\MemberPresence;
+use App\Message\ItacMembersMessage;
+use App\Message\MemberPresencesCsvMessage;
 use App\Repository\ClubDependent\MemberRepository;
 use App\Repository\ClubDependent\Plugin\Presence\ExternalPresenceRepository;
 use App\Repository\ClubDependent\Plugin\Presence\MemberPresenceRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use League\Csv\Reader;
+use Symfony\Component\Messenger\MessageBusInterface;
 
-class MemberPresenceService {
+class MemberPresenceService extends AbstractCsvService {
   public function __construct(
+    private readonly MessageBusInterface $bus,
     private readonly EntityManagerInterface $em,
     private readonly ExternalPresenceRepository $externalPresenceRepository,
     private readonly MemberRepository $memberRepository,
@@ -55,5 +60,31 @@ class MemberPresenceService {
     $this->em->flush();
 
     return $totalImported;
+  }
+
+  /**
+   * @param string $filename
+   * @return int
+   * @throws \League\Csv\Exception
+   * @throws \League\Csv\UnavailableStream
+   */
+  public function importFromFile(Club $club, string $filename): int {
+    $reader = Reader::createFromPath($filename);
+    $reader->setHeaderOffset(0); // Header is in first line
+    $records = $reader->getRecords();
+    $array = iterator_to_array($records);
+    $recordsChunks = array_chunk($array, 100);
+
+    foreach ($recordsChunks as $recordsChunk) {
+      $chunk = [];
+      foreach ($recordsChunk as $key => $value) {
+        foreach ($value as $k => $v) {
+          $chunk[$key][$this->convert($k)] = $this->convert($v);
+        }
+      }
+      $this->bus->dispatch(new MemberPresencesCsvMessage($club->getUuid()->toString(), $chunk));
+    }
+
+    return count($array);
   }
 }

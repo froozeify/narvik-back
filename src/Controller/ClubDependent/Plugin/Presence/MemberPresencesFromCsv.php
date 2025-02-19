@@ -4,6 +4,7 @@ namespace App\Controller\ClubDependent\Plugin\Presence;
 
 use App\Controller\Abstract\AbstractClubDependentController;
 use App\Importer\ImportMemberPresence;
+use App\Service\MemberPresenceService;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,7 +12,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class MemberPresencesFromCsv extends AbstractClubDependentController {
 
-  public function __invoke(Request $request, ImportMemberPresence $importMemberPresence): JsonResponse {
+  public function __invoke(Request $request, MemberPresenceService $memberPresenceService): JsonResponse {
     /** @var UploadedFile|null $uploadedFile */
     $uploadedFile = $request->files->get('file');
     if (!$uploadedFile) {
@@ -22,9 +23,7 @@ class MemberPresencesFromCsv extends AbstractClubDependentController {
       throw new BadRequestHttpException('The "file" must be a csv');
     }
 
-    $importMemberPresence->setClub($this->getQueryClub());
-    $response = $importMemberPresence->fromFile($uploadedFile);
-
+    $response = $memberPresenceService->importFromFile($this->getQueryClub(), $uploadedFile);
     return new JsonResponse($response);
   }
 

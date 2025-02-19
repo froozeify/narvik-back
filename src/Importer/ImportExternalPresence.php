@@ -21,6 +21,7 @@ class ImportExternalPresence extends AbstractCsvImporter {
   public const string COL_LASTNAME = 'lastname';
   public const string COL_DATE = 'date';
   public const string  COL_ACTIVITIES = 'activities';
+  public const string  COL_CREATED_AT = 'createdAt';
 
   public const array ERROR_CODES = [
     // 1xx: Error
@@ -76,6 +77,17 @@ class ImportExternalPresence extends AbstractCsvImporter {
 
 
     $externalPresence = new ExternalPresence();
+
+    $createdAt = $this->getCurrentRowValue(self::COL_CREATED_AT);
+    if ($createdAt) {
+      try {
+        $createdAt = new \DateTimeImmutable($createdAt);
+        $externalPresence->setCreatedAt($createdAt);
+        $date = $date->setTime($createdAt->format('H'), $createdAt->format('i'), $createdAt->format('s'));
+      } catch (\Exception $e) {
+      }
+    }
+
     $externalPresence
       ->setClub($this->getClub())
       ->setLicence($licence)

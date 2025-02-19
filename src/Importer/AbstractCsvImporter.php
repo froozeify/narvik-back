@@ -78,6 +78,17 @@ abstract class AbstractCsvImporter {
     return $this->parse($realRows);
   }
 
+  public function fromArrayWKeys(array $rows): array {
+    if (empty($rows)) {
+      return [];
+    }
+
+    // We get the "header" from the key
+    $keys = array_keys($rows[0]);
+    $this->headers = array_combine($keys, $keys);
+    return $this->parse($rows);
+  }
+
   private function parse(array $rows): array {
     $result = [
       "errors"  => [],

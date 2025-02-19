@@ -15,7 +15,6 @@ class TimestampEntityPrePersistSubscriber extends AbstractEventSubscriber {
       return;
     }
 
-    // We auto set the weight to the last one
     if (!$entity->getCreatedAt()) {
       $entity->setCreatedAt(new \DateTimeImmutable());
     }

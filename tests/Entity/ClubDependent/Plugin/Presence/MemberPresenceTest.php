@@ -6,6 +6,7 @@ use App\Entity\ClubDependent\Member;
 use App\Entity\ClubDependent\Plugin\Presence\MemberPresence;
 use App\Enum\ClubRole;
 use App\Message\CerberePresencesDateMessage;
+use App\Message\MemberPresencesCsvMessage;
 use App\Tests\Entity\Abstract\AbstractEntityClubLinkedTestCase;
 use App\Tests\Enum\ResponseCodeEnum;
 use App\Tests\Factory\ExternalPresenceFactory;
@@ -234,6 +235,9 @@ class MemberPresenceTest extends AbstractEntityClubLinkedTestCase {
   public function testImportPresencesFromCSV(): void {
     $club = _InitStory::club_1();
 
+    $transport = $this->transport('async_low');
+    $transport->queue()->assertEmpty();
+
     $file = FixtureFileManager::getUploadedFile(FixtureFileManager::PRESENCES_NARVIK);
     $fileFail = FixtureFileManager::getUploadedFile(FixtureFileManager::LOGO);
 
@@ -267,9 +271,12 @@ class MemberPresenceTest extends AbstractEntityClubLinkedTestCase {
     ]);
     $this->assertResponseIsSuccessful();
 
-    $this->assertCount(2, $response->toArray()['created']);
-    $this->assertCount(0, $response->toArray()['warnings']);
-    $this->assertCount(1, $response->toArray()['errors']);
+    $transport->queue()->assertCount(1);
+    $transport->queue()->assertContains(MemberPresencesCsvMessage::class, 1);
+
+    // We consume the queue
+    $transport->process();
+    $transport->queue()->assertEmpty();
 
     // 2 new presences
     $response = $this->makeGetRequest($this->getRootWClubUrl($club));
@@ -286,9 +293,13 @@ class MemberPresenceTest extends AbstractEntityClubLinkedTestCase {
       ],
     ]);
     $this->assertResponseIsSuccessful();
-    $this->assertCount(0, $response->toArray()['created']);
-    $this->assertCount(2, $response->toArray()['warnings']); // Already registered
-    $this->assertCount(1, $response->toArray()['errors']);
+
+    $transport->queue()->assertCount(1);
+    $transport->queue()->assertContains(MemberPresencesCsvMessage::class, 1);
+
+    // We consume the queue
+    $transport->process();
+    $transport->queue()->assertEmpty();
 
     $response = $this->makeGetRequest($this->getRootWClubUrl($club));
     $this->assertCount($this->TOTAL_ADMIN_CLUB_1 + 2, $response->toArray()['member']);

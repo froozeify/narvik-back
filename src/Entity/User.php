@@ -244,6 +244,7 @@ class User extends UuidEntity implements UserInterface, PasswordAuthenticatedUse
   #[ORM\Column(length: 180, unique: true)]
   #[Groups(['user-read', 'super-admin-write'])]
   #[Assert\NotBlank(allowNull: false)]
+  #[Assert\Email]
   private ?string $email = null;
 
   #[ORM\Column(length: 255, nullable: true)]

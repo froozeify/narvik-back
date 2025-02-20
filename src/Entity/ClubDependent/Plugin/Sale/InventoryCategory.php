@@ -104,7 +104,7 @@ class InventoryCategory extends UuidEntity implements ClubLinkedEntityInterface,
   private ?string $name = null;
 
   #[ORM\Column(nullable: true)]
-  #[Groups(['inventory-category-read'])]
+  #[Groups(['inventory-category'])]
   private ?int $weight = null;
 
   #[ORM\OneToMany(mappedBy: 'category', targetEntity: InventoryItem::class, orphanRemoval: true)]

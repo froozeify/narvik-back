@@ -112,7 +112,7 @@ class SalePaymentMode extends UuidEntity implements SortableEntityInterface, Clu
   private ?bool $available = true;
 
   #[ORM\Column(nullable: true)]
-  #[Groups(['sale-payment-mode-read'])]
+  #[Groups(['sale-payment-mode'])]
   private ?int $weight = null;
 
   public function getName(): ?string {

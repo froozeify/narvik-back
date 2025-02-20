@@ -4,9 +4,12 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    env(EXPOSE_VERSION): "false"
+    env(EXPOSE_VERSION): "false" # default value
     app.expose_version: '%env(bool:resolve:EXPOSE_VERSION)%'
-    
+
+    app.oauth_passphrase: '%env(OAUTH_PASSPHRASE)%'
+    app.oauth_private_key: '%env(resolve:OAUTH_PRIVATE_KEY)%'
+
     app.files: '%kernel.project_dir%/private/files'
     app.public_images: '%kernel.project_dir%/public/images'
     # app.members_photos: '%app.files%/members'

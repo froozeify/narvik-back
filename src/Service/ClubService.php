@@ -41,7 +41,7 @@ class ClubService {
       $user
         ->setAccountActivated(true)
         ->setFirstname('Badger')
-        ->setLastname('BADGER')
+        ->setLastname($club->getName() ?? 'BADGER')
         ->setRole(UserRole::badger)
         ->setEmail("badger@{$club->getUuid()->toString()}");
 

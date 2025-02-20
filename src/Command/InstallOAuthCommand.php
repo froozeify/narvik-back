@@ -55,7 +55,7 @@ class InstallOAuthCommand extends Command {
     $path = $this->kernel->getProjectDir() . "/config/jwt";
     $existingJwt = $this->fs->exists(["$path/private.pem", "$path/public.pem"]);
 
-    $oauthPassphrase = $_ENV['OAUTH_PASSPHRASE'];
+    $oauthPassphrase = $this->params->get('app.oauth_passphrase');
     if (!$oauthPassphrase) {
       throw new \Exception("Env var 'OAUTH_PASSPHRASE' is not defined");
     }

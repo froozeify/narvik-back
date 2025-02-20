@@ -7,7 +7,6 @@ use App\Repository\ClubRepository;
 use App\Service\ClubService;
 use App\Service\UuidService;
 use League\Bundle\OAuth2ServerBundle\Entity\Scope;
-use League\Bundle\OAuth2ServerBundle\Manager\Doctrine\RefreshTokenManager;
 use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\Exception\UniqueTokenIdentifierConstraintViolationException;
 use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
@@ -16,6 +15,7 @@ use League\OAuth2\Server\Repositories\RefreshTokenRepositoryInterface;
 use League\OAuth2\Server\ResponseTypes\BearerTokenResponse;
 use Nyholm\Psr7\Response as Psr7Response;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -26,6 +26,7 @@ class SecurityController extends AbstractController {
 
   #[Route(path: ['/auth/bdg'], name: 'auth_bdg', methods: ['POST'])]
   public function loginBadger(
+    ParameterBagInterface $params,
     Request $request,
     KernelInterface $kernel,
     ClientRepositoryInterface $clientRepository,
@@ -55,8 +56,8 @@ class SecurityController extends AbstractController {
     $scope = new Scope();
     $scope->setIdentifier('badger');
 
-    $key = str_replace('%kernel.project_dir%', $kernel->getProjectDir(), $_ENV['OAUTH_PRIVATE_KEY']);
-    $cryptKey = new CryptKey($key, $_ENV['OAUTH_PASSPHRASE'], false);
+    $key = str_replace('%kernel.project_dir%', $kernel->getProjectDir(), $params->get('app.oauth_private_key'));
+    $cryptKey = new CryptKey($key, $params->get('app.oauth_passphrase'), false);
 
     $accessToken = $accessTokenRepository->getNewToken($client, [$scope], "badger@{$club->getUuid()}");
     $accessToken->setExpiryDateTime((new \DateTimeImmutable())->add(new \DateInterval('PT1H')));
@@ -83,7 +84,7 @@ class SecurityController extends AbstractController {
 
     $bearer = new BearerTokenResponse();
     $bearer->setPrivateKey($cryptKey);
-    $bearer->setEncryptionKey($_ENV['OAUTH_ENCRYPTION_KEY']);
+    $bearer->setEncryptionKey($params->get('league.oauth2_server.encryption_key'));
     $bearer->setAccessToken($accessToken);
     $bearer->setRefreshToken($refreshToken);
     $response = $bearer->generateHttpResponse(new Psr7Response());

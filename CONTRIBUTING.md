@@ -20,3 +20,4 @@ When creating a new entity, you should do the next steps :
 6. Add the data generation inside `src/DataFixtures/AppFixtures`
 7. Generate the doctrine migration script
     - `bin/console make:migration` 
+    - Remove the alter fields for `user_member` and `user_security_code` the field is already migrated but the symfony scripts want to generate another one that will break the site... 

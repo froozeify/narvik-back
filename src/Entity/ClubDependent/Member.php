@@ -252,6 +252,12 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
   #[ORM\OneToMany(mappedBy: 'member', targetEntity: MemberSeason::class, orphanRemoval: true)]
   private Collection $memberSeasons;
 
+  #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+  #[Groups(['self-read', 'member-read', 'club-supervisor-write', 'member-presence-read'])]
+  private ?\DateTimeInterface $medicalCertificateExpiration = null;
+
+  #[Groups(['self-read', 'member-read', 'member-presence-read'])]
+  private string $medicalCertificateStatus = 'none';
 
 
 
@@ -334,6 +340,25 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
     $this->memberPresences = new ArrayCollection();
     $this->memberSeasons = new ArrayCollection();
     $this->sales = new ArrayCollection();
+  }
+
+  public function getMedicalCertificateStatus(): string {
+    $expirationDate = $this->getMedicalCertificateExpiration();
+
+    if (!$expirationDate) {
+      return 'none';
+    }
+
+    $date = new \DateTimeImmutable();
+    if ($date >= $expirationDate) {
+      return 'expired';
+    }
+
+    if ($date->add(new \DateInterval('P2M')) >= $expirationDate) {
+      return 'expire_soon';
+    }
+
+    return 'valid';
   }
 
   public function getProfileImage(): ?File {
@@ -616,4 +641,14 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
     $this->skipAutoSetUserMember = $skipAutoSetUserMember;
     return $this;
   }
+
+  public function getMedicalCertificateExpiration(): ?\DateTimeInterface {
+    return $this->medicalCertificateExpiration;
+  }
+
+  public function setMedicalCertificateExpiration(?\DateTimeInterface $medicalCertificateExpiration): Member {
+    $this->medicalCertificateExpiration = $medicalCertificateExpiration;
+    return $this;
+  }
+
 }

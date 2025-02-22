@@ -145,12 +145,28 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
     $member = _InitStory::MEMBER_member_club_1();
 
     $file = FixtureFileManager::getUploadedFile(FixtureFileManager::EDEN_MEMBERS);
+    $fileFail = FixtureFileManager::getUploadedFile(FixtureFileManager::LOGO);
 
     $this->loggedAsAdminClub1();
     $response = $this->makeGetRequest($this->getIriFromResource($member));
     $this->assertJsonNotHasKey('medicalCertificateExpiration', $response);
     $this->assertJsonContains([
       "medicalCertificateStatus" => "none",
+    ]);
+
+    // Wrong file
+    $this->makePostRequest($this->getRootWClubUrl($club) . "/-/from-eden", [
+      '_not_json' => true,
+      'headers' => ['Content-Type' => 'multipart/form-data'],
+      'extra' => [
+        'files' => [
+          'file' => $fileFail,
+        ],
+      ],
+    ]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+    $this->assertJsonContains([
+      "detail" => "The \"file\" must be an XLSX.",
     ]);
 
     // For the moment it only imports the medical certificate expiration date
@@ -179,10 +195,25 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
     $this->transport('async_medium')->queue()->assertEmpty();
 
     $file = FixtureFileManager::getUploadedFile(FixtureFileManager::ITAC_MEMBERS);
+    $fileFail = FixtureFileManager::getUploadedFile(FixtureFileManager::LOGO);
 
     $this->loggedAsAdminClub1();
     $response = $this->makeGetRequest($this->getRootWClubUrl($club));
     $this->assertCount($this->TOTAL_ADMIN_CLUB_1, $response->toArray()['member']);
+
+    $this->makePostRequest($this->getRootWClubUrl($club) . "/-/from-itac", [
+      '_not_json' => true,
+      'headers' => ['Content-Type' => 'multipart/form-data'],
+      'extra' => [
+        'files' => [
+          'file' => $fileFail,
+        ],
+      ],
+    ]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+    $this->assertJsonContains([
+      "detail" => "The \"file\" must be a CSV",
+    ]);
 
     $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/from-itac", [
       '_not_json' => true,
@@ -236,10 +267,25 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
     $transport->queue()->assertEmpty();
 
     $file = FixtureFileManager::getUploadedFile(FixtureFileManager::ITAC_SECONDARY_MEMBERS);
+    $fileFail = FixtureFileManager::getUploadedFile(FixtureFileManager::LOGO);
 
     $this->loggedAsAdminClub1();
     $response = $this->makeGetRequest($this->getRootWClubUrl($club));
     $this->assertCount($this->TOTAL_ADMIN_CLUB_1, $response->toArray()['member']);
+
+    $this->makePostRequest($this->getRootWClubUrl($club) . "/-/secondary-from-itac", [
+      '_not_json' => true,
+      'headers' => ['Content-Type' => 'multipart/form-data'],
+      'extra' => [
+        'files' => [
+          'file' => $fileFail,
+        ],
+      ],
+    ]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+    $this->assertJsonContains([
+      "detail" => "The \"file\" must be a CSV",
+    ]);
 
     $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/secondary-from-itac", [
       '_not_json' => true,

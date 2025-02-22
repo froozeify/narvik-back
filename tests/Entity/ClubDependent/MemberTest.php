@@ -12,7 +12,6 @@ use App\Tests\Factory\MemberFactory;
 use App\Tests\Factory\UserFactory;
 use App\Tests\FixtureFileManager;
 use App\Tests\Story\_InitStory;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Zenstruck\Messenger\Test\InteractsWithMessenger;
 
 class MemberTest extends AbstractEntityClubLinkedTestCase {
@@ -139,6 +138,39 @@ class MemberTest extends AbstractEntityClubLinkedTestCase {
     ]);
     $this->assertResponseStatusCodeSame(ResponseCodeEnum::ok->value);
     $this->assertCount(0, $response->toArray());
+  }
+
+  public function testImportEdenMembers(): void {
+    $club = _InitStory::club_1();
+    $member = _InitStory::MEMBER_member_club_1();
+
+    $file = FixtureFileManager::getUploadedFile(FixtureFileManager::EDEN_MEMBERS);
+
+    $this->loggedAsAdminClub1();
+    $response = $this->makeGetRequest($this->getIriFromResource($member));
+    $this->assertJsonNotHasKey('medicalCertificateExpiration', $response);
+    $this->assertJsonContains([
+      "medicalCertificateStatus" => "none",
+    ]);
+
+    // For the moment it only imports the medical certificate expiration date
+    $response = $this->makePostRequest($this->getRootWClubUrl($club) . "/-/from-eden", [
+      '_not_json' => true,
+      'headers' => ['Content-Type' => 'multipart/form-data'],
+      'extra' => [
+        'files' => [
+          'file' => $file,
+        ],
+      ],
+    ]);
+
+    $this->assertResponseIsSuccessful();
+
+    $response = $this->makeGetRequest($this->getIriFromResource($member));
+    $this->assertJsonHasKey('medicalCertificateExpiration', $response);
+    $this->assertJsonContains([
+      "medicalCertificateStatus" => "expired",
+    ]);
   }
 
   public function testImportItacMembers(): void {

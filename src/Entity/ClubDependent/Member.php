@@ -15,6 +15,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\ClubDependent\MemberChangeRole;
+use App\Controller\ClubDependent\MemberImportFromEden;
 use App\Controller\ClubDependent\MemberImportFromItac;
 use App\Controller\ClubDependent\MemberImportSecondaryClubFromItac;
 use App\Controller\ClubDependent\MemberLinkWithUser;
@@ -114,6 +115,33 @@ use Symfony\Component\Validator\Constraints as Assert;
       normalizationContext: ['groups' => 'autocomplete'],
       securityPostDenormalize: "is_granted('".ClubRole::supervisor->value."', request) || is_granted('".ClubRole::badger->value."', request)",
       read: false,
+    ),
+    new Post(
+      uriTemplate: '/clubs/{clubUuid}/members/-/from-eden',
+      uriVariables: [
+        'clubUuid' => new Link(toProperty: 'club', fromClass: Club::class),
+      ],
+      controller: MemberImportFromEden::class,
+      openapi: new Model\Operation(
+        requestBody: new Model\RequestBody(
+          content: new \ArrayObject([
+            'multipart/form-data' => [
+              'schema' => [
+                'type' => 'object',
+                'properties' => [
+                  'file' => [
+                    'type' => 'string',
+                    'format' => 'binary'
+                  ]
+                ]
+              ]
+            ]
+          ])
+        )
+      ),
+      securityPostDenormalize: "is_granted('".ClubRole::admin->value."', request)",
+      read: false,
+      deserialize: false,
     ),
     new Post(
       uriTemplate: '/clubs/{clubUuid}/members/-/from-itac',
@@ -252,9 +280,9 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
   #[ORM\OneToMany(mappedBy: 'member', targetEntity: MemberSeason::class, orphanRemoval: true)]
   private Collection $memberSeasons;
 
-  #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+  #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
   #[Groups(['self-read', 'member-read', 'club-supervisor-write', 'member-presence-read'])]
-  private ?\DateTimeInterface $medicalCertificateExpiration = null;
+  private ?\DateTimeImmutable $medicalCertificateExpiration = null;
 
   #[Groups(['self-read', 'member-read', 'member-presence-read'])]
   private string $medicalCertificateStatus = 'none';
@@ -642,11 +670,11 @@ class Member extends UuidEntity implements ClubLinkedEntityInterface {
     return $this;
   }
 
-  public function getMedicalCertificateExpiration(): ?\DateTimeInterface {
+  public function getMedicalCertificateExpiration(): ?\DateTimeImmutable {
     return $this->medicalCertificateExpiration;
   }
 
-  public function setMedicalCertificateExpiration(?\DateTimeInterface $medicalCertificateExpiration): Member {
+  public function setMedicalCertificateExpiration(?\DateTimeImmutable $medicalCertificateExpiration): Member {
     $this->medicalCertificateExpiration = $medicalCertificateExpiration;
     return $this;
   }

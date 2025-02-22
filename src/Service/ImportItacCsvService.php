@@ -3,12 +3,9 @@
 namespace App\Service;
 
 use App\Entity\Club;
-use App\Enum\GlobalSetting;
 use App\Message\ItacMembersMessage;
 use App\Message\ItacSecondaryClubMembersMessage;
 use League\Csv\Reader;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class ImportItacCsvService extends AbstractCsvService {

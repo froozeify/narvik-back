@@ -5,7 +5,9 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     env(EXPOSE_VERSION): "false" # default value
+    env(TURNSTILE_SECRET): "" # default value
     app.expose_version: '%env(bool:resolve:EXPOSE_VERSION)%'
+    app.turnstile_secret: '%env(resolve:TURNSTILE_SECRET)%'
 
     app.oauth_passphrase: '%env(OAUTH_PASSPHRASE)%'
     app.oauth_private_key: '%env(resolve:OAUTH_PRIVATE_KEY)%'

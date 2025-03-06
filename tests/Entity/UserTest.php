@@ -233,6 +233,7 @@ class UserTest extends AbstractEntityTestCase {
     $user = _InitStory::USER_member_club_1();
     $this->makePostRequest($this->getRootUrl() . "/-/initiate-reset-password", [
       "email" => $user->getEmail(),
+      "token" => "XXXX.DUMMY.TOKEN.XXXX" // We send the dummy token from clouflare
     ]);
     $this->assertResponseIsSuccessful();
   }
@@ -283,11 +284,28 @@ class UserTest extends AbstractEntityTestCase {
     ]);
     $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
     $this->assertJsonContains([
+      "detail" => "Missing required field: 'token'",
+    ]);
+    $this->makePostRequest($this->getRootUrl() . "/-/initiate-register", [
+      "email" => "admin@admin.com",
+      "token" => ""
+    ]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+    $this->assertJsonContains([
+      "detail" => "Invalid cf token.",
+    ]);
+    $this->makePostRequest($this->getRootUrl() . "/-/initiate-register", [
+      "email" => "admin@admin.com",
+      "token" => "XXXX.DUMMY.TOKEN.XXXX" // We send the dummy token from clouflare
+    ]);
+    $this->assertResponseStatusCodeSame(ResponseCodeEnum::bad_request->value);
+    $this->assertJsonContains([
       "detail" => "User already registered.",
     ]);
 
     $this->makePostRequest($this->getRootUrl() . "/-/initiate-register", [
       "email" => "newaccount@example.com",
+      "token" => "XXXX.DUMMY.TOKEN.XXXX" // We send the dummy token from clouflare
     ]);
     $this->assertResponseIsSuccessful();
   }

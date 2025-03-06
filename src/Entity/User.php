@@ -99,6 +99,7 @@ use Symfony\Component\Validator\Constraints as Assert;
               'type'       => 'object',
               'properties' => [
                 'email'     => ['type' => 'string'],
+                'token'     => ['type' => 'string'],
               ],
             ],
           ],
@@ -155,6 +156,7 @@ use Symfony\Component\Validator\Constraints as Assert;
                   'type'       => 'object',
                   'properties' => [
                     'email' => ['type' => 'string'],
+                    'token'     => ['type' => 'string'],
                   ],
                 ],
               ],
